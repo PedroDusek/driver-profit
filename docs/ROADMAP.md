@@ -8,7 +8,7 @@ Nunca implementar duas versões ao mesmo tempo.
 
 ## MVP
 
-### v0.1.0 — Foundation ✅ em andamento
+### v0.1.0 — Foundation ✅ concluída
 
 Fundação técnica. Nenhuma funcionalidade de produto.
 
@@ -28,14 +28,17 @@ Fundação técnica. Nenhuma funcionalidade de produto.
 **Critério de saída:** build passa, CI verde, app abre, banco inicial funciona.
 Dashboard **não** entra aqui.
 
-### v0.2.0 — Vehicle
+### v0.2.0 — Vehicle ✅ concluída
 
-- [ ] Cadastro de veículo
-- [ ] Edição e exclusão
-- [ ] Seleção de propulsão, combustível e capacidade de recarga
-- [ ] Odômetro inicial
-- [ ] Validações
-- [ ] Testes: repository, use cases, ViewModel
+- [x] Cadastro de veículo
+- [x] Edição e exclusão
+- [x] Seleção de propulsão, combustível e capacidade de recarga
+- [x] Odômetro inicial
+- [x] Validações
+- [x] Testes: repository, use cases, ViewModel
+
+**Critério de saída:** o motorista consegue cadastrar, editar e excluir seu
+veículo, e o formulário se adapta à propulsão escolhida.
 
 ### v0.3.0 — Earnings
 

@@ -162,6 +162,35 @@ custo de processamento de anotações no build nem curva de aprendizado. Se o
 grafo crescer a ponto de o arquivo ficar difícil de ler, reavaliar — e
 atualizar esta seção.
 
+### Validação devolve o motivo, não a mensagem
+
+`VehicleValidator` retorna `VehicleFieldError(field, error)`, onde `error` é um
+enum como `REQUIRED` ou `YEAR_OUT_OF_RANGE`. Quem traduz para texto é
+`core/ui/format/VehicleLabels`, na camada de apresentação.
+
+Se o domínio devolvesse a frase pronta, ele precisaria de `Context` para ler
+string resources — e deixaria de rodar em teste JUnit puro. Como bônus, mudar
+o texto de um erro não toca em regra de negócio.
+
+A validação também devolve **todos** os erros de uma vez, não o primeiro.
+Corrigir um campo por vez, com um erro novo aparecendo a cada tentativa, é a
+forma mais eficiente de irritar quem preenche formulário.
+
+### Coerência entre propulsão e campos dependentes
+
+`VehicleDraft.withPowertrain` zera combustível e capacidade de recarga quando
+eles deixam de fazer sentido. A regra fica no domínio, e não na tela: um
+elétrico com combustível cadastrado geraria um formulário de abastecimento
+impossível na v0.4.0, independente de por qual caminho o dado entrou.
+
+O validador cobre as duas direções — o que falta e o que sobra.
+
+### ViewModel factory centralizada
+
+`core/ui/ViewModelFactory.kt`. Com DI manual, cada ViewModel precisa de uma
+fábrica que monte suas dependências; concentrá-las num arquivo evita espalhar
+`viewModelFactory { }` dentro dos Composables.
+
 ### Dispatcher injetado
 
 Repositories recebem `CoroutineDispatcher` como parâmetro com default

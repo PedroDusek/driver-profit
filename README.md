@@ -140,18 +140,19 @@ Detalhes em [`docs/ARCHITECTURE.md`](docs/ARCHITECTURE.md).
 
 ## Status atual
 
-**v0.1.0 — Foundation** (em desenvolvimento)
+**v0.2.0 — Vehicle** (em desenvolvimento)
 
 | Item | Status |
 | --- | --- |
-| Projeto Gradle + Compose + Material 3 | ✅ |
-| Navegação Single Activity | ✅ |
-| Room + schema exportado | ✅ |
-| Repository + DI manual | ✅ |
-| Tipos base (`Money`, `WorkDuration`) + testes | ✅ |
-| CI no GitHub Actions | ✅ |
-| Documentação inicial | ✅ |
-| Cadastro de veículo | ⏳ v0.2.0 |
+| Projeto Gradle + Compose + Material 3 | ✅ v0.1.0 |
+| Navegação Single Activity | ✅ v0.1.0 |
+| Room + schema exportado | ✅ v0.1.0 |
+| Repository + DI manual | ✅ v0.1.0 |
+| Tipos base (`Money`, `WorkDuration`) + testes | ✅ v0.1.0 |
+| CI no GitHub Actions | ✅ v0.1.0 |
+| Documentação inicial | ✅ v0.1.0 |
+| Cadastro, edição e exclusão de veículo | ✅ v0.2.0 |
+| Formulário dinâmico por propulsão | ✅ v0.2.0 |
 | Registro de ganhos | ⏳ v0.3.0 |
 | Registro de despesas | ⏳ v0.4.0 |
 | Dashboard com indicadores | ⏳ v0.5.0 |
