@@ -80,20 +80,29 @@ Deve ser cadastrado antes que o usuário registre despesas relacionadas a ele.
 
 Campos: marca, modelo, ano, quilometragem inicial, tipo de propulsão.
 
-## 6–13. Propulsão, combustível e recarga
+## 6–13. Combustível
 
 O sistema usa enums, nunca strings espalhadas pelo código.
 
-**Decisão estrutural (§13):** separar três eixos independentes, para permitir
-combinações como `HYBRID + FLEX`, `HYBRID + GASOLINE`, `HYBRID + PLUG_IN` sem
-lógica rígida:
-
-```
-Vehicle
-├── powertrain          COMBUSTION | HYBRID | ELECTRIC
-├── combustionFuel      GASOLINE | ETHANOL | FLEX | CNG | FLEX_CNG | null
-└── chargingCapability  NONE | PLUG_IN | UNKNOWN | null
-```
+> **Revisão de produto (v0.2.1).** A especificação original pedia três eixos
+> independentes — `powertrain` + `combustionFuel` + `chargingCapability`
+> (§13). Isso foi substituído por um campo único:
+>
+> ```
+> Vehicle
+> ├── name    "Onix branco"
+> └── fuel    GASOLINE | ETHANOL | FLEX | CNG | FLEX_CNG | ELECTRIC | HYBRID
+> ```
+>
+> Motivo: o cadastro precisa do mínimo para calcular custo de abastecimento, e
+> a complexidade dos três eixos não se pagava num formulário preenchido uma
+> vez. `ELECTRIC` e `HYBRID` continuam na lista, então tudo o que as seções
+> §11 e §12 exigem segue atendido. O que se perdeu foi a distinção explícita
+> entre híbrido plug-in e convencional — se voltar a ser necessária, entra por
+> migração. Ver `docs/DATABASE.md`.
+>
+> Marca, modelo, ano e odômetro inicial também saíram do cadastro: nenhum
+> deles entra em conta de rentabilidade.
 
 ### Formulário de abastecimento (§7)
 
@@ -141,21 +150,32 @@ A interface se adapta automaticamente.
 
 ## 14. Modelo de dados do veículo
 
+Especificação original:
+
 ```
 Vehicle
- ├── id
- ├── brand
- ├── model
- ├── year
- ├── initialOdometer
- ├── powertrain
- ├── combustionFuel      (null quando não aplicável)
- ├── chargingCapability  (null quando não aplicável)
+ ├── id · userId · brand · model · year · initialOdometer
+ ├── powertrain · combustionFuel · chargingCapability
  └── createdAt
 ```
 
-> Desvio registrado: o campo `userId` da especificação original não foi criado.
-> O MVP não tem login (§48). Ver `DATABASE.md`.
+Implementado a partir da v0.2.1:
+
+```
+Vehicle
+ ├── id
+ ├── name
+ ├── fuel
+ └── createdAt
+```
+
+> Desvios registrados, ambos detalhados em `DATABASE.md`:
+> - `userId` não foi criado — o MVP não tem login (§48)
+> - marca, modelo, ano, odômetro inicial e os três eixos de propulsão foram
+>   removidos na v0.2.1, por decisão de produto
+>
+> A quilometragem volta na v0.6.0 como registro por lançamento, servindo a
+> controles de manutenção — não como atributo do veículo.
 
 ## 15–16. Registro de ganhos
 

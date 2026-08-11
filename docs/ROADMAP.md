@@ -32,13 +32,17 @@ Dashboard **não** entra aqui.
 
 - [x] Cadastro de veículo
 - [x] Edição e exclusão
-- [x] Seleção de propulsão, combustível e capacidade de recarga
-- [x] Odômetro inicial
+- [x] Seleção de tipo de combustível
 - [x] Validações
 - [x] Testes: repository, use cases, ViewModel
+- [x] Simplificação para nome + combustível (v0.2.1)
 
 **Critério de saída:** o motorista consegue cadastrar, editar e excluir seu
-veículo, e o formulário se adapta à propulsão escolhida.
+veículo em dois campos.
+
+Marca, modelo, ano e odômetro inicial foram removidos na v0.2.1 — nenhum deles
+entra em conta de rentabilidade. Quilometragem volta na v0.6.0 como registro
+por lançamento.
 
 ### v0.3.0 — Earnings
 
@@ -74,7 +78,9 @@ comparação entre plataformas depois (PRD §16) sem migração.
 - [ ] Gráficos
 - [ ] Despesas por categoria
 - [ ] Evolução de faturamento, R$/hora e R$/km
+- [ ] Odômetro por lançamento
 - [ ] Consumo estimado (km/L, km/kWh)
+- [ ] Alertas de manutenção por quilometragem (óleo, pneus)
 
 Consumo é sempre rotulado como **estimado**: o cálculo por odômetro só é exato
 se o tanque for abastecido em condições comparáveis (PRD §23).

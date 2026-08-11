@@ -152,7 +152,8 @@ Detalhes em [`docs/ARCHITECTURE.md`](docs/ARCHITECTURE.md).
 | CI no GitHub Actions | ✅ v0.1.0 |
 | Documentação inicial | ✅ v0.1.0 |
 | Cadastro, edição e exclusão de veículo | ✅ v0.2.0 |
-| Formulário dinâmico por propulsão | ✅ v0.2.0 |
+| Cadastro simplificado (nome + combustível) | ✅ v0.2.1 |
+| Migração de schema 1→2 | ✅ v0.2.1 |
 | Registro de ganhos | ⏳ v0.3.0 |
 | Registro de despesas | ⏳ v0.4.0 |
 | Dashboard com indicadores | ⏳ v0.5.0 |

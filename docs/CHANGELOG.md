@@ -5,6 +5,50 @@ Versionamento conforme [Semantic Versioning](https://semver.org/lang/pt-BR/).
 
 ## [Não publicado]
 
+## [0.2.1] — Cadastro de veículo simplificado
+
+Reduz o cadastro a **nome + tipo de combustível**. Decisão de produto: nenhum
+dos campos removidos entrava em conta de rentabilidade, e cada campo a mais é
+uma barreira entre o motorista e o primeiro lançamento.
+
+> ⚠️ **Desvio de versionamento assumido.** Pelo PRD §41, alteração de schema e
+> remoção de funcionalidade não caberiam em um PATCH. Numerado como 0.2.1 por
+> decisão explícita, para manter o roadmap intacto (Earnings segue como
+> v0.3.0). Registrado aqui para que o histórico não engane quem vier depois.
+
+### Alterado
+
+- `Vehicle` agora tem apenas `name`, `fuel` e `createdAt`
+- `VehicleFuel` — lista plana com gasolina, etanol, flex, GNV, flex+GNV,
+  elétrico e híbrido, substituindo os três eixos `VehiclePowertrain` +
+  `CombustionFuel` + `ChargingCapability`
+- `FuelType` ganha `ELECTRICITY`, medido em kWh
+- Formulário passa a ter dois campos; some a lógica de campos condicionais
+- Banco vai para a **versão 2**, com migração 1→2 que preserva os veículos
+  existentes (`name` recebe "marca modelo", `fuel` deriva da propulsão antiga)
+
+### Removido
+
+- `brand`, `model`, `year` e `initialOdometerKm` do veículo
+- `VehiclePowertrain`, `CombustionFuel` e `ChargingCapability`
+- `VehicleDraft.withPowertrain` e as validações de coerência entre eixos
+- Validações de ano e de odômetro
+
+Quilometragem volta depois como registro por lançamento, servindo a controles
+de manutenção (troca de óleo, pneus) — não como atributo do veículo.
+
+### Adicionado
+
+- `Migrations.kt` com a migração 1→2 registrada no builder do Room
+- `MigrationTest` — três casos cobrindo dados preservados, derivação de
+  combustível a partir da propulsão antiga e banco vazio
+- Schemas exportados de ambas as versões versionados no Git
+
+### Não verificado
+
+`MigrationTest` exige emulador ou aparelho e **não foi executado**. O gate de
+CI cobre apenas testes de unidade.
+
 ## [0.2.0] — Vehicle
 
 Cadastro de veículo completo: o primeiro fluxo de produto do aplicativo.
