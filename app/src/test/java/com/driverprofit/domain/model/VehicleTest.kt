@@ -7,90 +7,77 @@ import org.junit.Test
 import java.time.Instant
 
 /**
- * Garante que a separação powertrain / combustível / recarga (PRD §13)
- * produz o formulário certo para cada configuração de veículo.
+ * Garante que cada tipo de combustível produz as opções corretas de
+ * abastecimento — é isso que monta o formulário de lançamento e determina a
+ * unidade usada no cálculo de custo.
  */
 class VehicleTest {
 
-    private fun vehicle(
-        powertrain: VehiclePowertrain,
-        combustionFuel: CombustionFuel?,
-        chargingCapability: ChargingCapability?,
-    ) = Vehicle(
-        brand = "Marca",
-        model = "Modelo",
-        year = 2020,
-        initialOdometerKm = 50_000,
-        powertrain = powertrain,
-        combustionFuel = combustionFuel,
-        chargingCapability = chargingCapability,
+    private fun vehicle(fuel: VehicleFuel) = Vehicle(
+        name = "Onix branco",
+        fuel = fuel,
         createdAt = Instant.EPOCH,
     )
 
     @Test
-    fun `veiculo flex oferece gasolina e etanol no abastecimento`() {
-        val carro = vehicle(VehiclePowertrain.COMBUSTION, CombustionFuel.FLEX, null)
+    fun `flex oferece gasolina e etanol`() {
+        val carro = vehicle(VehicleFuel.FLEX)
 
         assertEquals(listOf(FuelType.GASOLINE, FuelType.ETHANOL), carro.refuelOptions)
         assertFalse(carro.supportsChargingRecords)
     }
 
     @Test
-    fun `veiculo a gasolina oferece apenas gasolina`() {
-        val carro = vehicle(VehiclePowertrain.COMBUSTION, CombustionFuel.GASOLINE, null)
-
-        assertEquals(listOf(FuelType.GASOLINE), carro.refuelOptions)
+    fun `gasolina oferece apenas gasolina`() {
+        assertEquals(listOf(FuelType.GASOLINE), vehicle(VehicleFuel.GASOLINE).refuelOptions)
     }
 
     @Test
     fun `gnv e medido em metros cubicos e nunca em litros`() {
-        val carro = vehicle(VehiclePowertrain.COMBUSTION, CombustionFuel.CNG, null)
-
-        assertEquals(listOf(FuelType.CNG), carro.refuelOptions)
+        assertEquals(listOf(FuelType.CNG), vehicle(VehicleFuel.CNG).refuelOptions)
         assertEquals(MeasurementUnit.CUBIC_METER, FuelType.CNG.unit)
         assertEquals(MeasurementUnit.LITER, FuelType.GASOLINE.unit)
     }
 
     @Test
-    fun `eletrico puro nao tem combustivel e aceita carregamento`() {
-        val carro = vehicle(VehiclePowertrain.ELECTRIC, null, ChargingCapability.PLUG_IN)
+    fun `flex com gnv oferece os tres insumos`() {
+        assertEquals(
+            listOf(FuelType.GASOLINE, FuelType.ETHANOL, FuelType.CNG),
+            vehicle(VehicleFuel.FLEX_CNG).refuelOptions,
+        )
+    }
 
-        assertTrue(carro.refuelOptions.isEmpty())
+    @Test
+    fun `eletrico e medido em kWh e aceita carregamento`() {
+        val carro = vehicle(VehicleFuel.ELECTRIC)
+
+        assertEquals(listOf(FuelType.ELECTRICITY), carro.refuelOptions)
+        assertEquals(MeasurementUnit.KILOWATT_HOUR, FuelType.ELECTRICITY.unit)
         assertTrue(carro.supportsChargingRecords)
     }
 
     @Test
-    fun `hibrido convencional abastece mas nao carrega`() {
-        val carro = vehicle(
-            VehiclePowertrain.HYBRID,
-            CombustionFuel.GASOLINE,
-            ChargingCapability.NONE,
+    fun `hibrido abastece e carrega`() {
+        val carro = vehicle(VehicleFuel.HYBRID)
+
+        assertEquals(
+            listOf(FuelType.GASOLINE, FuelType.ETHANOL, FuelType.ELECTRICITY),
+            carro.refuelOptions,
         )
-
-        assertEquals(listOf(FuelType.GASOLINE), carro.refuelOptions)
-        assertFalse(carro.supportsChargingRecords)
-    }
-
-    @Test
-    fun `hibrido plug-in flex abastece e carrega`() {
-        val carro = vehicle(
-            VehiclePowertrain.HYBRID,
-            CombustionFuel.FLEX,
-            ChargingCapability.PLUG_IN,
-        )
-
-        assertEquals(listOf(FuelType.GASOLINE, FuelType.ETHANOL), carro.refuelOptions)
         assertTrue(carro.supportsChargingRecords)
     }
 
     @Test
-    fun `capacidade de recarga desconhecida nao habilita o formulario`() {
-        val carro = vehicle(
-            VehiclePowertrain.HYBRID,
-            CombustionFuel.GASOLINE,
-            ChargingCapability.UNKNOWN,
-        )
+    fun `apenas eletrico e hibrido aceitam carregamento`() {
+        val comCarga = VehicleFuel.entries.filter { it.supportsCharging }.toSet()
 
-        assertFalse(carro.supportsChargingRecords)
+        assertEquals(setOf(VehicleFuel.ELECTRIC, VehicleFuel.HYBRID), comCarga)
+    }
+
+    @Test
+    fun `todo combustivel oferece ao menos uma opcao de abastecimento`() {
+        VehicleFuel.entries.forEach { fuel ->
+            assertTrue("sem opcoes: $fuel", fuel.refuelOptions.isNotEmpty())
+        }
     }
 }

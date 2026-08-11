@@ -6,9 +6,7 @@ import androidx.test.ext.junit.runners.AndroidJUnit4
 import com.driverprofit.data.local.dao.VehicleDao
 import com.driverprofit.data.local.database.DriverProfitDatabase
 import com.driverprofit.data.local.entity.VehicleEntity
-import com.driverprofit.domain.model.ChargingCapability
-import com.driverprofit.domain.model.CombustionFuel
-import com.driverprofit.domain.model.VehiclePowertrain
+import com.driverprofit.domain.model.VehicleFuel
 import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.test.runTest
 import org.junit.After
@@ -33,24 +31,14 @@ class VehicleDaoTest {
     private lateinit var dao: VehicleDao
 
     private val flexCar = VehicleEntity(
-        brand = "Chevrolet",
-        model = "Onix",
-        year = 2020,
-        initialOdometerKm = 50_000,
-        powertrain = VehiclePowertrain.COMBUSTION,
-        combustionFuel = CombustionFuel.FLEX,
-        chargingCapability = null,
+        name = "Onix branco",
+        fuel = VehicleFuel.FLEX,
         createdAt = Instant.ofEpochMilli(1_000_000),
     )
 
     private val electricCar = VehicleEntity(
-        brand = "BYD",
-        model = "Dolphin",
-        year = 2024,
-        initialOdometerKm = 1_200,
-        powertrain = VehiclePowertrain.ELECTRIC,
-        combustionFuel = null,
-        chargingCapability = ChargingCapability.PLUG_IN,
+        name = "Dolphin",
+        fuel = VehicleFuel.ELECTRIC,
         createdAt = Instant.ofEpochMilli(2_000_000),
     )
 
@@ -82,32 +70,26 @@ class VehicleDaoTest {
 
         val salvo = dao.findById(id)!!
 
-        assertEquals("Chevrolet", salvo.brand)
-        assertEquals("Onix", salvo.model)
-        assertEquals(2020, salvo.year)
-        assertEquals(50_000L, salvo.initialOdometerKm)
-        assertEquals(VehiclePowertrain.COMBUSTION, salvo.powertrain)
-        assertEquals(CombustionFuel.FLEX, salvo.combustionFuel)
+        assertEquals("Onix branco", salvo.name)
+        assertEquals(VehicleFuel.FLEX, salvo.fuel)
         assertEquals(Instant.ofEpochMilli(1_000_000), salvo.createdAt)
     }
 
     @Test
-    fun aceitaCombustivelNuloParaEletrico() = runTest {
-        val id = dao.insert(electricCar)
-
-        val salvo = dao.findById(id)!!
-
-        assertNull(salvo.combustionFuel)
-        assertEquals(ChargingCapability.PLUG_IN, salvo.chargingCapability)
+    fun persisteTodosOsTiposDeCombustivel() = runTest {
+        VehicleFuel.entries.forEach { fuel ->
+            val id = dao.insert(flexCar.copy(name = fuel.name, fuel = fuel))
+            assertEquals(fuel, dao.findById(id)!!.fuel)
+        }
     }
 
     @Test
     fun atualizaVeiculoExistente() = runTest {
         val id = dao.insert(flexCar)
 
-        dao.update(flexCar.copy(id = id, initialOdometerKm = 61_500))
+        dao.update(flexCar.copy(id = id, fuel = VehicleFuel.CNG))
 
-        assertEquals(61_500L, dao.findById(id)!!.initialOdometerKm)
+        assertEquals(VehicleFuel.CNG, dao.findById(id)!!.fuel)
         assertEquals(1, dao.count())
     }
 
@@ -128,7 +110,7 @@ class VehicleDaoTest {
 
         val vehicles = dao.observeAll().first()
 
-        assertEquals(listOf("BYD", "Chevrolet"), vehicles.map { it.brand })
+        assertEquals(listOf("Dolphin", "Onix branco"), vehicles.map { it.name })
     }
 
     @Test

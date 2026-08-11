@@ -1,8 +1,7 @@
 ﻿package com.driverprofit.feature.vehicle
 
-import com.driverprofit.domain.model.CombustionFuel
 import com.driverprofit.domain.model.Vehicle
-import com.driverprofit.domain.model.VehiclePowertrain
+import com.driverprofit.domain.model.VehicleFuel
 import com.driverprofit.domain.usecase.DeleteVehicleUseCase
 import com.driverprofit.domain.usecase.ObserveVehiclesUseCase
 import com.driverprofit.feature.vehicle.list.VehicleListUiState
@@ -28,15 +27,10 @@ class VehicleListViewModelTest {
     @get:Rule
     val mainDispatcherRule = MainDispatcherRule()
 
-    private fun vehicle(id: Long, model: String, createdAt: Instant) = Vehicle(
+    private fun vehicle(id: Long, name: String, createdAt: Instant) = Vehicle(
         id = id,
-        brand = "Chevrolet",
-        model = model,
-        year = 2020,
-        initialOdometerKm = 50_000,
-        powertrain = VehiclePowertrain.COMBUSTION,
-        combustionFuel = CombustionFuel.FLEX,
-        chargingCapability = null,
+        name = name,
+        fuel = VehicleFuel.FLEX,
         createdAt = createdAt,
     )
 
@@ -75,7 +69,7 @@ class VehicleListViewModelTest {
 
         val state = viewModel.uiState.value
         assertTrue(state is VehicleListUiState.Content)
-        assertEquals(listOf("Onix"), (state as VehicleListUiState.Content).vehicles.map { it.model })
+        assertEquals(listOf("Onix"), (state as VehicleListUiState.Content).vehicles.map { it.name })
         collectJob.cancel()
     }
 
@@ -93,7 +87,7 @@ class VehicleListViewModelTest {
         advanceUntilIdle()
 
         val state = viewModel.uiState.value as VehicleListUiState.Content
-        assertEquals(listOf("Recente", "Antigo"), state.vehicles.map { it.model })
+        assertEquals(listOf("Recente", "Antigo"), state.vehicles.map { it.name })
         collectJob.cancel()
     }
 
