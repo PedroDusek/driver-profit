@@ -1,0 +1,53 @@
+### Android / Gradle ###
+*.apk
+*.aab
+*.ap_
+*.dex
+*.class
+bin/
+gen/
+out/
+release/
+build/
+.gradle/
+local.properties
+.cxx/
+captures/
+.externalNativeBuild/
+
+### Android Studio / IntelliJ ###
+.idea/
+*.iml
+*.iws
+*.ipr
+.navigation/
+
+### Keystores e segredos — NUNCA versionar (PRD §56) ###
+*.jks
+*.keystore
+keystore.properties
+signing.properties
+secrets.properties
+*.p12
+*.pem
+google-services.json
+
+### Logs e relatórios ###
+*.log
+*.hprof
+lint-results*.html
+lint-results*.xml
+reports/
+
+### Sistema operacional ###
+Thumbs.db
+ehthumbs.db
+Desktop.ini
+$RECYCLE.BIN/
+.DS_Store
+
+### Ferramentas locais ###
+.kotlin/
+
+### Claude Code — configuração local da máquina (a de projeto é versionada) ###
+.claude/settings.local.json

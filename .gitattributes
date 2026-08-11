@@ -1,0 +1,37 @@
+# Normaliza finais de linha no repositório: LF no Git, nativo no working tree.
+* text=auto
+
+# Scripts que DEVEM permanecer com LF para funcionar em Linux/macOS e no CI.
+gradlew text eol=lf
+*.sh text eol=lf
+
+# Scripts que devem permanecer com CRLF no Windows.
+gradlew.bat text eol=crlf
+*.cmd text eol=crlf
+*.bat text eol=crlf
+
+# Fontes e configuração: texto.
+*.kt text
+*.kts text
+*.java text
+*.xml text
+*.md text
+*.yml text
+*.yaml text
+*.json text
+*.pro text
+*.properties text
+
+# Binários: nunca aplicar conversão de fim de linha.
+*.jar binary
+*.png binary
+*.jpg binary
+*.jpeg binary
+*.webp binary
+*.gif binary
+*.ttf binary
+*.otf binary
+*.keystore binary
+*.jks binary
+*.zip binary
+*.aar binary
