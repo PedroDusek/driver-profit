@@ -5,6 +5,11 @@ import androidx.room.Room
 import com.driverprofit.data.local.database.DriverProfitDatabase
 import com.driverprofit.data.repository.OfflineVehicleRepository
 import com.driverprofit.domain.repository.VehicleRepository
+import com.driverprofit.domain.usecase.DeleteVehicleUseCase
+import com.driverprofit.domain.usecase.GetVehicleUseCase
+import com.driverprofit.domain.usecase.ObserveVehiclesUseCase
+import com.driverprofit.domain.usecase.SaveVehicleUseCase
+import com.driverprofit.domain.usecase.VehicleValidator
 
 /**
  * Injeção de dependências manual.
@@ -17,6 +22,11 @@ import com.driverprofit.domain.repository.VehicleRepository
  */
 interface AppContainer {
     val vehicleRepository: VehicleRepository
+
+    val saveVehicle: SaveVehicleUseCase
+    val observeVehicles: ObserveVehiclesUseCase
+    val getVehicle: GetVehicleUseCase
+    val deleteVehicle: DeleteVehicleUseCase
 }
 
 class DefaultAppContainer(private val context: Context) : AppContainer {
@@ -32,5 +42,23 @@ class DefaultAppContainer(private val context: Context) : AppContainer {
 
     override val vehicleRepository: VehicleRepository by lazy {
         OfflineVehicleRepository(database.vehicleDao())
+    }
+
+    private val vehicleValidator = VehicleValidator()
+
+    override val saveVehicle: SaveVehicleUseCase by lazy {
+        SaveVehicleUseCase(vehicleRepository, vehicleValidator)
+    }
+
+    override val observeVehicles: ObserveVehiclesUseCase by lazy {
+        ObserveVehiclesUseCase(vehicleRepository)
+    }
+
+    override val getVehicle: GetVehicleUseCase by lazy {
+        GetVehicleUseCase(vehicleRepository)
+    }
+
+    override val deleteVehicle: DeleteVehicleUseCase by lazy {
+        DeleteVehicleUseCase(vehicleRepository)
     }
 }
