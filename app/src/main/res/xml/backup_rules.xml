@@ -1,0 +1,11 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!--
+    Backup automático (Android 11 e anteriores).
+    Todo o dado do motorista vive no banco local, então ele entra no backup.
+    Não há credenciais ou tokens a excluir — o MVP não tem login (PRD §48).
+-->
+<full-backup-content>
+    <include
+        domain="database"
+        path="driver_profit.db" />
+</full-backup-content>

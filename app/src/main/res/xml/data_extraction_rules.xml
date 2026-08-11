@@ -1,0 +1,20 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!--
+    Regras de extração de dados (Android 12+).
+    - cloud-backup: backup na conta Google do usuário.
+    - device-transfer: migração para um aparelho novo.
+    Nos dois casos o banco local é incluído: perder o histórico ao trocar de
+    celular seria a pior falha possível para um app de controle financeiro.
+-->
+<data-extraction-rules>
+    <cloud-backup>
+        <include
+            domain="database"
+            path="driver_profit.db" />
+    </cloud-backup>
+    <device-transfer>
+        <include
+            domain="database"
+            path="driver_profit.db" />
+    </device-transfer>
+</data-extraction-rules>
