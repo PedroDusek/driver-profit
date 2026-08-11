@@ -115,26 +115,38 @@ impede, em tempo de compilação, o erro clássico de tratar GNV em litros
 | Tempo | minuto | `WorkDuration` |
 | Dinheiro | centavo | `Money` |
 
-### Propulsão separada de combustível e de recarga
+### Cadastro de veículo mínimo
 
-Três enums independentes em vez de um só (PRD §13):
+O veículo guarda **nome e combustível**, nada mais:
 
 ```
 Vehicle
-├── powertrain          COMBUSTION | HYBRID | ELECTRIC
-├── combustionFuel      GASOLINE | ETHANOL | FLEX | CNG | FLEX_CNG | null
-└── chargingCapability  NONE | PLUG_IN | UNKNOWN | null
+├── name    "Onix branco"
+└── fuel    GASOLINE | ETHANOL | FLEX | CNG | FLEX_CNG | ELECTRIC | HYBRID
 ```
 
-Um enum único (`FLEX`, `HYBRID`, `ELECTRIC`…) não representa "híbrido flex
-plug-in" sem explodir em combinações. Com três eixos, `HYBRID + FLEX + PLUG_IN`
-já é representável hoje, sem migração de schema amanhã.
+Marca, modelo e ano ficaram de fora porque nenhum deles entra em qualquer
+conta de rentabilidade — e cada campo a mais é uma barreira entre o motorista
+e o primeiro lançamento. Quilometragem também não é atributo do veículo: ela
+será registrada por lançamento, servindo a controles de manutenção.
 
-`null` significa "não se aplica": elétrico puro não tem combustível; carro a
-combustão não tem capacidade de recarga.
+O que o cálculo realmente precisa do veículo é a **unidade de medida do
+abastecimento**, e é isso que `fuel` determina.
 
-O formulário de abastecimento se monta a partir de `vehicle.refuelOptions` —
-a UI nunca oferece um combustível incompatível com o veículo.
+`FLEX` e `HYBRID` não são insumos, são capacidades. O insumo efetivo é
+escolhido no lançamento, a partir de `vehicle.refuelOptions`, e cada
+lançamento guarda qual foi usado — o que mantém histórico separado por insumo
+(PRD §9) e viabiliza comparar custo/km entre gasolina e etanol depois.
+
+A unidade viaja no tipo (`FuelType.CNG.unit == CUBIC_METER`), o que impede em
+tempo de compilação tratar GNV em litros ou energia em litros.
+
+> **Desvio registrado.** O PRD §13 pedia três eixos independentes
+> (`powertrain` + `combustionFuel` + `chargingCapability`) para permitir
+> combinações futuras. A v0.2.1 substituiu isso por uma lista plana, por
+> decisão de produto: a complexidade dos três eixos não se pagava num
+> cadastro que o motorista preenche uma vez. `ELECTRIC` e `HYBRID` continuam
+> na lista, então os casos do PRD §11 e §12 seguem atendidos.
 
 ### Datas
 
@@ -175,15 +187,6 @@ o texto de um erro não toca em regra de negócio.
 A validação também devolve **todos** os erros de uma vez, não o primeiro.
 Corrigir um campo por vez, com um erro novo aparecendo a cada tentativa, é a
 forma mais eficiente de irritar quem preenche formulário.
-
-### Coerência entre propulsão e campos dependentes
-
-`VehicleDraft.withPowertrain` zera combustível e capacidade de recarga quando
-eles deixam de fazer sentido. A regra fica no domínio, e não na tela: um
-elétrico com combustível cadastrado geraria um formulário de abastecimento
-impossível na v0.4.0, independente de por qual caminho o dado entrou.
-
-O validador cobre as duas direções — o que falta e o que sobra.
 
 ### ViewModel factory centralizada
 
