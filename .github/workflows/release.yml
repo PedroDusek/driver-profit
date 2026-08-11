@@ -1,0 +1,58 @@
+name: Release
+
+# Dispara ao publicar uma tag de versão (PRD §42/§43).
+# A tag deve apontar para um commit da main já validado pelo CI.
+on:
+  push:
+    tags:
+      - 'v*.*.*'
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+jobs:
+  release:
+    name: Publicar release
+    runs-on: ubuntu-latest
+    timeout-minutes: 30
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v7
+        with:
+          fetch-depth: 0
+
+      - name: Setup JDK 21
+        uses: actions/setup-java@v5
+        with:
+          distribution: temurin
+          java-version: '21'
+
+      - name: Validar Gradle wrapper
+        uses: gradle/actions/wrapper-validation@v6
+
+      - name: Setup Gradle
+        uses: gradle/actions/setup-gradle@v6
+
+      # A tag só vira release se o código realmente passar no gate.
+      - name: Testes unitários
+        run: ./gradlew testDebugUnitTest --no-daemon
+
+      - name: Lint
+        run: ./gradlew lintDebug --no-daemon
+
+      # Build de debug: a assinatura de release depende de um keystore, que
+      # não é versionado (PRD §56). Quando houver publicação na Play Store,
+      # adicionar o keystore como secret e trocar para bundleRelease.
+      - name: Assemble Debug
+        run: ./gradlew assembleDebug --no-daemon
+
+      - name: Criar GitHub Release
+        uses: softprops/action-gh-release@v3
+        with:
+          name: ${{ github.ref_name }}
+          generate_release_notes: true
+          body_path: docs/CHANGELOG.md
+          files: app/build/outputs/apk/debug/*.apk
+          fail_on_unmatched_files: false

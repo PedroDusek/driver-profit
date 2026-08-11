@@ -1,0 +1,72 @@
+name: CI
+
+# Gate obrigatório de qualidade (PRD §36).
+# Se qualquer etapa falhar, o Pull Request não deve ser aprovado.
+on:
+  pull_request:
+    branches: [main]
+  push:
+    branches: [main]
+  workflow_dispatch:
+
+# Um PR atualizado cancela a execução anterior — economiza minutos de runner.
+concurrency:
+  group: ci-${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
+
+permissions:
+  contents: read
+
+jobs:
+  build:
+    name: Build, testes e lint
+    runs-on: ubuntu-latest
+    timeout-minutes: 30
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v7
+
+      - name: Setup JDK 21
+        uses: actions/setup-java@v5
+        with:
+          distribution: temurin
+          java-version: '21'
+
+      # Confere que o gradle-wrapper.jar versionado é o oficial e não foi
+      # adulterado — proteção contra supply chain no wrapper.
+      - name: Validar Gradle wrapper
+        uses: gradle/actions/wrapper-validation@v6
+
+      - name: Setup Gradle
+        uses: gradle/actions/setup-gradle@v6
+        with:
+          cache-read-only: ${{ github.ref != 'refs/heads/main' }}
+
+      - name: Testes unitários
+        run: ./gradlew testDebugUnitTest --no-daemon --stacktrace
+
+      - name: Lint
+        run: ./gradlew lintDebug --no-daemon --stacktrace
+
+      - name: Assemble Debug
+        run: ./gradlew assembleDebug --no-daemon --stacktrace
+
+      - name: Publicar relatórios de teste
+        if: always()
+        uses: actions/upload-artifact@v7
+        with:
+          name: test-reports
+          path: |
+            app/build/reports/tests/
+            app/build/reports/lint-results-*.html
+          retention-days: 7
+          if-no-files-found: ignore
+
+      - name: Publicar APK de debug
+        uses: actions/upload-artifact@v7
+        with:
+          name: app-debug-apk
+          path: app/build/outputs/apk/debug/*.apk
+          retention-days: 7
+          if-no-files-found: warn
