@@ -3,6 +3,7 @@ package com.driverprofit.core.di
 import android.content.Context
 import androidx.room.Room
 import com.driverprofit.data.local.database.DriverProfitDatabase
+import com.driverprofit.data.local.database.Migrations
 import com.driverprofit.data.repository.OfflineVehicleRepository
 import com.driverprofit.domain.repository.VehicleRepository
 import com.driverprofit.domain.usecase.DeleteVehicleUseCase
@@ -36,8 +37,10 @@ class DefaultAppContainer(private val context: Context) : AppContainer {
             context.applicationContext,
             DriverProfitDatabase::class.java,
             DriverProfitDatabase.NAME,
-        ).build()
-        // Sem fallbackToDestructiveMigration: ver DriverProfitDatabase.
+        )
+            .addMigrations(*Migrations.ALL)
+            // Sem fallbackToDestructiveMigration: ver DriverProfitDatabase.
+            .build()
     }
 
     override val vehicleRepository: VehicleRepository by lazy {

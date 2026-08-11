@@ -19,8 +19,8 @@ android {
         targetSdk = libs.versions.targetSdk.get().toInt()
 
         // versionName segue o Semantic Versioning do projeto (PRD §40).
-        versionCode = 2
-        versionName = "0.2.0"
+        versionCode = 3
+        versionName = "0.2.1"
 
         testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
         vectorDrawables { useSupportLibrary = true }
@@ -61,6 +61,12 @@ android {
         unitTests {
             isIncludeAndroidResources = true
         }
+    }
+
+    // Expõe os schemas exportados como assets do androidTest para que o
+    // MigrationTestHelper consiga abrir o banco na versão antiga (PRD §45).
+    sourceSets.getByName("androidTest") {
+        assets.directories.add("$projectDir/schemas")
     }
 
     lint {

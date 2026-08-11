@@ -14,8 +14,8 @@ import com.driverprofit.data.local.entity.VehicleEntity
  *
  * **Nunca** adicionar `fallbackToDestructiveMigration()`: perder os dados do
  * motorista para resolver mudança de schema não é aceitável. Toda alteração de
- * schema exige incrementar [VERSION], escrever a `Migration`, testá-la e
- * atualizar `docs/DATABASE.md`.
+ * schema exige incrementar [VERSION], escrever a `Migration` em [Migrations],
+ * testá-la e atualizar `docs/DATABASE.md`.
  */
 @Database(
     entities = [VehicleEntity::class],
@@ -28,8 +28,11 @@ abstract class DriverProfitDatabase : RoomDatabase() {
     abstract fun vehicleDao(): VehicleDao
 
     companion object {
-        /** Versão 1 — schema inicial: apenas `vehicles`. */
-        const val VERSION = 1
+        /**
+         * Versão 2 — cadastro de veículo simplificado para nome + combustível.
+         * Versão 1 tinha marca, modelo, ano, odômetro e três eixos de propulsão.
+         */
+        const val VERSION = 2
 
         const val NAME = "driver_profit.db"
     }
