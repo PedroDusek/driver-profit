@@ -31,27 +31,23 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.stringResource
-import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
-import androidx.compose.foundation.text.KeyboardOptions
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.lifecycle.viewmodel.compose.viewModel
 import com.driverprofit.R
 import com.driverprofit.core.ui.DriverProfitViewModelFactory
 import com.driverprofit.core.ui.format.VehicleLabels
 import com.driverprofit.core.ui.theme.DriverProfitTheme
-import com.driverprofit.domain.model.ChargingCapability
-import com.driverprofit.domain.model.CombustionFuel
 import com.driverprofit.domain.model.VehicleField
-import com.driverprofit.domain.model.VehiclePowertrain
+import com.driverprofit.domain.model.VehicleFuel
 
 /**
  * Cadastro e edição de veículo.
  *
- * O formulário é dinâmico (PRD §7): combustível só aparece para quem tem motor
- * a combustão, recarga só para quem tem motor elétrico. O motorista nunca vê
- * um campo que não se aplica ao próprio carro.
+ * Dois campos apenas: como o motorista chama o carro, e o que ele coloca no
+ * tanque. Marca, modelo e ano não entram em nenhuma conta de rentabilidade, e
+ * cada campo a mais é uma barreira entre o motorista e o primeiro lançamento.
  */
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -114,82 +110,21 @@ fun VehicleFormScreen(
                 .padding(horizontal = 16.dp, vertical = 8.dp),
             verticalArrangement = Arrangement.spacedBy(16.dp),
         ) {
-            FormTextField(
-                value = uiState.brand,
-                onValueChange = viewModel::onBrandChange,
-                label = stringResource(R.string.vehicle_brand),
-                error = uiState.errorFor(VehicleField.BRAND)?.let {
+            NameField(
+                value = uiState.name,
+                onValueChange = viewModel::onNameChange,
+                error = uiState.errorFor(VehicleField.NAME)?.let {
                     stringResource(VehicleLabels.error(it))
                 },
             )
 
-            FormTextField(
-                value = uiState.model,
-                onValueChange = viewModel::onModelChange,
-                label = stringResource(R.string.vehicle_model),
-                error = uiState.errorFor(VehicleField.MODEL)?.let {
+            FuelDropdown(
+                selected = uiState.fuel,
+                onSelect = viewModel::onFuelChange,
+                error = uiState.errorFor(VehicleField.FUEL)?.let {
                     stringResource(VehicleLabels.error(it))
                 },
             )
-
-            FormTextField(
-                value = uiState.yearInput,
-                onValueChange = viewModel::onYearChange,
-                label = stringResource(R.string.vehicle_year),
-                keyboardType = KeyboardType.Number,
-                error = uiState.errorFor(VehicleField.YEAR)?.let {
-                    stringResource(VehicleLabels.error(it))
-                },
-            )
-
-            FormTextField(
-                value = uiState.odometerInput,
-                onValueChange = viewModel::onOdometerChange,
-                label = stringResource(R.string.vehicle_initial_odometer),
-                keyboardType = KeyboardType.Number,
-                supportingText = stringResource(R.string.vehicle_initial_odometer_hint),
-                error = uiState.errorFor(VehicleField.INITIAL_ODOMETER)?.let {
-                    stringResource(VehicleLabels.error(it))
-                },
-            )
-
-            EnumDropdown(
-                label = stringResource(R.string.vehicle_powertrain),
-                options = VehiclePowertrain.entries,
-                selected = uiState.powertrain,
-                optionLabel = { stringResource(VehicleLabels.powertrain(it)) },
-                onSelect = viewModel::onPowertrainChange,
-                error = uiState.errorFor(VehicleField.POWERTRAIN)?.let {
-                    stringResource(VehicleLabels.error(it))
-                },
-            )
-
-            if (uiState.showCombustionFuel) {
-                EnumDropdown(
-                    label = stringResource(R.string.vehicle_combustion_fuel),
-                    options = CombustionFuel.entries,
-                    selected = uiState.combustionFuel,
-                    optionLabel = { stringResource(VehicleLabels.combustionFuel(it)) },
-                    onSelect = viewModel::onCombustionFuelChange,
-                    error = uiState.errorFor(VehicleField.COMBUSTION_FUEL)?.let {
-                        stringResource(VehicleLabels.error(it))
-                    },
-                )
-            }
-
-            if (uiState.showChargingCapability) {
-                EnumDropdown(
-                    label = stringResource(R.string.vehicle_charging_capability),
-                    options = ChargingCapability.entries,
-                    selected = uiState.chargingCapability,
-                    optionLabel = { stringResource(VehicleLabels.chargingCapability(it)) },
-                    onSelect = viewModel::onChargingCapabilityChange,
-                    supportingText = stringResource(R.string.vehicle_charging_capability_hint),
-                    error = uiState.errorFor(VehicleField.CHARGING_CAPABILITY)?.let {
-                        stringResource(VehicleLabels.error(it))
-                    },
-                )
-            }
 
             Button(
                 onClick = viewModel::onSave,
@@ -203,41 +138,30 @@ fun VehicleFormScreen(
 }
 
 @Composable
-private fun FormTextField(
+private fun NameField(
     value: String,
     onValueChange: (String) -> Unit,
-    label: String,
     modifier: Modifier = Modifier,
-    keyboardType: KeyboardType = KeyboardType.Text,
-    supportingText: String? = null,
     error: String? = null,
 ) {
     OutlinedTextField(
         value = value,
         onValueChange = onValueChange,
-        label = { Text(label) },
+        label = { Text(stringResource(R.string.vehicle_name)) },
+        placeholder = { Text(stringResource(R.string.vehicle_name_placeholder)) },
         modifier = modifier.fillMaxWidth(),
         singleLine = true,
         isError = error != null,
-        keyboardOptions = KeyboardOptions(keyboardType = keyboardType),
-        supportingText = (error ?: supportingText)?.let { { Text(it) } },
+        supportingText = { Text(error ?: stringResource(R.string.vehicle_name_hint)) },
     )
 }
 
-/**
- * Seletor de enum. Genérico porque os três campos de configuração do veículo
- * têm exatamente o mesmo comportamento — duplicar três vezes seria ruído.
- */
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-private fun <T> EnumDropdown(
-    label: String,
-    options: List<T>,
-    selected: T?,
-    optionLabel: @Composable (T) -> String,
-    onSelect: (T) -> Unit,
+private fun FuelDropdown(
+    selected: VehicleFuel?,
+    onSelect: (VehicleFuel) -> Unit,
     modifier: Modifier = Modifier,
-    supportingText: String? = null,
     error: String? = null,
 ) {
     var expanded by remember { mutableStateOf(false) }
@@ -248,13 +172,13 @@ private fun <T> EnumDropdown(
         modifier = modifier.fillMaxWidth(),
     ) {
         OutlinedTextField(
-            value = selected?.let { optionLabel(it) }.orEmpty(),
+            value = selected?.let { stringResource(VehicleLabels.fuel(it)) }.orEmpty(),
             onValueChange = {},
             readOnly = true,
-            label = { Text(label) },
+            label = { Text(stringResource(R.string.vehicle_fuel)) },
             isError = error != null,
             trailingIcon = { ExposedDropdownMenuDefaults.TrailingIcon(expanded = expanded) },
-            supportingText = (error ?: supportingText)?.let { { Text(it) } },
+            supportingText = { Text(error ?: stringResource(R.string.vehicle_fuel_hint)) },
             modifier = Modifier
                 .fillMaxWidth()
                 // PrimaryNotEditable: o campo abre o menu ao toque e não
@@ -262,9 +186,9 @@ private fun <T> EnumDropdown(
                 .menuAnchor(ExposedDropdownMenuAnchorType.PrimaryNotEditable),
         )
         ExposedDropdownMenu(expanded = expanded, onDismissRequest = { expanded = false }) {
-            options.forEach { option ->
+            VehicleFuel.entries.forEach { option ->
                 DropdownMenuItem(
-                    text = { Text(optionLabel(option)) },
+                    text = { Text(stringResource(VehicleLabels.fuel(option))) },
                     onClick = {
                         onSelect(option)
                         expanded = false
@@ -277,19 +201,14 @@ private fun <T> EnumDropdown(
 
 @Preview(showBackground = true)
 @Composable
-private fun VehicleFormFieldPreview() {
+private fun VehicleFormFieldsPreview() {
     DriverProfitTheme(dynamicColor = false) {
         Column(
             modifier = Modifier.padding(16.dp),
             verticalArrangement = Arrangement.spacedBy(16.dp),
         ) {
-            FormTextField(value = "Chevrolet", onValueChange = {}, label = "Marca")
-            FormTextField(
-                value = "",
-                onValueChange = {},
-                label = "Modelo",
-                error = "Campo obrigatório",
-            )
+            NameField(value = "Onix branco", onValueChange = {})
+            NameField(value = "", onValueChange = {}, error = "Campo obrigatório")
         }
     }
 }

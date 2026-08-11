@@ -38,13 +38,10 @@ import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.lifecycle.viewmodel.compose.viewModel
 import com.driverprofit.R
 import com.driverprofit.core.ui.DriverProfitViewModelFactory
-import com.driverprofit.core.ui.format.BrazilianFormatter
 import com.driverprofit.core.ui.format.VehicleLabels
 import com.driverprofit.core.ui.theme.DriverProfitTheme
-import com.driverprofit.domain.model.ChargingCapability
-import com.driverprofit.domain.model.CombustionFuel
 import com.driverprofit.domain.model.Vehicle
-import com.driverprofit.domain.model.VehiclePowertrain
+import com.driverprofit.domain.model.VehicleFuel
 import java.time.Instant
 
 /** Lista de veículos cadastrados, com acesso a cadastro, edição e exclusão. */
@@ -114,14 +111,7 @@ fun VehicleListScreen(
         AlertDialog(
             onDismissRequest = viewModel::onDeleteDismissed,
             title = { Text(stringResource(R.string.vehicle_delete_title)) },
-            text = {
-                Text(
-                    stringResource(
-                        R.string.vehicle_delete_message,
-                        "${vehicle.brand} ${vehicle.model}",
-                    ),
-                )
-            },
+            text = { Text(stringResource(R.string.vehicle_delete_message, vehicle.name)) },
             confirmButton = {
                 TextButton(onClick = viewModel::onDeleteConfirmed) {
                     Text(stringResource(R.string.action_delete))
@@ -151,17 +141,12 @@ private fun VehicleCard(
         ) {
             Column(modifier = Modifier.weight(1f)) {
                 Text(
-                    text = "${vehicle.brand} ${vehicle.model}",
+                    text = vehicle.name,
                     style = MaterialTheme.typography.titleLarge,
                 )
                 Text(
-                    text = "${vehicle.year} · ${BrazilianFormatter.kilometers(vehicle.initialOdometerKm)}",
+                    text = stringResource(VehicleLabels.fuel(vehicle.fuel)),
                     style = MaterialTheme.typography.bodyLarge,
-                    color = MaterialTheme.colorScheme.onSurfaceVariant,
-                )
-                Text(
-                    text = vehicleSummary(vehicle),
-                    style = MaterialTheme.typography.labelMedium,
                     color = MaterialTheme.colorScheme.onSurfaceVariant,
                 )
             }
@@ -178,16 +163,6 @@ private fun VehicleCard(
         }
     }
 }
-
-/** Resume propulsão, combustível e recarga em uma linha só. */
-@Composable
-private fun vehicleSummary(vehicle: Vehicle): String = listOfNotNull(
-    stringResource(VehicleLabels.powertrain(vehicle.powertrain)),
-    vehicle.combustionFuel?.let { stringResource(VehicleLabels.combustionFuel(it)) },
-    vehicle.chargingCapability
-        ?.takeIf { it == ChargingCapability.PLUG_IN }
-        ?.let { stringResource(VehicleLabels.chargingCapability(it)) },
-).joinToString(" · ")
 
 @Composable
 private fun LoadingState(modifier: Modifier = Modifier) {
@@ -230,13 +205,8 @@ private fun VehicleCardPreview() {
         VehicleCard(
             vehicle = Vehicle(
                 id = 1,
-                brand = "Chevrolet",
-                model = "Onix",
-                year = 2020,
-                initialOdometerKm = 50_000,
-                powertrain = VehiclePowertrain.COMBUSTION,
-                combustionFuel = CombustionFuel.FLEX,
-                chargingCapability = null,
+                name = "Onix branco",
+                fuel = VehicleFuel.FLEX,
                 createdAt = Instant.EPOCH,
             ),
             onEdit = {},

@@ -17,44 +17,30 @@
     <string name="vehicle_list_title">Veículos</string>
     <string name="vehicle_add">Novo veículo</string>
     <string name="vehicle_empty_title">Nenhum veículo cadastrado</string>
-    <string name="vehicle_empty_message">Cadastre seu veículo para começar a registrar abastecimentos e manutenções.</string>
+    <string name="vehicle_empty_message">Cadastre seu veículo para começar a registrar abastecimentos.</string>
     <string name="vehicle_delete_title">Excluir veículo?</string>
     <string name="vehicle_delete_message">%1$s será removido. Esta ação não pode ser desfeita.</string>
 
     <!-- Formulário de veículo -->
     <string name="vehicle_form_add_title">Novo veículo</string>
     <string name="vehicle_form_edit_title">Editar veículo</string>
-    <string name="vehicle_brand">Marca</string>
-    <string name="vehicle_model">Modelo</string>
-    <string name="vehicle_year">Ano</string>
-    <string name="vehicle_initial_odometer">Quilometragem atual</string>
-    <string name="vehicle_initial_odometer_hint">Km marcados no painel hoje</string>
-    <string name="vehicle_powertrain">Tipo de propulsão</string>
-    <string name="vehicle_combustion_fuel">Combustível</string>
-    <string name="vehicle_charging_capability">Recarga elétrica</string>
-    <string name="vehicle_charging_capability_hint">Seu carro pode ser carregado na tomada?</string>
+    <string name="vehicle_name">Nome do veículo</string>
+    <string name="vehicle_name_placeholder">Onix branco</string>
+    <string name="vehicle_name_hint">Como você chama esse carro</string>
+    <string name="vehicle_fuel">Tipo de combustível</string>
+    <string name="vehicle_fuel_hint">Define a unidade usada no cálculo de custo</string>
 
-    <!-- Propulsão -->
-    <string name="powertrain_combustion">Combustão</string>
-    <string name="powertrain_hybrid">Híbrido</string>
-    <string name="powertrain_electric">Elétrico</string>
-
-    <!-- Combustível -->
+    <!-- Combustíveis -->
     <string name="fuel_gasoline">Gasolina</string>
     <string name="fuel_ethanol">Etanol</string>
     <string name="fuel_flex">Flex (gasolina e etanol)</string>
     <string name="fuel_cng">GNV</string>
     <string name="fuel_flex_cng">Flex + GNV</string>
-
-    <!-- Recarga -->
-    <string name="charging_none">Não recarrega na tomada</string>
-    <string name="charging_plug_in">Plug-in</string>
-    <string name="charging_unknown">Não sei informar</string>
+    <string name="fuel_electric">Elétrico</string>
+    <string name="fuel_hybrid">Híbrido (combustão e elétrico)</string>
+    <string name="fuel_electricity">Energia elétrica</string>
 
     <!-- Erros de validação -->
     <string name="error_required">Campo obrigatório</string>
-    <string name="error_year_out_of_range">Ano inválido</string>
-    <string name="error_negative_odometer">A quilometragem não pode ser negativa</string>
-    <string name="error_odometer_too_high">Quilometragem muito alta — confira o valor</string>
-    <string name="error_not_applicable">Não se aplica a este veículo</string>
+    <string name="error_name_too_long">Nome muito longo</string>
 </resources>
