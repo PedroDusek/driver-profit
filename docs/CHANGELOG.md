@@ -5,6 +5,48 @@ Versionamento conforme [Semantic Versioning](https://semver.org/lang/pt-BR/).
 
 ## [Não publicado]
 
+## [0.2.0] — Vehicle
+
+Cadastro de veículo completo: o primeiro fluxo de produto do aplicativo.
+
+### Adicionado
+
+**Domínio**
+- `VehicleDraft` — veículo em preenchimento, com todo campo obrigatório
+  anulável, porque "ainda não escolhido" é um estado legítimo do formulário
+- `VehicleValidator` — validação pura, com `Clock` injetado para tornar a
+  regra de ano determinística nos testes
+- `SaveVehicleUseCase` — insert e update no mesmo use case, decidido pelo id
+  do rascunho; preserva o `createdAt` original ao editar
+- `ObserveVehiclesUseCase`, `GetVehicleUseCase`, `DeleteVehicleUseCase`
+
+**Interface**
+- Lista de veículos com estados de carregamento, vazio e conteúdo
+- Formulário de cadastro e edição, com campos que aparecem conforme a
+  propulsão escolhida (PRD §7)
+- Exclusão com diálogo de confirmação
+- Acesso à lista pelo ícone de veículo no dashboard
+- Todos os textos em português, com os enums traduzidos em `VehicleLabels`
+
+**Testes**
+- 46 testes novos (85 no total): validação, use case, ViewModel de lista e
+  ViewModel de formulário
+- `FakeVehicleRepository` e `MainDispatcherRule` para testar ViewModels na JVM
+
+### Decisões registradas
+
+- **A validação devolve o motivo, não a mensagem.** O domínio retorna
+  `VehicleValidationError.REQUIRED`; a camada de apresentação escolhe o texto.
+  Assim o domínio continua sem `Context` e testável sem Android.
+- **Todos os erros de uma vez**, e não o primeiro encontrado. Corrigir um
+  campo por vez, com um erro novo aparecendo a cada tentativa, é a forma mais
+  eficiente de irritar quem preenche formulário.
+- **Trocar a propulsão limpa o que deixou de se aplicar.** A regra vive em
+  `VehicleDraft.withPowertrain`, no domínio, e não na tela — assim vale para
+  qualquer caminho que altere um veículo.
+- **Uma rota só para cadastro e edição.** A tela é a mesma; muda apenas se ela
+  começa preenchida.
+
 ## [0.1.0] — Foundation
 
 Fundação técnica do projeto. Nenhuma funcionalidade de produto: o objetivo
