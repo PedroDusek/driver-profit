@@ -1,0 +1,8 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="app_name">Driver Profit</string>
+
+    <!-- Dashboard -->
+    <string name="dashboard_foundation_title">Fundação v0.1.0</string>
+    <string name="dashboard_foundation_message">Estrutura técnica no ar: Compose, navegação, tema e banco local.\nOs indicadores de rentabilidade chegam na v0.5.0.</string>
+</resources>
