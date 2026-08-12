@@ -70,8 +70,11 @@ com.driverprofit/
 │   ├── model/                   # Vehicle, enums de propulsão
 │   ├── repository/              # contratos
 │   └── usecase/                 # regras de negócio (a partir de v0.2.0)
-└── feature/
-    └── dashboard/               # uma pasta por tela
+└── feature/                     # uma pasta por tela
+    ├── dashboard/
+    ├── earnings/                # list/ e form/
+    ├── expenses/                # list/ e form/
+    └── vehicle/                 # list/ e form/
 ```
 
 A estrutura é proporcional ao projeto: módulo Gradle único, sem camadas
@@ -147,6 +150,51 @@ tempo de compilação tratar GNV em litros ou energia em litros.
 > decisão de produto: a complexidade dos três eixos não se pagava num
 > cadastro que o motorista preenche uma vez. `ELECTRIC` e `HYBRID` continuam
 > na lista, então os casos do PRD §11 e §12 seguem atendidos.
+
+### O cálculo do dashboard vive no domínio
+
+`domain/model/DashboardMetrics.kt`. Recebe as sessões e as despesas de um
+período e devolve os doze indicadores do PRD §21. Kotlin puro: sem Android,
+sem Room, sem `Context`.
+
+É o cálculo que **é** o produto, então ele precisa cair na primeira linha de
+teste, com JUnit, sem emulador (PRD §29). Colocá-lo em ViewModel ou em
+Composable o tornaria verificável apenas com um aparelho ligado — e é
+justamente o número que ninguém pode errar.
+
+A classe guarda só somas; tudo que é razão entre duas somas é propriedade
+derivada. Assim não existe a possibilidade de um total e um indicador
+discordarem: o segundo é sempre calculado do primeiro.
+
+### Custo/km usa apenas despesa operacional
+
+`ExpenseCategory.isOperationalCost` separa seguro, IPVA e financiamento do
+resto, e é essa soma reduzida que entra no `costPerKm`.
+
+Custo fixo não varia com a distância. Lançar o seguro anual num dia de
+trabalho jogaria o custo/km daquele dia para as alturas e faria o motorista
+concluir que rodar não compensa — o que seria falso (PRD §22). Os três
+continuam dentro de "Despesas" e do lucro; ficam fora apenas da razão por
+quilômetro, e a tela informa isso quando eles existem no período.
+
+O rateio de custo fixo ao longo do tempo é da v1.4 (PRD §47).
+
+### Período é `sealed`, e o dia de referência é parâmetro
+
+`domain/model/DashboardPeriod.kt`. "Personalizado" carrega um intervalo e os
+demais não; com `enum`, esse intervalo viajaria por fora, num campo anulável
+que só faz sentido para uma das constantes, e cada leitor do estado precisaria
+lembrar dessa combinação.
+
+`rangeAt(today)` recebe o dia em vez de ler `LocalDate.now()` internamente. É
+isso que torna "ontem" e "mês anterior" testáveis sem depender do relógio da
+máquina — o mesmo motivo pelo qual `DashboardViewModel` recebe um `Clock`, e
+pelo qual `VehicleValidator` já recebia.
+
+A semana é ISO — **segunda a domingo** — fixada no código e não deduzida do
+`Locale`. O primeiro dia da semana muda de país para país, e um indicador que
+troca de intervalo conforme a configuração do aparelho é impossível de
+conferir.
 
 ### Datas
 

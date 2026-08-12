@@ -74,19 +74,27 @@ formulário só oferece o que faz sentido para o veículo dele.
 
 Odômetro por lançamento e consumo estimado ficaram para a v0.6.0.
 
-### v0.5.0 — Dashboard
+### v0.5.0 — Dashboard ✅ concluída
 
-- [ ] Faturamento, despesas, lucro
-- [ ] Corridas, km, horas
-- [ ] R$/km, R$/hora, R$/corrida
-- [ ] Custo/km, lucro/km, lucro/hora
-- [ ] Filtros: hoje, ontem, semana, mês, mês anterior, personalizado
-- [ ] `DashboardMetrics` como classe pura, testável sem Android
+- [x] Faturamento, despesas, lucro
+- [x] Corridas, km, horas
+- [x] R$/km, R$/hora, R$/corrida
+- [x] Custo/km, lucro/km, lucro/hora
+- [x] Filtros: hoje, ontem, semana, mês, mês anterior, personalizado
+- [x] `DashboardMetrics` como classe pura, testável sem Android
+- [x] Despesas do período separadas por natureza
+
+**Critério de saída:** o motorista escolhe um período e vê quanto lucrou e
+quanto lhe custa cada quilômetro.
+
+Custo/km usa apenas despesa operacional: seguro, IPVA e financiamento entram
+no lucro, mas não na razão por quilômetro (PRD §22). O rateio de custo fixo é
+da v1.4.
 
 ### v0.6.0 — Analytics
 
 - [ ] Gráficos
-- [ ] Despesas por categoria
+- [ ] Custo por km separado por natureza (PRD §22)
 - [ ] Evolução de faturamento, R$/hora e R$/km
 - [ ] Odômetro por lançamento
 - [ ] Consumo estimado (km/L, km/kWh)
