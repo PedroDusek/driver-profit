@@ -63,6 +63,39 @@ object Migrations {
         }
     }
 
+    /**
+     * 2 → 3: registro de ganhos.
+     *
+     * Cria `work_sessions`. Migração puramente aditiva — nenhuma tabela
+     * existente é tocada, então não há risco para os dados do motorista.
+     *
+     * O índice em `date` acompanha a criação porque toda consulta do
+     * dashboard vai filtrar por período (PRD §20).
+     */
+    val MIGRATION_2_3 = object : Migration(2, 3) {
+        override fun migrate(db: SupportSQLiteDatabase) {
+            db.execSQL(
+                """
+                CREATE TABLE IF NOT EXISTS `work_sessions` (
+                    `id` INTEGER PRIMARY KEY AUTOINCREMENT NOT NULL,
+                    `date` INTEGER NOT NULL,
+                    `platform` TEXT NOT NULL,
+                    `rides` INTEGER NOT NULL,
+                    `revenue_cents` INTEGER NOT NULL,
+                    `online_minutes` INTEGER NOT NULL,
+                    `distance_km` INTEGER NOT NULL,
+                    `note` TEXT NOT NULL,
+                    `created_at` INTEGER NOT NULL
+                )
+                """.trimIndent(),
+            )
+            db.execSQL(
+                "CREATE INDEX IF NOT EXISTS `index_work_sessions_date` " +
+                    "ON `work_sessions` (`date`)",
+            )
+        }
+    }
+
     /** Todas as migrações conhecidas, na ordem. */
-    val ALL: Array<Migration> = arrayOf(MIGRATION_1_2)
+    val ALL: Array<Migration> = arrayOf(MIGRATION_1_2, MIGRATION_2_3)
 }

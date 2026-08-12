@@ -5,12 +5,19 @@ import androidx.room.Room
 import com.driverprofit.data.local.database.DriverProfitDatabase
 import com.driverprofit.data.local.database.Migrations
 import com.driverprofit.data.repository.OfflineVehicleRepository
+import com.driverprofit.data.repository.OfflineWorkSessionRepository
 import com.driverprofit.domain.repository.VehicleRepository
+import com.driverprofit.domain.repository.WorkSessionRepository
 import com.driverprofit.domain.usecase.DeleteVehicleUseCase
+import com.driverprofit.domain.usecase.DeleteWorkSessionUseCase
 import com.driverprofit.domain.usecase.GetVehicleUseCase
+import com.driverprofit.domain.usecase.GetWorkSessionUseCase
 import com.driverprofit.domain.usecase.ObserveVehiclesUseCase
+import com.driverprofit.domain.usecase.ObserveWorkSessionsUseCase
 import com.driverprofit.domain.usecase.SaveVehicleUseCase
+import com.driverprofit.domain.usecase.SaveWorkSessionUseCase
 import com.driverprofit.domain.usecase.VehicleValidator
+import com.driverprofit.domain.usecase.WorkSessionValidator
 
 /**
  * Injeção de dependências manual.
@@ -23,11 +30,17 @@ import com.driverprofit.domain.usecase.VehicleValidator
  */
 interface AppContainer {
     val vehicleRepository: VehicleRepository
+    val workSessionRepository: WorkSessionRepository
 
     val saveVehicle: SaveVehicleUseCase
     val observeVehicles: ObserveVehiclesUseCase
     val getVehicle: GetVehicleUseCase
     val deleteVehicle: DeleteVehicleUseCase
+
+    val saveWorkSession: SaveWorkSessionUseCase
+    val observeWorkSessions: ObserveWorkSessionsUseCase
+    val getWorkSession: GetWorkSessionUseCase
+    val deleteWorkSession: DeleteWorkSessionUseCase
 }
 
 class DefaultAppContainer(private val context: Context) : AppContainer {
@@ -63,5 +76,27 @@ class DefaultAppContainer(private val context: Context) : AppContainer {
 
     override val deleteVehicle: DeleteVehicleUseCase by lazy {
         DeleteVehicleUseCase(vehicleRepository)
+    }
+
+    override val workSessionRepository: WorkSessionRepository by lazy {
+        OfflineWorkSessionRepository(database.workSessionDao())
+    }
+
+    private val workSessionValidator = WorkSessionValidator()
+
+    override val saveWorkSession: SaveWorkSessionUseCase by lazy {
+        SaveWorkSessionUseCase(workSessionRepository, workSessionValidator)
+    }
+
+    override val observeWorkSessions: ObserveWorkSessionsUseCase by lazy {
+        ObserveWorkSessionsUseCase(workSessionRepository)
+    }
+
+    override val getWorkSession: GetWorkSessionUseCase by lazy {
+        GetWorkSessionUseCase(workSessionRepository)
+    }
+
+    override val deleteWorkSession: DeleteWorkSessionUseCase by lazy {
+        DeleteWorkSessionUseCase(workSessionRepository)
     }
 }
