@@ -78,10 +78,30 @@ v0.4.0; esta versão é a conta entre eles — a razão de o produto existir.
   gráficos da v0.6.0.
 - **Custos fixos rateados** — v1.4, como o PRD §47 já previa.
 
-### Não verificado
+### Corrigido
 
-Nenhuma tela foi aberta em aparelho. Testes instrumentados exigem emulador e
-**não foram executados**.
+**Os testes de migração nunca conseguiam começar.** `kotlinx-serialization`
+resolvia quebrado no classpath de `androidTest`: o `json` em 1.8.1 e o `core`
+em 1.7.3.
+
+A causa é a *consistent resolution* do AGP, que obriga o classpath de teste a
+acompanhar o do app. `room-testing` pede 1.8.1, mas só existe em
+`androidTest` — no classpath do app quem manda são navigation e lifecycle, que
+trazem 1.7.3. As classes de schema do Room, compiladas contra 1.8.x, chamavam
+`GeneratedSerializer.typeParametersSerializers()`, que em 1.7.3 ainda é
+abstrato: `AbstractMethodError` ao ler o schema exportado, antes de qualquer
+migração rodar.
+
+O BOM do `kotlinx-serialization` alinha as duas pontas em 1.8.1.
+
+### Verificado em aparelho
+
+Primeira execução dos testes instrumentados na história do projeto:
+**36 testes, todos passando** num Redmi Note 8 Pro com Android 9 — os três
+DAOs e as quatro migrações encadeadas (1→2→3→4).
+
+Continua sem verificação: os fluxos de interface nunca foram usados de verdade
+num aparelho.
 
 ## [0.4.1] — Campo de valor corrigido e quantidade opcional
 

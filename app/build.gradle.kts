@@ -130,6 +130,21 @@ dependencies {
     // --- Concorrência ---
     implementation(libs.kotlinx.coroutines.android)
 
+    // --- Alinhamento de kotlinx-serialization ---
+    //
+    // O projeto não usa serialização diretamente: ela chega por navigation e
+    // lifecycle, que trazem a versão 1.7.3, e por room-testing, que pede 1.8.1.
+    //
+    // A "consistent resolution" do AGP obriga o classpath de androidTest a
+    // acompanhar o do app. Como room-testing só existe no androidTest, o `core`
+    // ficava preso em 1.7.3 enquanto o `json` resolvia em 1.8.1 — e as classes
+    // de schema do Room, compiladas contra 1.8.x, estouravam com
+    // AbstractMethodError ao ler o schema exportado. Efeito prático: **nenhum
+    // teste de migração conseguia sequer começar**.
+    //
+    // O BOM alinha as duas pontas numa versão só.
+    implementation(platform(libs.kotlinx.serialization.bom))
+
     // --- Testes unitários (JVM, sem Android) ---
     testImplementation(libs.junit)
     testImplementation(libs.kotlinx.coroutines.test)
