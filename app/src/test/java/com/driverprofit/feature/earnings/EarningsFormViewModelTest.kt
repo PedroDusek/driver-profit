@@ -141,25 +141,54 @@ class EarningsFormViewModelTest {
     }
 
     @Test
-    fun `salvar sem plataforma expoe o erro`() = runTest {
+    fun `salvar formulario em branco acusa todos os campos obrigatorios`() = runTest {
         val viewModel = viewModel()
 
-        viewModel.onRevenueChange("10000")
         viewModel.onSave()
         advanceUntilIdle()
 
-        assertEquals(
-            WorkSessionValidationError.REQUIRED,
-            viewModel.uiState.value.errorFor(WorkSessionField.PLATFORM),
-        )
+        val errors = viewModel.uiState.value.errors
+        assertEquals(WorkSessionValidationError.REQUIRED, errors[WorkSessionField.PLATFORM])
+        assertEquals(WorkSessionValidationError.REQUIRED, errors[WorkSessionField.REVENUE])
+        assertEquals(WorkSessionValidationError.REQUIRED, errors[WorkSessionField.RIDES])
+        assertEquals(WorkSessionValidationError.REQUIRED, errors[WorkSessionField.ONLINE_TIME])
+        assertEquals(WorkSessionValidationError.REQUIRED, errors[WorkSessionField.DISTANCE])
         assertNull(viewModel.uiState.value.savedSessionId)
     }
 
     @Test
-    fun `salvar sessao sem nenhum numero expoe erro de sessao vazia`() = runTest {
+    fun `campo em branco e diferente de zero`() = runTest {
+        val viewModel = viewModel()
+
+        assertNull(viewModel.uiState.value.revenue)
+        assertNull(viewModel.uiState.value.onlineTime)
+
+        viewModel.onRevenueChange("0")
+        viewModel.onHoursChange("0")
+
+        // Zero digitado e uma resposta; campo vazio nao e.
+        assertEquals(Money.ZERO, viewModel.uiState.value.revenue)
+        assertEquals(WorkDuration.ZERO, viewModel.uiState.value.onlineTime)
+    }
+
+    @Test
+    fun `so os minutos preenchidos ja contam como tempo informado`() = runTest {
+        val viewModel = viewModel()
+
+        viewModel.onMinutesChange("40")
+
+        assertEquals(WorkDuration(40), viewModel.uiState.value.onlineTime)
+    }
+
+    @Test
+    fun `tudo preenchido em zero expoe erro de sessao vazia`() = runTest {
         val viewModel = viewModel()
 
         viewModel.onPlatformChange(Platform.UBER)
+        viewModel.onRevenueChange("0")
+        viewModel.onRidesChange("0")
+        viewModel.onHoursChange("0")
+        viewModel.onDistanceChange("0")
         viewModel.onSave()
         advanceUntilIdle()
 
@@ -174,14 +203,41 @@ class EarningsFormViewModelTest {
         val viewModel = viewModel()
 
         viewModel.onPlatformChange(Platform.UBER)
+        viewModel.onRevenueChange("0")
+        viewModel.onRidesChange("0")
+        viewModel.onHoursChange("0")
+        viewModel.onDistanceChange("0")
         viewModel.onSave()
         advanceUntilIdle()
         assertNotNull(viewModel.uiState.value.errorFor(WorkSessionField.REVENUE))
 
-        // O erro e reportado no faturamento, mas as corridas tambem o resolvem.
+        // O erro e da sessao inteira, so exibido no faturamento: mexer nas
+        // corridas tambem pode resolve-lo.
         viewModel.onRidesChange("5")
 
         assertNull(viewModel.uiState.value.errorFor(WorkSessionField.REVENUE))
+    }
+
+    @Test
+    fun `erro proprio do faturamento nao some ao editar outro campo`() = runTest {
+        val viewModel = viewModel()
+
+        viewModel.onPlatformChange(Platform.UBER)
+        viewModel.onRidesChange("10")
+        viewModel.onSave()
+        advanceUntilIdle()
+        assertEquals(
+            WorkSessionValidationError.REQUIRED,
+            viewModel.uiState.value.errorFor(WorkSessionField.REVENUE),
+        )
+
+        viewModel.onDistanceChange("100")
+
+        // REQUIRED e erro do proprio campo; so sai quando ele for preenchido.
+        assertEquals(
+            WorkSessionValidationError.REQUIRED,
+            viewModel.uiState.value.errorFor(WorkSessionField.REVENUE),
+        )
     }
 
     @Test
@@ -241,6 +297,8 @@ class EarningsFormViewModelTest {
         viewModel.onPlatformChange(Platform.UBER)
         viewModel.onRevenueChange("32050")
         viewModel.onRidesChange("18")
+        viewModel.onHoursChange("8")
+        viewModel.onMinutesChange("20")
         viewModel.onDistanceChange("210")
     }
 }

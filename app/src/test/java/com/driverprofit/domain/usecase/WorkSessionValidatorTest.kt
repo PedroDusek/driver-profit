@@ -39,23 +39,21 @@ class WorkSessionValidatorTest {
     }
 
     @Test
-    fun `rascunho vazio acusa data, plataforma e sessao vazia`() {
+    fun `rascunho vazio acusa todos os campos obrigatorios de uma vez`() {
         val errors = validator.validate(WorkSessionDraft())
 
         assertEquals(
             setOf(
-                WorkSessionFieldError(WorkSessionField.DATE, WorkSessionValidationError.REQUIRED),
-                WorkSessionFieldError(
-                    WorkSessionField.PLATFORM,
-                    WorkSessionValidationError.REQUIRED,
-                ),
-                WorkSessionFieldError(
-                    WorkSessionField.REVENUE,
-                    WorkSessionValidationError.EMPTY_SESSION,
-                ),
+                WorkSessionField.DATE,
+                WorkSessionField.PLATFORM,
+                WorkSessionField.REVENUE,
+                WorkSessionField.RIDES,
+                WorkSessionField.DISTANCE,
+                WorkSessionField.ONLINE_TIME,
             ),
-            errors.toSet(),
+            errors.map { it.field }.toSet(),
         )
+        assertTrue(errors.all { it.error == WorkSessionValidationError.REQUIRED })
     }
 
     @Test
@@ -86,27 +84,70 @@ class WorkSessionValidatorTest {
     }
 
     @Test
-    fun `apenas o faturamento preenchido ja basta`() {
-        // Um dia pode ter sido lancado so com o valor do extrato, sem que o
-        // motorista tenha anotado horas ou quilometragem.
+    fun `faturamento em branco e rejeitado`() {
+        // O dashboard divide soma(faturamento) por soma(horas). Deixar um
+        // campo em branco entrar como zero produziria indicador errado com
+        // cara de indicador certo.
         assertEquals(
-            emptyList<WorkSessionFieldError>(),
-            validator.validate(
-                WorkSessionDraft(
-                    date = hoje,
-                    platform = Platform.UBER,
-                    revenue = Money.of(320, 50),
+            listOf(
+                WorkSessionFieldError(
+                    WorkSessionField.REVENUE,
+                    WorkSessionValidationError.REQUIRED,
                 ),
             ),
+            validator.validate(validDraft.copy(revenue = null)),
         )
     }
 
     @Test
-    fun `apenas as corridas preenchidas ja basta`() {
+    fun `tempo online em branco e rejeitado`() {
+        assertEquals(
+            listOf(
+                WorkSessionFieldError(
+                    WorkSessionField.ONLINE_TIME,
+                    WorkSessionValidationError.REQUIRED,
+                ),
+            ),
+            validator.validate(validDraft.copy(onlineTime = null)),
+        )
+    }
+
+    @Test
+    fun `corridas em branco sao rejeitadas`() {
+        assertEquals(
+            listOf(
+                WorkSessionFieldError(WorkSessionField.RIDES, WorkSessionValidationError.REQUIRED),
+            ),
+            validator.validate(validDraft.copy(rides = null)),
+        )
+    }
+
+    @Test
+    fun `distancia em branco e rejeitada`() {
+        assertEquals(
+            listOf(
+                WorkSessionFieldError(
+                    WorkSessionField.DISTANCE,
+                    WorkSessionValidationError.REQUIRED,
+                ),
+            ),
+            validator.validate(validDraft.copy(distanceKm = null)),
+        )
+    }
+
+    @Test
+    fun `zero preenchido e resposta valida`() {
+        // Seis horas online sem nenhuma corrida e um dia ruim que existe.
+        // O que se recusa e o campo em branco, nao o valor zero.
         assertEquals(
             emptyList<WorkSessionFieldError>(),
             validator.validate(
-                WorkSessionDraft(date = hoje, platform = Platform.UBER, rides = 5),
+                validDraft.copy(
+                    revenue = Money.ZERO,
+                    rides = 0,
+                    distanceKm = 0,
+                    onlineTime = WorkDuration.of(6, 0),
+                ),
             ),
         )
     }
@@ -202,16 +243,13 @@ class WorkSessionValidatorTest {
     }
 
     @Test
-    fun `toSession preenche com zero o que nao foi informado`() {
-        val session = validator.toSession(
-            WorkSessionDraft(date = hoje, platform = Platform.UBER, revenue = Money.of(100, 0)),
-        )
+    fun `toSession copia os valores informados sem inventar defaults`() {
+        val session = validator.toSession(validDraft)
 
-        // Para o dashboard, "nao anotei" e "zero" somam igual - o que nao pode
-        // e o dia inteiro estar em branco, e isso a validacao ja barrou.
-        assertEquals(0, session.rides)
-        assertEquals(WorkDuration.ZERO, session.onlineTime)
-        assertEquals(0L, session.distanceKm)
+        assertEquals(18, session.rides)
+        assertEquals(Money.of(320, 50), session.revenue)
+        assertEquals(WorkDuration.of(8, 20), session.onlineTime)
+        assertEquals(210L, session.distanceKm)
     }
 
     @Test

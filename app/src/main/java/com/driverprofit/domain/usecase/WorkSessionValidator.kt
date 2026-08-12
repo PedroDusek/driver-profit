@@ -1,7 +1,5 @@
 package com.driverprofit.domain.usecase
 
-import com.driverprofit.core.common.Money
-import com.driverprofit.core.common.WorkDuration
 import com.driverprofit.domain.model.WorkSession
 import com.driverprofit.domain.model.WorkSessionDraft
 import com.driverprofit.domain.model.WorkSessionField
@@ -30,32 +28,58 @@ class WorkSessionValidator(
             add(error(WorkSessionField.PLATFORM, WorkSessionValidationError.REQUIRED))
         }
 
-        // Faturamento, corridas, tempo e distância são individualmente
-        // opcionais: um dia pode ter tido corridas sem que o motorista tenha
-        // anotado a quilometragem, e forçar o preenchimento faria ele inventar
-        // um número — pior que não ter o dado.
-        draft.revenue?.let {
-            if (it.isNegative) add(error(WorkSessionField.REVENUE, WorkSessionValidationError.NEGATIVE))
+        // Faturamento, corridas, tempo e distância são todos obrigatórios.
+        //
+        // Não por burocracia: o dashboard agrega período dividindo
+        // soma(faturamento) por soma(horas). Uma sessão com valor preenchido e
+        // horas em branco entraria com o valor no numerador e zero no
+        // denominador, produzindo um R$/hora inflado — exibido com a mesma
+        // confiança de um número correto. Um dado ausente e visível é ruim; um
+        // indicador errado e invisível é pior (PRD §59: correção primeiro).
+        //
+        // Zero é resposta válida: um dia de 6h online sem nenhuma corrida
+        // existe. O que não se aceita é o campo em branco.
+        when {
+            draft.revenue == null ->
+                add(error(WorkSessionField.REVENUE, WorkSessionValidationError.REQUIRED))
+            draft.revenue.isNegative ->
+                add(error(WorkSessionField.REVENUE, WorkSessionValidationError.NEGATIVE))
         }
-        draft.rides?.let {
-            if (it < 0) add(error(WorkSessionField.RIDES, WorkSessionValidationError.NEGATIVE))
+        when {
+            draft.rides == null ->
+                add(error(WorkSessionField.RIDES, WorkSessionValidationError.REQUIRED))
+            draft.rides < 0 ->
+                add(error(WorkSessionField.RIDES, WorkSessionValidationError.NEGATIVE))
         }
-        draft.distanceKm?.let {
-            if (it < 0) add(error(WorkSessionField.DISTANCE, WorkSessionValidationError.NEGATIVE))
+        when {
+            draft.distanceKm == null ->
+                add(error(WorkSessionField.DISTANCE, WorkSessionValidationError.REQUIRED))
+            draft.distanceKm < 0 ->
+                add(error(WorkSessionField.DISTANCE, WorkSessionValidationError.NEGATIVE))
         }
-        draft.onlineTime?.let {
-            if (it.minutes > MAX_ONLINE_MINUTES_PER_DAY) {
-                add(error(WorkSessionField.ONLINE_TIME, WorkSessionValidationError.ONLINE_TIME_TOO_LONG))
-            }
+        when {
+            draft.onlineTime == null ->
+                add(error(WorkSessionField.ONLINE_TIME, WorkSessionValidationError.REQUIRED))
+            draft.onlineTime.minutes > MAX_ONLINE_MINUTES_PER_DAY ->
+                add(
+                    error(
+                        WorkSessionField.ONLINE_TIME,
+                        WorkSessionValidationError.ONLINE_TIME_TOO_LONG,
+                    ),
+                )
         }
 
         if (draft.note.length > WorkSession.MAX_NOTE_LENGTH) {
             add(error(WorkSessionField.NOTE, WorkSessionValidationError.NOTE_TOO_LONG))
         }
 
-        // O que não pode é a sessão inteira estar vazia: um registro sem
-        // nenhum número não informa nada e ainda polui o histórico.
-        if (isEmpty(draft)) {
+        // Tudo preenchido, mas tudo zero, é um dia que não aconteceu: não
+        // informa nada e ainda polui o histórico.
+        //
+        // Só faz sentido reclamar disso quando os quatro campos foram
+        // informados. Com campos em branco, o erro correto é "campo
+        // obrigatório" — acusar "sessão vazia" em cima disso seria ruído.
+        if (isFullyFilled(draft) && isAllZero(draft)) {
             add(error(WorkSessionField.REVENUE, WorkSessionValidationError.EMPTY_SESSION))
         }
     }
@@ -63,9 +87,9 @@ class WorkSessionValidator(
     /**
      * Converte um rascunho válido em [WorkSession].
      *
-     * Campos numéricos não preenchidos viram zero: para o dashboard, "não
-     * anotei quantos km rodei" e "rodei zero km" somam igual. O que não pode
-     * é o dia inteiro estar em branco, e isso [validate] já barrou.
+     * Só chame depois de [validate] retornar lista vazia — daí os `!!`, que
+     * documentam a pré-condição em vez de escondê-la atrás de defaults
+     * silenciosos que reintroduziriam o zero implícito.
      */
     fun toSession(
         draft: WorkSessionDraft,
@@ -74,10 +98,10 @@ class WorkSessionValidator(
         id = draft.id,
         date = draft.date!!,
         platform = draft.platform!!,
-        rides = draft.rides ?: 0,
-        revenue = draft.revenue ?: Money.ZERO,
-        onlineTime = draft.onlineTime ?: WorkDuration.ZERO,
-        distanceKm = draft.distanceKm ?: 0L,
+        rides = draft.rides!!,
+        revenue = draft.revenue!!,
+        onlineTime = draft.onlineTime!!,
+        distanceKm = draft.distanceKm!!,
         note = draft.note.trim(),
         createdAt = createdAt,
     )
@@ -90,11 +114,17 @@ class WorkSessionValidator(
         else -> emptyList()
     }
 
-    private fun isEmpty(draft: WorkSessionDraft): Boolean =
-        (draft.revenue?.isZero ?: true) &&
-            (draft.rides ?: 0) == 0 &&
-            (draft.onlineTime?.isZero ?: true) &&
-            (draft.distanceKm ?: 0L) == 0L
+    private fun isFullyFilled(draft: WorkSessionDraft): Boolean =
+        draft.revenue != null &&
+            draft.rides != null &&
+            draft.onlineTime != null &&
+            draft.distanceKm != null
+
+    private fun isAllZero(draft: WorkSessionDraft): Boolean =
+        draft.revenue?.isZero == true &&
+            draft.rides == 0 &&
+            draft.onlineTime?.isZero == true &&
+            draft.distanceKm == 0L
 
     private fun error(field: WorkSessionField, error: WorkSessionValidationError) =
         WorkSessionFieldError(field, error)
