@@ -96,6 +96,49 @@ object Migrations {
         }
     }
 
+    /**
+     * 3 → 4: registro de despesas.
+     *
+     * Cria `expenses` com chave estrangeira para `vehicles`. Aditiva: nenhuma
+     * tabela existente é alterada.
+     *
+     * `ON DELETE SET NULL` no veículo — excluir um carro não pode apagar o
+     * histórico financeiro; a despesa fica órfã e continua somando.
+     *
+     * Dois índices: `date`, porque toda consulta do dashboard filtra por
+     * período, e `vehicle_id`, que o Room exige para a chave estrangeira (sem
+     * ele, apagar um veículo faria varredura completa da tabela).
+     */
+    val MIGRATION_3_4 = object : Migration(3, 4) {
+        override fun migrate(db: SupportSQLiteDatabase) {
+            db.execSQL(
+                """
+                CREATE TABLE IF NOT EXISTS `expenses` (
+                    `id` INTEGER PRIMARY KEY AUTOINCREMENT NOT NULL,
+                    `vehicle_id` INTEGER,
+                    `date` INTEGER NOT NULL,
+                    `category` TEXT NOT NULL,
+                    `amount_cents` INTEGER NOT NULL,
+                    `description` TEXT NOT NULL,
+                    `fuel_type` TEXT,
+                    `quantity_thousandths` INTEGER,
+                    `charging_location` TEXT,
+                    `maintenance_category` TEXT,
+                    `place` TEXT,
+                    `created_at` INTEGER NOT NULL,
+                    FOREIGN KEY(`vehicle_id`) REFERENCES `vehicles`(`id`)
+                        ON UPDATE NO ACTION ON DELETE SET NULL
+                )
+                """.trimIndent(),
+            )
+            db.execSQL("CREATE INDEX IF NOT EXISTS `index_expenses_date` ON `expenses` (`date`)")
+            db.execSQL(
+                "CREATE INDEX IF NOT EXISTS `index_expenses_vehicle_id` " +
+                    "ON `expenses` (`vehicle_id`)",
+            )
+        }
+    }
+
     /** Todas as migrações conhecidas, na ordem. */
-    val ALL: Array<Migration> = arrayOf(MIGRATION_1_2, MIGRATION_2_3)
+    val ALL: Array<Migration> = arrayOf(MIGRATION_1_2, MIGRATION_2_3, MIGRATION_3_4)
 }
