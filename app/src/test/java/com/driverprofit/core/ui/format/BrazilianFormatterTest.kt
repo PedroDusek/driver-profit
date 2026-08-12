@@ -39,6 +39,19 @@ class BrazilianFormatterTest {
     }
 
     @Test
+    fun `moneyOrUnavailable formata o valor quando ele existe`() {
+        assertEquals("R$ 0,60", BrazilianFormatter.moneyOrUnavailable(Money(60)))
+        assertEquals("-R$ 1,50", BrazilianFormatter.moneyOrUnavailable(Money(-150)))
+    }
+
+    @Test
+    fun `moneyOrUnavailable nunca exibe zero no lugar de indisponivel`() {
+        // Confundir os dois faria o dashboard afirmar que o custo por km e
+        // zero num periodo em que ele apenas nao pode ser calculado.
+        assertEquals("—", BrazilianFormatter.moneyOrUnavailable(null))
+    }
+
+    @Test
     fun `duration exibe horas e minutos`() {
         assertEquals("8h 20min", BrazilianFormatter.duration(WorkDuration(500)))
     }
