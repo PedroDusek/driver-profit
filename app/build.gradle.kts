@@ -19,8 +19,8 @@ android {
         targetSdk = libs.versions.targetSdk.get().toInt()
 
         // versionName segue o Semantic Versioning do projeto (PRD §40).
-        versionCode = 7
-        versionName = "0.4.1"
+        versionCode = 8
+        versionName = "0.5.0"
 
         testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
         vectorDrawables { useSupportLibrary = true }
@@ -83,7 +83,14 @@ android {
         //
         // Atualização de dependência é decisão consciente, feita em um PR
         // próprio (PRD §55), não um erro de build.
-        disable += setOf("GradleDependency", "NewerVersionAvailable")
+        //
+        // "Typos" compara cada palavra dos textos com um dicionário **inglês**.
+        // Este app é inteiramente em português: a checagem acusa "eles" como
+        // erro de digitação de "eels", e com warningsAsErrors isso transforma
+        // qualquer frase nova da interface em falha de build. Nenhum acerto
+        // possível, só falso positivo. `tools:locale="pt-BR"` em strings.xml
+        // não desarma a checagem nesta versão do lint.
+        disable += setOf("GradleDependency", "NewerVersionAvailable", "Typos")
     }
 }
 
