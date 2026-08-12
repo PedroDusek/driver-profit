@@ -16,16 +16,26 @@ import java.time.LocalDate
  */
 sealed interface ExpenseDetail {
 
-    /** Abastecimento — combustível líquido ou gasoso (PRD §7 a §10). */
+    /**
+     * Abastecimento — combustível líquido ou gasoso (PRD §7 a §10).
+     *
+     * [quantity] é opcional: o indicador principal do produto é **custo/km**,
+     * que sai do valor pago e dos quilômetros rodados, sem depender de quantos
+     * litros entraram no tanque. Exigir a quantidade só para calcular R$/litro
+     * cobraria um dado a cada abastecimento em troca de um número secundário.
+     *
+     * Quando informada, ela habilita o R$/litro (ou R$/m³) daquele
+     * abastecimento.
+     */
     data class Refuel(
         val fuelType: FuelType,
-        val quantity: Quantity,
+        val quantity: Quantity? = null,
         val station: String = "",
     ) : ExpenseDetail
 
-    /** Recarga elétrica (PRD §11). */
+    /** Recarga elétrica (PRD §11). [energy] é opcional, como em [Refuel]. */
     data class Charging(
-        val energy: Quantity,
+        val energy: Quantity? = null,
         val location: ChargingLocation,
         val place: String = "",
     ) : ExpenseDetail
@@ -78,10 +88,12 @@ data class Expense(
     /**
      * Preço por unidade: R$/litro, R$/m³ ou R$/kWh (PRD §7, §10, §11).
      *
-     * `null` quando não há quantidade — inclusive no caso de recarga
-     * gratuita registrada sem kWh. Uma recarga gratuita **com** kWh informado
-     * tem preço `R$ 0,00` por unidade, que é informação válida e diferente de
-     * indisponível.
+     * `null` quando a quantidade não foi informada — o que é comum, já que ela
+     * é opcional. Indicador secundário: o custo/km, que é o principal, não
+     * depende dele.
+     *
+     * Uma recarga gratuita **com** kWh informado tem preço `R$ 0,00` por
+     * unidade, que é informação válida e diferente de indisponível.
      */
     val pricePerUnit: Money?
         get() = quantity?.let { amount.per(it.toUnits()) }

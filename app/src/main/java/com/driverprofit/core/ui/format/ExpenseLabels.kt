@@ -80,7 +80,6 @@ object ExpenseLabels {
         ExpenseValidationError.REQUIRED -> R.string.error_required
         ExpenseValidationError.DATE_IN_FUTURE -> R.string.error_date_in_future
         ExpenseValidationError.NEGATIVE -> R.string.error_negative
-        ExpenseValidationError.QUANTITY_REQUIRED -> R.string.error_quantity_required
         ExpenseValidationError.QUANTITY_ZERO -> R.string.error_quantity_zero
         ExpenseValidationError.FUEL_NOT_SUPPORTED_BY_VEHICLE ->
             R.string.error_fuel_not_supported

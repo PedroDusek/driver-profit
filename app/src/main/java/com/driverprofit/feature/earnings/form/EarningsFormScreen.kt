@@ -154,7 +154,7 @@ fun EarningsFormScreen(
             OutlinedTextField(
                 // Campo em branco fica em branco: mostrar "R$ 0,00" faria
                 // parecer preenchido, e o valor é obrigatório.
-                value = uiState.revenue?.let(BrazilianFormatter::money).orEmpty(),
+                value = uiState.revenueText,
                 onValueChange = viewModel::onRevenueChange,
                 label = { Text(stringResource(R.string.session_revenue)) },
                 singleLine = true,

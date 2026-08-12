@@ -19,8 +19,8 @@ android {
         targetSdk = libs.versions.targetSdk.get().toInt()
 
         // versionName segue o Semantic Versioning do projeto (PRD §40).
-        versionCode = 6
-        versionName = "0.4.0"
+        versionCode = 7
+        versionName = "0.4.1"
 
         testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
         vectorDrawables { useSupportLibrary = true }
@@ -74,6 +74,16 @@ android {
         warningsAsErrors = true
         abortOnError = true
         checkDependencies = true
+
+        // "Existe uma versão mais nova desta biblioteca" não é defeito do
+        // código: com warningsAsErrors, essa checagem faz um commit que
+        // passava hoje falhar amanhã sozinho, só porque alguém publicou uma
+        // release. Isso quebraria o critério do PRD §58 — conseguir fazer
+        // checkout de uma tag antiga e reproduzir aquele estado.
+        //
+        // Atualização de dependência é decisão consciente, feita em um PR
+        // próprio (PRD §55), não um erro de build.
+        disable += setOf("GradleDependency", "NewerVersionAvailable")
     }
 }
 

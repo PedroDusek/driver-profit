@@ -5,6 +5,46 @@ Versionamento conforme [Semantic Versioning](https://semver.org/lang/pt-BR/).
 
 ## [Não publicado]
 
+## [0.4.1] — Campo de valor corrigido e quantidade opcional
+
+### Corrigido
+
+**O campo de valor travava em `R$ 0,00`.**
+
+O campo exibe o valor já formatado, e o `onValueChange` reextraía *todos* os
+dígitos do texto devolvido. Só que `"R$ 0,00"` contém **três** dígitos, não um
+— estado e tela deixavam de ser reversíveis:
+
+- apagar um caractere de `R$ 0,00` devolvia `"00"`, que normalizava de volta
+  para `"0"`: o campo travava e nunca esvaziava;
+- tocar no meio do texto e digitar `3` produzia `R$ 30,00` em vez de `R$ 0,03`,
+  porque a posição do dígito no texto formatado mudava o resultado.
+
+`MoneyInput` passa a raciocinar por diferença: compara os dígitos do texto
+exibido com os do texto devolvido para saber se o motorista digitou ou apagou,
+e identifica o trecho inserido por prefixo/sufixo em comum. Vale para o campo
+de ganhos e para o de despesas.
+
+### Alterado
+
+- **Quantidade de combustível virou opcional.** O indicador principal do
+  produto é **custo/km**, que sai do valor pago e dos quilômetros rodados —
+  não de quantos litros entraram no tanque. Exigir a quantidade cobrava um
+  dado a cada abastecimento em troca de R$/litro, que é secundário
+- Quando informada, a quantidade continua habilitando o preço por unidade.
+  Zero segue rejeitado: ou não foi informado, e aí fica em branco, ou é erro
+  de digitação
+- `ExpenseDetail.Refuel.quantity` e `ExpenseDetail.Charging.energy` agora são
+  anuláveis. **Sem mudança de schema** — as colunas já eram anuláveis
+- Lint deixa de tratar `GradleDependency` e `NewerVersionAvailable` como erro:
+  com `warningsAsErrors`, um commit que passava hoje falharia amanhã sozinho
+  ao ser publicada uma release de dependência, quebrando o critério do PRD §58
+
+### Adicionado
+
+- `docs/HANDOFF.md` — estado do projeto para retomar em sessão nova
+- `MoneyInputTest` com o grupo de regressão do defeito acima
+
 ## [0.4.0] — Expenses
 
 Registro de despesas. Com ganhos e despesas no mesmo banco, a v0.5.0 pode

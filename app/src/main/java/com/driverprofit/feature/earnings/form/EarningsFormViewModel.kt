@@ -6,6 +6,7 @@ import androidx.lifecycle.viewModelScope
 import com.driverprofit.core.common.Money
 import com.driverprofit.core.common.WorkDuration
 import com.driverprofit.core.navigation.DriverProfitDestination
+import com.driverprofit.core.ui.format.MoneyInput
 import com.driverprofit.domain.model.Platform
 import com.driverprofit.domain.model.WorkSession
 import com.driverprofit.domain.model.WorkSessionDraft
@@ -55,7 +56,10 @@ data class EarningsFormUiState(
      * Distinguir "vazio" de "zero" é o que permite exigir o preenchimento sem
      * impedir que o motorista registre um dia de R$ 0,00 — que é um dia real.
      */
-    val revenue: Money? get() = revenueDigits.takeIf { it.isNotEmpty() }?.let { Money(it.toLong()) }
+    val revenue: Money? get() = MoneyInput.toMoney(revenueDigits)
+
+    /** Texto já formatado do campo de valor. */
+    val revenueText: String get() = MoneyInput.display(revenueDigits)
 
     /** `null` enquanto horas e minutos estiverem ambos em branco. */
     val onlineTime: WorkDuration?
@@ -141,11 +145,7 @@ class EarningsFormViewModel(
         updateField(WorkSessionField.PLATFORM) { copy(platform = value) }
 
     fun onRevenueChange(value: String) = updateField(WorkSessionField.REVENUE) {
-        val digits = value.digits(REVENUE_MAX_DIGITS)
-        // Remove zeros à esquerda, mas preserva um "0" digitado: campo vazio e
-        // valor zero precisam continuar distinguíveis, senão o campo
-        // obrigatório aceitaria o branco disfarçado de zero.
-        copy(revenueDigits = digits.trimStart('0').ifEmpty { if (digits.isEmpty()) "" else "0" })
+        copy(revenueDigits = MoneyInput.onTextChanged(revenueDigits, value, REVENUE_MAX_DIGITS))
     }
 
     fun onRidesChange(value: String) = updateField(WorkSessionField.RIDES) {
