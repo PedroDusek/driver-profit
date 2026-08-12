@@ -1,5 +1,6 @@
 package com.driverprofit.core.navigation
 
+import com.driverprofit.domain.model.Expense
 import com.driverprofit.domain.model.Vehicle
 import com.driverprofit.domain.model.WorkSession
 
@@ -39,6 +40,18 @@ object DriverProfitDestination {
 
     fun earningsForm(sessionId: Long = WorkSession.UNSAVED_ID): String =
         "earnings_form?$ARG_SESSION_ID=$sessionId"
+
+    // --- Despesas ---
+
+    /** Histórico de despesas (PRD §19). */
+    const val EXPENSES_LIST = "expenses_list"
+
+    const val ARG_EXPENSE_ID = "expenseId"
+
+    const val EXPENSE_FORM = "expense_form?$ARG_EXPENSE_ID={$ARG_EXPENSE_ID}"
+
+    fun expenseForm(expenseId: Long = Expense.UNSAVED_ID): String =
+        "expense_form?$ARG_EXPENSE_ID=$expenseId"
 
     /** Destino inicial do grafo de navegação. */
     const val START = DASHBOARD

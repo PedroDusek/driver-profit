@@ -8,11 +8,14 @@ import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
 import androidx.navigation.navArgument
+import com.driverprofit.domain.model.Expense
 import com.driverprofit.domain.model.Vehicle
 import com.driverprofit.domain.model.WorkSession
 import com.driverprofit.feature.dashboard.DashboardScreen
 import com.driverprofit.feature.earnings.form.EarningsFormScreen
 import com.driverprofit.feature.earnings.list.EarningsListScreen
+import com.driverprofit.feature.expenses.form.ExpenseFormScreen
+import com.driverprofit.feature.expenses.list.ExpensesListScreen
 import com.driverprofit.feature.vehicle.form.VehicleFormScreen
 import com.driverprofit.feature.vehicle.list.VehicleListScreen
 
@@ -34,6 +37,7 @@ fun DriverProfitNavHost(
             DashboardScreen(
                 onOpenVehicles = { navController.navigate(DriverProfitDestination.VEHICLE_LIST) },
                 onOpenEarnings = { navController.navigate(DriverProfitDestination.EARNINGS_LIST) },
+                onOpenExpenses = { navController.navigate(DriverProfitDestination.EXPENSES_LIST) },
             )
         }
 
@@ -89,6 +93,33 @@ fun DriverProfitNavHost(
             EarningsFormScreen(
                 onBack = navController::popBackStack,
                 // Após salvar, volta para o histórico já atualizado pelo Flow.
+                onSaved = { navController.popBackStack() },
+            )
+        }
+
+        composable(route = DriverProfitDestination.EXPENSES_LIST) {
+            ExpensesListScreen(
+                onBack = navController::popBackStack,
+                onAddExpense = {
+                    navController.navigate(DriverProfitDestination.expenseForm())
+                },
+                onEditExpense = { expenseId ->
+                    navController.navigate(DriverProfitDestination.expenseForm(expenseId))
+                },
+            )
+        }
+
+        composable(
+            route = DriverProfitDestination.EXPENSE_FORM,
+            arguments = listOf(
+                navArgument(DriverProfitDestination.ARG_EXPENSE_ID) {
+                    type = NavType.LongType
+                    defaultValue = Expense.UNSAVED_ID
+                },
+            ),
+        ) {
+            ExpenseFormScreen(
+                onBack = navController::popBackStack,
                 onSaved = { navController.popBackStack() },
             )
         }
