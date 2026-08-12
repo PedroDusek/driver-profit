@@ -1,5 +1,13 @@
 <?xml version="1.0" encoding="utf-8"?>
-<resources>
+<!--
+    tools:locale declara que estes textos são português, e não inglês — o que
+    orienta as ferramentas que inspecionam recursos de string.
+
+    Ele não basta para a verificação Typos do lint, que segue comparando as
+    palavras com um dicionário inglês; essa checagem está desligada em
+    app/build.gradle.kts, com a justificativa registrada lá.
+-->
+<resources xmlns:tools="http://schemas.android.com/tools" tools:locale="pt-BR">
     <string name="app_name">Driver Profit</string>
 
     <!-- Ações genéricas -->
@@ -11,8 +19,42 @@
     <string name="action_confirm">Confirmar</string>
 
     <!-- Dashboard -->
-    <string name="dashboard_foundation_title">Fundação v0.1.0</string>
-    <string name="dashboard_foundation_message">Estrutura técnica no ar: Compose, navegação, tema e banco local.\nOs indicadores de rentabilidade chegam na v0.5.0.</string>
+    <string name="dashboard_empty_title">Nada neste período</string>
+    <string name="dashboard_empty_message">Nenhum ganho ou despesa registrado entre essas datas. Escolha outro período ou lance uma jornada.</string>
+
+    <!-- Filtros de período -->
+    <string name="dashboard_period_today">Hoje</string>
+    <string name="dashboard_period_yesterday">Ontem</string>
+    <string name="dashboard_period_this_week">Esta semana</string>
+    <string name="dashboard_period_this_month">Este mês</string>
+    <string name="dashboard_period_last_month">Mês anterior</string>
+    <string name="dashboard_period_custom">Personalizado</string>
+    <string name="dashboard_period_custom_title">Escolha o período</string>
+    <string name="dashboard_range">%1$s a %2$s</string>
+
+    <!-- Indicadores -->
+    <string name="dashboard_revenue">Faturamento</string>
+    <string name="dashboard_expenses">Despesas</string>
+    <string name="dashboard_profit">Lucro</string>
+
+    <string name="dashboard_section_volume">Volume</string>
+    <string name="dashboard_distance">Km rodados</string>
+    <string name="dashboard_online_time">Horas online</string>
+    <string name="dashboard_rides">Corridas</string>
+
+    <string name="dashboard_section_revenue">Quanto rendeu</string>
+    <string name="dashboard_revenue_per_km">Ganho por km</string>
+    <string name="dashboard_revenue_per_hour">Ganho por hora</string>
+    <string name="dashboard_revenue_per_ride">Ganho por corrida</string>
+
+    <string name="dashboard_section_cost">Custo e lucro</string>
+    <string name="dashboard_cost_per_km">Custo por km</string>
+    <string name="dashboard_profit_per_km">Lucro por km</string>
+    <string name="dashboard_profit_per_hour">Lucro por hora</string>
+    <string name="dashboard_fixed_note">Seguro, IPVA e financiamento entram no lucro, mas ficam fora do custo por km: eles não variam com o quanto você roda.</string>
+    <string name="dashboard_fixed_expenses">Custos fixos no período</string>
+
+    <string name="dashboard_section_expenses">Despesas por natureza</string>
 
     <!-- Veículos -->
     <string name="vehicle_list_title">Veículos</string>

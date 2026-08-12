@@ -17,8 +17,11 @@ import com.driverprofit.domain.usecase.ExpenseValidator
 import com.driverprofit.domain.usecase.GetExpenseUseCase
 import com.driverprofit.domain.usecase.GetVehicleUseCase
 import com.driverprofit.domain.usecase.GetWorkSessionUseCase
+import com.driverprofit.domain.usecase.ObserveDashboardUseCase
+import com.driverprofit.domain.usecase.ObserveExpensesBetweenUseCase
 import com.driverprofit.domain.usecase.ObserveExpensesUseCase
 import com.driverprofit.domain.usecase.ObserveVehiclesUseCase
+import com.driverprofit.domain.usecase.ObserveWorkSessionsBetweenUseCase
 import com.driverprofit.domain.usecase.ObserveWorkSessionsUseCase
 import com.driverprofit.domain.usecase.SaveExpenseUseCase
 import com.driverprofit.domain.usecase.SaveVehicleUseCase
@@ -53,6 +56,8 @@ interface AppContainer {
     val observeExpenses: ObserveExpensesUseCase
     val getExpense: GetExpenseUseCase
     val deleteExpense: DeleteExpenseUseCase
+
+    val observeDashboard: ObserveDashboardUseCase
 }
 
 class DefaultAppContainer(private val context: Context) : AppContainer {
@@ -132,5 +137,12 @@ class DefaultAppContainer(private val context: Context) : AppContainer {
 
     override val deleteExpense: DeleteExpenseUseCase by lazy {
         DeleteExpenseUseCase(expenseRepository)
+    }
+
+    override val observeDashboard: ObserveDashboardUseCase by lazy {
+        ObserveDashboardUseCase(
+            observeWorkSessionsBetween = ObserveWorkSessionsBetweenUseCase(workSessionRepository),
+            observeExpensesBetween = ObserveExpensesBetweenUseCase(expenseRepository),
+        )
     }
 }
