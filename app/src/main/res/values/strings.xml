@@ -8,6 +8,7 @@
     <string name="action_edit">Editar</string>
     <string name="action_delete">Excluir</string>
     <string name="action_cancel">Cancelar</string>
+    <string name="action_confirm">Confirmar</string>
 
     <!-- Dashboard -->
     <string name="dashboard_foundation_title">Fundação v0.1.0</string>
@@ -40,7 +41,54 @@
     <string name="fuel_hybrid">Híbrido (combustão e elétrico)</string>
     <string name="fuel_electricity">Energia elétrica</string>
 
+    <!-- Ganhos -->
+    <string name="earnings_list_title">Ganhos</string>
+    <string name="earnings_add">Novo lançamento</string>
+    <string name="earnings_empty_title">Nenhum ganho registrado</string>
+    <string name="earnings_empty_message">Registre uma jornada de trabalho para começar a acompanhar quanto você ganha por hora e por quilômetro.</string>
+    <string name="earnings_delete_title">Excluir lançamento?</string>
+    <string name="earnings_delete_message">O registro de %1$s será removido. Esta ação não pode ser desfeita.</string>
+
+    <!-- Resumo do histórico -->
+    <!-- O título já rotula o valor em destaque; não há string de "faturamento" aqui. -->
+    <string name="earnings_summary_title">Total do histórico</string>
+    <string name="earnings_summary_rides">Corridas</string>
+    <string name="earnings_summary_time">Horas online</string>
+    <string name="earnings_summary_distance">Distância</string>
+    <string name="earnings_summary_per_hour">Por hora</string>
+    <string name="earnings_summary_per_km">Por km</string>
+
+    <!-- Formulário de ganhos -->
+    <string name="earnings_form_add_title">Novo lançamento</string>
+    <string name="earnings_form_edit_title">Editar lançamento</string>
+    <string name="session_date">Data</string>
+    <string name="session_platform">Plataforma</string>
+    <string name="session_revenue">Valor recebido</string>
+    <string name="session_rides">Corridas</string>
+    <string name="session_online_time">Tempo online</string>
+    <string name="session_hours">Horas</string>
+    <string name="session_minutes">Minutos</string>
+    <string name="session_distance">Km rodados</string>
+    <string name="session_note">Observação</string>
+    <string name="session_note_optional">Opcional</string>
+
+    <plurals name="session_rides_count">
+        <item quantity="one">%1$d corrida</item>
+        <item quantity="other">%1$d corridas</item>
+    </plurals>
+
+    <!-- Plataformas -->
+    <string name="platform_uber">Uber</string>
+    <string name="platform_99">99</string>
+    <string name="platform_indrive">InDrive</string>
+    <string name="platform_other">Outra</string>
+
     <!-- Erros de validação -->
     <string name="error_required">Campo obrigatório</string>
     <string name="error_name_too_long">Nome muito longo</string>
+    <string name="error_date_in_future">A data não pode ser no futuro</string>
+    <string name="error_negative">O valor não pode ser negativo</string>
+    <string name="error_online_time_too_long">Um dia tem no máximo 24 horas</string>
+    <string name="error_note_too_long">Observação muito longa</string>
+    <string name="error_empty_session">Preencha ao menos um número da jornada</string>
 </resources>

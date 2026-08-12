@@ -7,6 +7,8 @@ import androidx.lifecycle.viewmodel.initializer
 import androidx.lifecycle.viewmodel.viewModelFactory
 import com.driverprofit.DriverProfitApplication
 import com.driverprofit.core.di.AppContainer
+import com.driverprofit.feature.earnings.form.EarningsFormViewModel
+import com.driverprofit.feature.earnings.list.EarningsListViewModel
 import com.driverprofit.feature.vehicle.form.VehicleFormViewModel
 import com.driverprofit.feature.vehicle.list.VehicleListViewModel
 
@@ -31,6 +33,19 @@ object DriverProfitViewModelFactory {
                 savedStateHandle = createSavedStateHandle(),
                 getVehicle = container().getVehicle,
                 saveVehicle = container().saveVehicle,
+            )
+        }
+        initializer {
+            EarningsListViewModel(
+                observeWorkSessions = container().observeWorkSessions,
+                deleteWorkSession = container().deleteWorkSession,
+            )
+        }
+        initializer {
+            EarningsFormViewModel(
+                savedStateHandle = createSavedStateHandle(),
+                getWorkSession = container().getWorkSession,
+                saveWorkSession = container().saveWorkSession,
             )
         }
     }

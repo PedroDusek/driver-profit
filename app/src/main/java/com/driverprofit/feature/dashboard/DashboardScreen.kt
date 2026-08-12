@@ -6,6 +6,7 @@ import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.padding
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.DirectionsCar
+import androidx.compose.material.icons.filled.Payments
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
@@ -27,13 +28,14 @@ import com.driverprofit.core.ui.theme.DriverProfitTheme
  * Dashboard — tela principal do aplicativo (PRD §20).
  *
  * Ainda é um marcador: os indicadores de rentabilidade pertencem à v0.5.0 e
- * dependem de ganhos (v0.3.0) e despesas (v0.4.0) existirem. Por enquanto ela
- * serve de porta de entrada para o cadastro de veículos.
+ * dependem de despesas (v0.4.0) existirem para que "lucro" signifique algo.
+ * Por enquanto ela serve de porta de entrada para ganhos e veículos.
  */
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun DashboardScreen(
     onOpenVehicles: () -> Unit,
+    onOpenEarnings: () -> Unit,
     modifier: Modifier = Modifier,
 ) {
     Scaffold(
@@ -42,6 +44,12 @@ fun DashboardScreen(
             TopAppBar(
                 title = { Text(text = stringResource(R.string.app_name)) },
                 actions = {
+                    IconButton(onClick = onOpenEarnings) {
+                        Icon(
+                            imageVector = Icons.Default.Payments,
+                            contentDescription = stringResource(R.string.earnings_list_title),
+                        )
+                    }
                     IconButton(onClick = onOpenVehicles) {
                         Icon(
                             imageVector = Icons.Default.DirectionsCar,
@@ -79,6 +87,6 @@ fun DashboardScreen(
 @Composable
 private fun DashboardScreenPreview() {
     DriverProfitTheme(dynamicColor = false) {
-        DashboardScreen(onOpenVehicles = {})
+        DashboardScreen(onOpenVehicles = {}, onOpenEarnings = {})
     }
 }
