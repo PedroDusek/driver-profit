@@ -83,6 +83,81 @@
     <string name="platform_indrive">InDrive</string>
     <string name="platform_other">Outra</string>
 
+    <!-- Despesas -->
+    <string name="expenses_list_title">Despesas</string>
+    <string name="expenses_add">Nova despesa</string>
+    <string name="expenses_empty_title">Nenhuma despesa registrada</string>
+    <string name="expenses_empty_message">Registre abastecimentos, manutenções e outros gastos para saber quanto você realmente lucra.</string>
+    <string name="expenses_filter_empty_title">Nada neste filtro</string>
+    <string name="expenses_filter_empty_message">Você tem despesas registradas, mas nenhuma dessa natureza.</string>
+    <string name="expenses_delete_title">Excluir despesa?</string>
+    <string name="expenses_delete_message">A despesa de %1$s em %2$s será removida. Esta ação não pode ser desfeita.</string>
+    <string name="expenses_summary_title">Total do histórico</string>
+
+    <!-- Filtros de despesa -->
+    <string name="expenses_filter_all">Todas</string>
+    <string name="expenses_filter_fuel">Combustível e energia</string>
+    <string name="expenses_filter_maintenance">Manutenção</string>
+    <string name="expenses_filter_others">Outras</string>
+
+    <!-- Formulário de despesa -->
+    <string name="expenses_form_add_title">Nova despesa</string>
+    <string name="expenses_form_edit_title">Editar despesa</string>
+    <string name="expense_date">Data</string>
+    <string name="expense_category">Natureza da despesa</string>
+    <string name="expense_amount">Valor pago</string>
+    <string name="expense_amount_hint">Zero é válido: recarga gratuita conta</string>
+    <string name="expense_vehicle">Veículo</string>
+    <string name="expense_vehicle_none">Cadastre um veículo antes de lançar esta despesa</string>
+    <string name="expense_description">Observação</string>
+    <string name="expense_fuel_type">Combustível abastecido</string>
+    <string name="expense_quantity">Quantidade</string>
+    <string name="expense_quantity_with_unit">Quantidade (%1$s)</string>
+    <string name="expense_quantity_hint">Use vírgula para os decimais: 35,478</string>
+    <string name="expense_station">Posto</string>
+    <string name="expense_charging_location">Tipo de carregamento</string>
+    <string name="expense_place">Local da recarga</string>
+    <string name="expense_maintenance_category">Item da manutenção</string>
+    <string name="expense_workshop">Oficina</string>
+
+    <!-- Naturezas de despesa -->
+    <string name="expense_category_fuel">Abastecimento</string>
+    <string name="expense_category_charging">Carregamento elétrico</string>
+    <string name="expense_category_maintenance">Manutenção</string>
+    <string name="expense_category_car_wash">Lavagem</string>
+    <string name="expense_category_toll">Pedágio</string>
+    <string name="expense_category_parking">Estacionamento</string>
+    <string name="expense_category_insurance">Seguro</string>
+    <string name="expense_category_vehicle_tax">IPVA</string>
+    <string name="expense_category_financing">Financiamento</string>
+    <string name="expense_category_other">Outros</string>
+
+    <!-- Itens de manutenção -->
+    <string name="maintenance_oil">Óleo</string>
+    <string name="maintenance_filters">Filtros</string>
+    <string name="maintenance_tires">Pneus</string>
+    <string name="maintenance_brakes">Freios</string>
+    <string name="maintenance_suspension">Suspensão</string>
+    <string name="maintenance_battery">Bateria</string>
+    <string name="maintenance_belt">Correia</string>
+    <string name="maintenance_parts">Peças</string>
+    <string name="maintenance_electrical">Elétrica</string>
+    <string name="maintenance_mechanical">Mecânica</string>
+    <string name="maintenance_bodywork">Funilaria</string>
+    <string name="maintenance_inspection">Revisão</string>
+    <string name="maintenance_other">Outros</string>
+
+    <!-- Tipos de carregamento -->
+    <string name="charging_residential">Residencial</string>
+    <string name="charging_commercial">Comercial</string>
+    <string name="charging_public">Público</string>
+    <string name="charging_other">Outro</string>
+
+    <!-- Unidades -->
+    <string name="unit_liter">L</string>
+    <string name="unit_cubic_meter">m³</string>
+    <string name="unit_kwh">kWh</string>
+
     <!-- Erros de validação -->
     <string name="error_required">Campo obrigatório</string>
     <string name="error_name_too_long">Nome muito longo</string>
@@ -91,4 +166,9 @@
     <string name="error_online_time_too_long">Um dia tem no máximo 24 horas</string>
     <string name="error_note_too_long">Observação muito longa</string>
     <string name="error_empty_session">Preencha ao menos um número da jornada</string>
+    <string name="error_quantity_required">Informe quanto foi abastecido</string>
+    <string name="error_quantity_zero">A quantidade não pode ser zero</string>
+    <string name="error_fuel_not_supported">Seu veículo não aceita esse combustível</string>
+    <string name="error_vehicle_cannot_charge">Esse veículo não é recarregável</string>
+    <string name="error_text_too_long">Texto muito longo</string>
 </resources>

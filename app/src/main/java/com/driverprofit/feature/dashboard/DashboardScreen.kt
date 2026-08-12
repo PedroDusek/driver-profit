@@ -7,6 +7,7 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.DirectionsCar
 import androidx.compose.material.icons.filled.Payments
+import androidx.compose.material.icons.filled.ReceiptLong
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
@@ -36,6 +37,7 @@ import com.driverprofit.core.ui.theme.DriverProfitTheme
 fun DashboardScreen(
     onOpenVehicles: () -> Unit,
     onOpenEarnings: () -> Unit,
+    onOpenExpenses: () -> Unit,
     modifier: Modifier = Modifier,
 ) {
     Scaffold(
@@ -48,6 +50,12 @@ fun DashboardScreen(
                         Icon(
                             imageVector = Icons.Default.Payments,
                             contentDescription = stringResource(R.string.earnings_list_title),
+                        )
+                    }
+                    IconButton(onClick = onOpenExpenses) {
+                        Icon(
+                            imageVector = Icons.Default.ReceiptLong,
+                            contentDescription = stringResource(R.string.expenses_list_title),
                         )
                     }
                     IconButton(onClick = onOpenVehicles) {
@@ -87,6 +95,6 @@ fun DashboardScreen(
 @Composable
 private fun DashboardScreenPreview() {
     DriverProfitTheme(dynamicColor = false) {
-        DashboardScreen(onOpenVehicles = {}, onOpenEarnings = {})
+        DashboardScreen(onOpenVehicles = {}, onOpenEarnings = {}, onOpenExpenses = {})
     }
 }

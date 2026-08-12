@@ -9,6 +9,8 @@ import com.driverprofit.DriverProfitApplication
 import com.driverprofit.core.di.AppContainer
 import com.driverprofit.feature.earnings.form.EarningsFormViewModel
 import com.driverprofit.feature.earnings.list.EarningsListViewModel
+import com.driverprofit.feature.expenses.form.ExpenseFormViewModel
+import com.driverprofit.feature.expenses.list.ExpensesListViewModel
 import com.driverprofit.feature.vehicle.form.VehicleFormViewModel
 import com.driverprofit.feature.vehicle.list.VehicleListViewModel
 
@@ -46,6 +48,20 @@ object DriverProfitViewModelFactory {
                 savedStateHandle = createSavedStateHandle(),
                 getWorkSession = container().getWorkSession,
                 saveWorkSession = container().saveWorkSession,
+            )
+        }
+        initializer {
+            ExpensesListViewModel(
+                observeExpenses = container().observeExpenses,
+                deleteExpense = container().deleteExpense,
+            )
+        }
+        initializer {
+            ExpenseFormViewModel(
+                savedStateHandle = createSavedStateHandle(),
+                observeVehicles = container().observeVehicles,
+                getExpense = container().getExpense,
+                saveExpense = container().saveExpense,
             )
         }
     }
