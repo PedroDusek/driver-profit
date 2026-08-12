@@ -1,6 +1,10 @@
 package com.driverprofit.data.local.database
 
 import androidx.room.TypeConverter
+import com.driverprofit.domain.model.ChargingLocation
+import com.driverprofit.domain.model.ExpenseCategory
+import com.driverprofit.domain.model.FuelType
+import com.driverprofit.domain.model.MaintenanceCategory
 import com.driverprofit.domain.model.Platform
 import com.driverprofit.domain.model.VehicleFuel
 import java.time.Instant
@@ -42,4 +46,31 @@ class Converters {
 
     @TypeConverter
     fun nameToPlatform(value: String?): Platform? = value?.let(Platform::valueOf)
+
+    @TypeConverter
+    fun expenseCategoryToName(value: ExpenseCategory?): String? = value?.name
+
+    @TypeConverter
+    fun nameToExpenseCategory(value: String?): ExpenseCategory? =
+        value?.let(ExpenseCategory::valueOf)
+
+    @TypeConverter
+    fun fuelTypeToName(value: FuelType?): String? = value?.name
+
+    @TypeConverter
+    fun nameToFuelType(value: String?): FuelType? = value?.let(FuelType::valueOf)
+
+    @TypeConverter
+    fun chargingLocationToName(value: ChargingLocation?): String? = value?.name
+
+    @TypeConverter
+    fun nameToChargingLocation(value: String?): ChargingLocation? =
+        value?.let(ChargingLocation::valueOf)
+
+    @TypeConverter
+    fun maintenanceCategoryToName(value: MaintenanceCategory?): String? = value?.name
+
+    @TypeConverter
+    fun nameToMaintenanceCategory(value: String?): MaintenanceCategory? =
+        value?.let(MaintenanceCategory::valueOf)
 }

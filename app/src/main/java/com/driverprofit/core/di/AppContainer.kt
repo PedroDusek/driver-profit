@@ -4,16 +4,23 @@ import android.content.Context
 import androidx.room.Room
 import com.driverprofit.data.local.database.DriverProfitDatabase
 import com.driverprofit.data.local.database.Migrations
+import com.driverprofit.data.repository.OfflineExpenseRepository
 import com.driverprofit.data.repository.OfflineVehicleRepository
 import com.driverprofit.data.repository.OfflineWorkSessionRepository
+import com.driverprofit.domain.repository.ExpenseRepository
 import com.driverprofit.domain.repository.VehicleRepository
 import com.driverprofit.domain.repository.WorkSessionRepository
+import com.driverprofit.domain.usecase.DeleteExpenseUseCase
 import com.driverprofit.domain.usecase.DeleteVehicleUseCase
 import com.driverprofit.domain.usecase.DeleteWorkSessionUseCase
+import com.driverprofit.domain.usecase.ExpenseValidator
+import com.driverprofit.domain.usecase.GetExpenseUseCase
 import com.driverprofit.domain.usecase.GetVehicleUseCase
 import com.driverprofit.domain.usecase.GetWorkSessionUseCase
+import com.driverprofit.domain.usecase.ObserveExpensesUseCase
 import com.driverprofit.domain.usecase.ObserveVehiclesUseCase
 import com.driverprofit.domain.usecase.ObserveWorkSessionsUseCase
+import com.driverprofit.domain.usecase.SaveExpenseUseCase
 import com.driverprofit.domain.usecase.SaveVehicleUseCase
 import com.driverprofit.domain.usecase.SaveWorkSessionUseCase
 import com.driverprofit.domain.usecase.VehicleValidator
@@ -41,6 +48,11 @@ interface AppContainer {
     val observeWorkSessions: ObserveWorkSessionsUseCase
     val getWorkSession: GetWorkSessionUseCase
     val deleteWorkSession: DeleteWorkSessionUseCase
+
+    val saveExpense: SaveExpenseUseCase
+    val observeExpenses: ObserveExpensesUseCase
+    val getExpense: GetExpenseUseCase
+    val deleteExpense: DeleteExpenseUseCase
 }
 
 class DefaultAppContainer(private val context: Context) : AppContainer {
@@ -98,5 +110,27 @@ class DefaultAppContainer(private val context: Context) : AppContainer {
 
     override val deleteWorkSession: DeleteWorkSessionUseCase by lazy {
         DeleteWorkSessionUseCase(workSessionRepository)
+    }
+
+    private val expenseRepository: ExpenseRepository by lazy {
+        OfflineExpenseRepository(database.expenseDao())
+    }
+
+    private val expenseValidator = ExpenseValidator()
+
+    override val saveExpense: SaveExpenseUseCase by lazy {
+        SaveExpenseUseCase(expenseRepository, vehicleRepository, expenseValidator)
+    }
+
+    override val observeExpenses: ObserveExpensesUseCase by lazy {
+        ObserveExpensesUseCase(expenseRepository)
+    }
+
+    override val getExpense: GetExpenseUseCase by lazy {
+        GetExpenseUseCase(expenseRepository)
+    }
+
+    override val deleteExpense: DeleteExpenseUseCase by lazy {
+        DeleteExpenseUseCase(expenseRepository)
     }
 }
