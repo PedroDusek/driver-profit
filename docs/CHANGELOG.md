@@ -5,6 +5,57 @@ Versionamento conforme [Semantic Versioning](https://semver.org/lang/pt-BR/).
 
 ## [Não publicado]
 
+## [0.3.0] — Earnings
+
+Registro de ganhos: o motorista já consegue lançar quanto trabalhou e quanto
+recebeu, e ver R$/hora e R$/km do histórico.
+
+### Adicionado
+
+**Domínio**
+- `WorkSession` — sessão de trabalho com data, plataforma, corridas,
+  faturamento, tempo online, distância e observação
+- `revenuePerHour`, `revenuePerKm` e `revenuePerRide` como propriedades da
+  sessão, devolvendo `null` quando o divisor é zero (PRD §21)
+- `Platform` — Uber, 99, InDrive e Outra
+- `WorkSessionValidator`, `SaveWorkSessionUseCase` e os use cases de leitura
+- `ObserveWorkSessionsBetweenUseCase` — consulta por período, já pronta para os
+  filtros do dashboard da v0.5.0
+
+**Dados**
+- Banco vai para a **versão 3**, com `work_sessions` e índice sobre `date`
+- Migração 2→3 puramente aditiva
+
+**Interface**
+- Histórico de lançamentos com card de totais, edição e exclusão
+- Formulário com seletor de data, plataforma, valor, corridas, tempo e
+  distância
+- Acesso pelo ícone de ganhos no dashboard
+
+**Testes**
+- 53 testes novos (126 no total)
+- Testes instrumentados de `WorkSessionDao`, incluindo consulta por período,
+  e de migração 2→3 e 1→3
+
+### Decisões registradas
+
+- **Registro por sessão, não por corrida.** Pedir para lançar corrida a corrida
+  seria trabalho demais para quem dirige o dia inteiro; o motorista consulta o
+  extrato da plataforma e lança o consolidado.
+- **Valor digitado em centavos.** Teclar `32050` mostra `R$ 320,50` — evita a
+  briga com vírgula, ponto e teclado numérico.
+- **Distância em quilômetros inteiros.** Meio quilômetro muda R$/km na terceira
+  casa decimal; não vale a complexidade de fracionar.
+- **Campos numéricos são individualmente opcionais**, mas a sessão inteira não
+  pode estar vazia. Forçar o preenchimento de km faria o motorista inventar um
+  número — pior que não ter o dado.
+- **Data de hoje já vem preenchida** no lançamento novo, que é o caso comum.
+- **Minutos acima de 59 são recusados na digitação**, não no save.
+
+### Não verificado
+
+Testes instrumentados exigem emulador e **não foram executados**.
+
 ## [0.2.1] — Cadastro de veículo simplificado
 
 Reduz o cadastro a **nome + tipo de combustível**. Decisão de produto: nenhum

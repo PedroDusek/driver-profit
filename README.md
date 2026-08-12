@@ -154,7 +154,8 @@ Detalhes em [`docs/ARCHITECTURE.md`](docs/ARCHITECTURE.md).
 | Cadastro, edição e exclusão de veículo | ✅ v0.2.0 |
 | Cadastro simplificado (nome + combustível) | ✅ v0.2.1 |
 | Migração de schema 1→2 | ✅ v0.2.1 |
-| Registro de ganhos | ⏳ v0.3.0 |
+| Registro de ganhos e histórico | ✅ v0.3.0 |
+| R$/hora e R$/km do histórico | ✅ v0.3.0 |
 | Registro de despesas | ⏳ v0.4.0 |
 | Dashboard com indicadores | ⏳ v0.5.0 |
 

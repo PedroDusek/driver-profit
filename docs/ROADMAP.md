@@ -44,13 +44,16 @@ Marca, modelo, ano e odômetro inicial foram removidos na v0.2.1 — nenhum dele
 entra em conta de rentabilidade. Quilometragem volta na v0.6.0 como registro
 por lançamento.
 
-### v0.3.0 — Earnings
+### v0.3.0 — Earnings ✅ concluída
 
-- [ ] Registro de sessão de trabalho: data, plataforma, corridas, valor, horas, km
-- [ ] Plataformas: Uber, 99, InDrive, Outra
-- [ ] Edição e exclusão
-- [ ] Histórico básico
-- [ ] Testes dos cálculos básicos
+- [x] Registro de sessão de trabalho: data, plataforma, corridas, valor, horas, km
+- [x] Plataformas: Uber, 99, InDrive, Outra
+- [x] Edição e exclusão
+- [x] Histórico básico, com totais do período exibido
+- [x] Testes dos cálculos básicos
+
+**Critério de saída:** o motorista lança uma jornada e vê quanto ganhou por
+hora e por quilômetro.
 
 A plataforma é armazenada em cada registro desde já, para viabilizar
 comparação entre plataformas depois (PRD §16) sem migração.

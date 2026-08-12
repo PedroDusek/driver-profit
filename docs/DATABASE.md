@@ -2,7 +2,7 @@
 
 Room sobre SQLite, local ao aparelho. Nome do arquivo: `driver_profit.db`.
 
-**Versão atual do schema: 2**
+**Versão atual do schema: 3**
 
 O JSON do schema é exportado em `app/schemas/` e **é versionado no Git**. Ele é
 o que torna possível escrever testes de migração de verdade. Os schemas
@@ -29,6 +29,37 @@ ele determina a unidade de medida do abastecimento (litro, m³ ou kWh).
 **Quilometragem não vive aqui.** Ela será registrada por lançamento, servindo
 a controles de manutenção (troca de óleo, pneus), e não como atributo do
 veículo.
+
+### `work_sessions` (v3)
+
+Uma sessão de trabalho: o que o motorista fez em um dia, numa plataforma
+(PRD §15). Rodar na Uber e na 99 no mesmo dia são dois registros — é isso que
+torna a comparação entre plataformas possível depois (PRD §16).
+
+| Coluna | Tipo SQL | Nulo | Descrição |
+| --- | --- | --- | --- |
+| `id` | INTEGER PK AUTOINCREMENT | não | Identificador |
+| `date` | INTEGER | não | Epoch day do dia de trabalho |
+| `platform` | TEXT | não | `UBER` \| `NINETY_NINE` \| `INDRIVE` \| `OTHER` |
+| `rides` | INTEGER | não | Número de corridas |
+| `revenue_cents` | INTEGER | não | Valor recebido, em centavos |
+| `online_minutes` | INTEGER | não | Tempo online, em minutos |
+| `distance_km` | INTEGER | não | Quilômetros rodados, inteiros |
+| `note` | TEXT | não | Observação; string vazia quando não informada |
+| `created_at` | INTEGER | não | Epoch millis (UTC) |
+
+**Índice:** `index_work_sessions_date` sobre `date`. Toda consulta do dashboard
+filtra por período (PRD §20), e como `date` é epoch day o `BETWEEN` é
+comparação numérica que usa o índice.
+
+**Campos numéricos não são anuláveis.** Um dia sem quilometragem anotada grava
+`0`, não `NULL`: para somar no dashboard, "não anotei" e "zero" dão no mesmo, e
+`NULL` em coluna numérica só produziria `COALESCE` espalhado por toda query.
+O que a validação impede é a sessão inteira estar zerada.
+
+**A plataforma é gravada desde já**, mesmo sem análise por plataforma no MVP.
+Adicionar uma plataforma nova é acrescentar uma constante no enum — não mexe no
+banco, porque a coluna guarda o `name`.
 
 ## Convenções
 
@@ -64,6 +95,7 @@ Data como epoch day mantém consulta por período como comparação numérica �
 | `Instant` | `INTEGER` epoch millis |
 | `LocalDate` | `INTEGER` epoch day |
 | `VehicleFuel` | `TEXT` |
+| `Platform` | `TEXT` |
 
 ## Migrações
 
@@ -90,6 +122,7 @@ Um PR que altera apenas a Entity está incompleto.
 | --- | --- | --- |
 | 1 | v0.1.0 | Schema inicial: `vehicles` com marca, modelo, ano, odômetro inicial, propulsão, combustível e capacidade de recarga |
 | 2 | v0.2.1 | Cadastro simplificado: remove `brand`, `model`, `year`, `initial_odometer_km`, `powertrain` e `charging_capability`; introduz `name` e `fuel` |
+| 3 | v0.3.0 | Adiciona `work_sessions` e o índice sobre `date` |
 
 #### Migração 1 → 2
 
@@ -109,6 +142,11 @@ brasileira de aplicativo — e porque a coluna não aceita nulo.
 As colunas `initial_odometer_km` e `charging_capability` são descartadas sem
 destino. Isso é perda de informação assumida: o odômetro passa a ser registrado
 por lançamento, e a distinção plug-in deixou de existir no modelo.
+
+#### Migração 2 → 3
+
+Puramente aditiva: cria `work_sessions` e seu índice. Nenhuma tabela existente
+é tocada, então não há risco para os dados já gravados.
 
 ## Desvios registrados em relação ao PRD
 
