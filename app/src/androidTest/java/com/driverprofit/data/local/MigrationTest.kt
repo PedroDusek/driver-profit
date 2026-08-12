@@ -102,6 +102,58 @@ class MigrationTest {
         }
     }
 
+    @Test
+    fun migracao2para3CriaWorkSessionsSemTocarEmVehicles() {
+        helper.createDatabase(TEST_DB, 2).use { db ->
+            db.execSQL(
+                "INSERT INTO vehicles (id, name, fuel, created_at) " +
+                    "VALUES (1, 'Onix branco', 'FLEX', 1000)",
+            )
+        }
+
+        val db = helper.runMigrationsAndValidate(TEST_DB, 3, true, Migrations.MIGRATION_2_3)
+
+        // A migração é aditiva: o veículo cadastrado tem que continuar lá.
+        db.query("SELECT name FROM vehicles").use { cursor ->
+            assertTrue(cursor.moveToFirst())
+            assertEquals("Onix branco", cursor.getString(0))
+        }
+        db.query("SELECT COUNT(*) FROM work_sessions").use { cursor ->
+            assertTrue(cursor.moveToFirst())
+            assertEquals(0, cursor.getInt(0))
+        }
+    }
+
+    @Test
+    fun migracao1para3AtravessaAsDuasEtapas() {
+        helper.createDatabase(TEST_DB, 1).use { db ->
+            db.execSQL(
+                """
+                INSERT INTO vehicles
+                    (id, brand, model, year, initial_odometer_km, powertrain,
+                     combustion_fuel, charging_capability, created_at)
+                VALUES
+                    (1, 'Chevrolet', 'Onix', 2020, 50000, 'COMBUSTION', 'FLEX', NULL, 1000)
+                """.trimIndent(),
+            )
+        }
+
+        // Quem instalou a v0.1.0 e pulou a v0.2.1 precisa chegar inteiro na v3.
+        val db = helper.runMigrationsAndValidate(
+            TEST_DB,
+            3,
+            true,
+            Migrations.MIGRATION_1_2,
+            Migrations.MIGRATION_2_3,
+        )
+
+        db.query("SELECT name, fuel FROM vehicles").use { cursor ->
+            assertTrue(cursor.moveToFirst())
+            assertEquals("Chevrolet Onix", cursor.getString(0))
+            assertEquals("FLEX", cursor.getString(1))
+        }
+    }
+
     private companion object {
         const val TEST_DB = "migration-test.db"
     }
