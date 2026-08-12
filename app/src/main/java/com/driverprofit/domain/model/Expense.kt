@@ -1,0 +1,99 @@
+package com.driverprofit.domain.model
+
+import com.driverprofit.core.common.Money
+import com.driverprofit.core.common.Quantity
+import java.time.Instant
+import java.time.LocalDate
+
+/**
+ * Campos específicos de cada natureza de despesa.
+ *
+ * Modelado como `sealed` para que seja impossível construir um abastecimento
+ * sem combustível ou uma recarga com posto de gasolina. No banco tudo isso
+ * vira colunas anuláveis de uma tabela só (PRD §17: nada de estrutura rígida
+ * que impeça categorias novas), mas o domínio não precisa herdar essa
+ * frouxidão.
+ */
+sealed interface ExpenseDetail {
+
+    /** Abastecimento — combustível líquido ou gasoso (PRD §7 a §10). */
+    data class Refuel(
+        val fuelType: FuelType,
+        val quantity: Quantity,
+        val station: String = "",
+    ) : ExpenseDetail
+
+    /** Recarga elétrica (PRD §11). */
+    data class Charging(
+        val energy: Quantity,
+        val location: ChargingLocation,
+        val place: String = "",
+    ) : ExpenseDetail
+
+    /** Manutenção (PRD §18). */
+    data class Maintenance(
+        val category: MaintenanceCategory,
+        val workshop: String = "",
+    ) : ExpenseDetail
+}
+
+/**
+ * Uma despesa lançada pelo motorista (PRD §17).
+ *
+ * @param vehicleId veículo a que a despesa se refere. Anulável porque pedágio
+ *   e estacionamento não dependem de veículo, e porque excluir um veículo não
+ *   pode apagar o histórico financeiro — a despesa fica, órfã.
+ * @param detail `null` para categorias que são só valor e descrição.
+ */
+data class Expense(
+    val id: Long = UNSAVED_ID,
+    val vehicleId: Long? = null,
+    val date: LocalDate,
+    val category: ExpenseCategory,
+    val amount: Money,
+    val description: String = "",
+    val detail: ExpenseDetail? = null,
+    val createdAt: Instant,
+) {
+    /**
+     * Quantidade abastecida ou carregada, quando houver.
+     *
+     * A unidade vem de [unit] — nunca assuma litros.
+     */
+    val quantity: Quantity?
+        get() = when (detail) {
+            is ExpenseDetail.Refuel -> detail.quantity
+            is ExpenseDetail.Charging -> detail.energy
+            else -> null
+        }
+
+    /** Unidade de medida da [quantity]. */
+    val unit: MeasurementUnit?
+        get() = when (detail) {
+            is ExpenseDetail.Refuel -> detail.fuelType.unit
+            is ExpenseDetail.Charging -> MeasurementUnit.KILOWATT_HOUR
+            else -> null
+        }
+
+    /**
+     * Preço por unidade: R$/litro, R$/m³ ou R$/kWh (PRD §7, §10, §11).
+     *
+     * `null` quando não há quantidade — inclusive no caso de recarga
+     * gratuita registrada sem kWh. Uma recarga gratuita **com** kWh informado
+     * tem preço `R$ 0,00` por unidade, que é informação válida e diferente de
+     * indisponível.
+     */
+    val pricePerUnit: Money?
+        get() = quantity?.let { amount.per(it.toUnits()) }
+
+    companion object {
+        /** Id atribuído a uma despesa que ainda não foi persistida. */
+        const val UNSAVED_ID: Long = 0L
+
+        /** Acima disso a descrição vira outra coisa. */
+        const val MAX_DESCRIPTION_LENGTH: Int = 200
+
+        /** Nome de posto, oficina ou local de recarga. */
+        const val MAX_PLACE_LENGTH: Int = 80
+    }
+}
