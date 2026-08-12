@@ -154,6 +154,71 @@ class MigrationTest {
         }
     }
 
+    @Test
+    fun migracao3para4CriaExpensesSemTocarNoQueJaExiste() {
+        helper.createDatabase(TEST_DB, 3).use { db ->
+            db.execSQL(
+                "INSERT INTO vehicles (id, name, fuel, created_at) " +
+                    "VALUES (1, 'Onix branco', 'FLEX', 1000)",
+            )
+            db.execSQL(
+                """
+                INSERT INTO work_sessions
+                    (id, date, platform, rides, revenue_cents, online_minutes,
+                     distance_km, note, created_at)
+                VALUES (1, 20000, 'UBER', 18, 32050, 500, 210, '', 1000)
+                """.trimIndent(),
+            )
+        }
+
+        val db = helper.runMigrationsAndValidate(TEST_DB, 4, true, Migrations.MIGRATION_3_4)
+
+        // Aditiva: veículo e jornada continuam intactos.
+        db.query("SELECT COUNT(*) FROM vehicles").use { cursor ->
+            assertTrue(cursor.moveToFirst())
+            assertEquals(1, cursor.getInt(0))
+        }
+        db.query("SELECT COUNT(*) FROM work_sessions").use { cursor ->
+            assertTrue(cursor.moveToFirst())
+            assertEquals(1, cursor.getInt(0))
+        }
+        db.query("SELECT COUNT(*) FROM expenses").use { cursor ->
+            assertTrue(cursor.moveToFirst())
+            assertEquals(0, cursor.getInt(0))
+        }
+    }
+
+    @Test
+    fun migracao1para4AtravessaTodasAsEtapas() {
+        helper.createDatabase(TEST_DB, 1).use { db ->
+            db.execSQL(
+                """
+                INSERT INTO vehicles
+                    (id, brand, model, year, initial_odometer_km, powertrain,
+                     combustion_fuel, charging_capability, created_at)
+                VALUES
+                    (1, 'Chevrolet', 'Onix', 2020, 50000, 'COMBUSTION', 'FLEX', NULL, 1000)
+                """.trimIndent(),
+            )
+        }
+
+        // Quem instalou a v0.1.0 e só agora atualiza precisa chegar inteiro.
+        val db = helper.runMigrationsAndValidate(
+            TEST_DB,
+            4,
+            true,
+            Migrations.MIGRATION_1_2,
+            Migrations.MIGRATION_2_3,
+            Migrations.MIGRATION_3_4,
+        )
+
+        db.query("SELECT name, fuel FROM vehicles").use { cursor ->
+            assertTrue(cursor.moveToFirst())
+            assertEquals("Chevrolet Onix", cursor.getString(0))
+            assertEquals("FLEX", cursor.getString(1))
+        }
+    }
+
     private companion object {
         const val TEST_DB = "migration-test.db"
     }
