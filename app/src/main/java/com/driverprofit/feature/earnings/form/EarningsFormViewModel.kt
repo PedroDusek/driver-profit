@@ -49,7 +49,24 @@ data class EarningsFormUiState(
     val errors: Map<WorkSessionField, WorkSessionValidationError> = emptyMap(),
     val savedSessionId: Long? = null,
 ) {
-    val revenue: Money get() = Money(revenueDigits.toLongOrNull() ?: 0L)
+    /**
+     * `null` enquanto o campo estiver em branco.
+     *
+     * Distinguir "vazio" de "zero" é o que permite exigir o preenchimento sem
+     * impedir que o motorista registre um dia de R$ 0,00 — que é um dia real.
+     */
+    val revenue: Money? get() = revenueDigits.takeIf { it.isNotEmpty() }?.let { Money(it.toLong()) }
+
+    /** `null` enquanto horas e minutos estiverem ambos em branco. */
+    val onlineTime: WorkDuration?
+        get() = if (hoursInput.isEmpty() && minutesInput.isEmpty()) {
+            null
+        } else {
+            WorkDuration(
+                (hoursInput.toLongOrNull() ?: 0L) * WorkDuration.MINUTES_PER_HOUR +
+                    (minutesInput.toLongOrNull() ?: 0L),
+            )
+        }
 
     fun errorFor(field: WorkSessionField): WorkSessionValidationError? = errors[field]
 }
@@ -124,7 +141,11 @@ class EarningsFormViewModel(
         updateField(WorkSessionField.PLATFORM) { copy(platform = value) }
 
     fun onRevenueChange(value: String) = updateField(WorkSessionField.REVENUE) {
-        copy(revenueDigits = value.digits(REVENUE_MAX_DIGITS).trimStart('0'))
+        val digits = value.digits(REVENUE_MAX_DIGITS)
+        // Remove zeros à esquerda, mas preserva um "0" digitado: campo vazio e
+        // valor zero precisam continuar distinguíveis, senão o campo
+        // obrigatório aceitaria o branco disfarçado de zero.
+        copy(revenueDigits = digits.trimStart('0').ifEmpty { if (digits.isEmpty()) "" else "0" })
     }
 
     fun onRidesChange(value: String) = updateField(WorkSessionField.RIDES) {
@@ -172,11 +193,21 @@ class EarningsFormViewModel(
         field: WorkSessionField,
         transform: EarningsFormUiState.() -> EarningsFormUiState,
     ) {
-        _uiState.update {
-            // O erro de sessão vazia é reportado no campo de faturamento, mas
-            // qualquer número preenchido pode resolvê-lo — então ele sai a
-            // cada edição.
-            it.transform().copy(errors = it.errors - field - WorkSessionField.REVENUE)
+        _uiState.update { current ->
+            val remaining = current.errors - field
+            // EMPTY_SESSION é erro da sessão inteira, apenas exibido no campo
+            // de faturamento: preencher qualquer número pode resolvê-lo, então
+            // ele sai a cada edição. Os demais erros do faturamento são só
+            // dele e continuam até o próximo save.
+            val cleared =
+                if (remaining[WorkSessionField.REVENUE] ==
+                    WorkSessionValidationError.EMPTY_SESSION
+                ) {
+                    remaining - WorkSessionField.REVENUE
+                } else {
+                    remaining
+                }
+            current.transform().copy(errors = cleared)
         }
     }
 
@@ -208,10 +239,7 @@ internal fun EarningsFormUiState.toDraft(
     platform = platform,
     rides = ridesInput.toIntOrNull(),
     revenue = revenue,
-    onlineTime = WorkDuration(
-        (hoursInput.toLongOrNull() ?: 0L) * WorkDuration.MINUTES_PER_HOUR +
-            (minutesInput.toLongOrNull() ?: 0L),
-    ),
+    onlineTime = onlineTime,
     distanceKm = distanceInput.toLongOrNull(),
     note = note,
 )

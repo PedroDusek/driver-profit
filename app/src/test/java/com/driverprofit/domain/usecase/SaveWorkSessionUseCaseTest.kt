@@ -99,6 +99,8 @@ class SaveWorkSessionUseCaseTest {
                 platform = Platform.UBER,
                 rides = 12,
                 revenue = Money.of(250, 0),
+                onlineTime = WorkDuration.of(5, 0),
+                distanceKm = 100,
             ),
         )
 
@@ -117,9 +119,26 @@ class SaveWorkSessionUseCaseTest {
     }
 
     @Test
-    fun `sessao vazia e rejeitada antes de tocar o repositorio`() = runTest {
+    fun `campos em branco sao rejeitados antes de tocar o repositorio`() = runTest {
         val result = saveSession(
             WorkSessionDraft(date = hoje, platform = Platform.UBER),
+        )
+
+        assertTrue(result is SaveWorkSessionResult.Invalid)
+        assertTrue(repository.current.isEmpty())
+    }
+
+    @Test
+    fun `sessao com tudo preenchido em zero e rejeitada`() = runTest {
+        // Tudo zero e um dia que nao aconteceu: nao informa nada e poluiria o
+        // historico.
+        val result = saveSession(
+            validDraft.copy(
+                revenue = Money.ZERO,
+                rides = 0,
+                onlineTime = WorkDuration.ZERO,
+                distanceKm = 0,
+            ),
         )
 
         assertTrue(result is SaveWorkSessionResult.Invalid)

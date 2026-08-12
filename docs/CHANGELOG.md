@@ -5,6 +5,42 @@ Versionamento conforme [Semantic Versioning](https://semver.org/lang/pt-BR/).
 
 ## [Não publicado]
 
+## [0.3.1] — Campos da jornada obrigatórios
+
+Corrige uma regra de validação que produziria indicadores errados no dashboard.
+
+### O problema
+
+Na v0.3.0, faturamento, corridas, tempo online e distância eram
+individualmente opcionais. O dashboard agrega período assim:
+
+```
+R$/hora do período = soma(faturamento) ÷ soma(horas)
+```
+
+Uma sessão com valor preenchido e horas em branco entraria com o valor no
+numerador e zero no denominador — inflando o R$/hora e exibindo o resultado com
+a mesma confiança de um número correto. A regra antiga trocava um dado ausente
+e visível por um indicador errado e invisível, contra o PRD §59.
+
+### Alterado
+
+- Faturamento, corridas, tempo online e distância passam a ser obrigatórios
+- **Zero continua sendo resposta válida**: seis horas online sem nenhuma
+  corrida é um dia ruim que existe. O que se recusa é o campo em branco
+- `EMPTY_SESSION` só é acusado quando os quatro campos foram informados e todos
+  valem zero; com campos em branco, o erro correto é "campo obrigatório"
+- O campo de valor fica vazio em vez de mostrar `R$ 0,00`, que dava aparência
+  de preenchido
+- `WorkSessionValidator.toSession` deixa de preencher zeros implícitos
+
+### Corrigido
+
+- Digitar `0` no valor era descartado junto com os zeros à esquerda, tornando
+  "campo vazio" e "valor zero" indistinguíveis
+- Editar um campo qualquer limpava o erro do faturamento, mesmo quando esse
+  erro era do próprio campo
+
 ## [0.3.0] — Earnings
 
 Registro de ganhos: o motorista já consegue lançar quanto trabalhou e quanto
