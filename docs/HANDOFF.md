@@ -129,22 +129,28 @@ não uma refatoração.
 
 ## 7. Débito conhecido
 
-**Nenhum teste instrumentado jamais foi executado.** São 4 arquivos em
-`app/src/androidTest/`, cobrindo os três DAOs e as quatro migrações
-encadeadas (1→2→3→4). Eles compilam e estão no repositório, mas exigem
-emulador ou aparelho conectado, e o CI não os roda.
-
-Com um aparelho em depuração USB:
+**Os testes instrumentados foram executados pela primeira vez na v0.5.0, e
+passaram.** 36 testes num Redmi Note 8 Pro com Android 9, cobrindo os três
+DAOs e as quatro migrações encadeadas (1→2→3→4). As migrações finalmente
+tocaram um SQLite real — o que era, até então, o maior risco do projeto.
 
 ```bash
 cd C:/Users/pedro/Desktop/driver-profit && ./gradlew connectedDebugAndroidTest
 ```
 
-Isso é o item de maior risco do projeto: as migrações nunca tocaram um SQLite
-real.
+⚠️ **O CI continua não rodando esses testes** — eles exigem aparelho ou
+emulador. Cada mudança de schema precisa dessa execução manual antes do
+merge; o gate verde do PR não cobre migração.
 
-Além disso: **nenhuma tela foi aberta em um aparelho.** Tudo o que existe foi
-verificado por teste unitário, lint e build.
+Para rodar num Xiaomi/MIUI, as três chaves precisam estar ligadas em Opções do
+desenvolvedor: **Depuração USB**, **Instalar via USB** e **Depuração USB
+(Configurações de segurança)**. Se o `adb` mostrar `offline` e não sair desse
+estado, reiniciar o aparelho destrava — alternar a chave já não resolve depois
+que o `adbd` engasga.
+
+O que **continua sem verificação**: nenhuma tela foi usada de verdade. O app é
+instalável e roda, mas os fluxos de interface só foram exercitados por teste
+unitário de ViewModel, lint e build.
 
 ## 8. Fluxo de trabalho
 

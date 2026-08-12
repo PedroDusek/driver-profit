@@ -27,6 +27,9 @@ room = "2.8.4"
 
 # --- Kotlin ecosystem ---
 coroutines = "1.11.0"
+# Alinha kotlinx-serialization em toda a árvore. Ver o comentário no
+# build.gradle.kts do app: sem isso, os testes de migração nem chegam a rodar.
+kotlinxSerialization = "1.8.1"
 
 # --- Testes ---
 junit = "4.13.2"
@@ -58,6 +61,7 @@ androidx-room-testing = { group = "androidx.room", name = "room-testing", versio
 
 # --- Kotlin ---
 kotlinx-coroutines-android = { group = "org.jetbrains.kotlinx", name = "kotlinx-coroutines-android", version.ref = "coroutines" }
+kotlinx-serialization-bom = { group = "org.jetbrains.kotlinx", name = "kotlinx-serialization-bom", version.ref = "kotlinxSerialization" }
 
 # --- Testes unitários (JVM) ---
 junit = { group = "junit", name = "junit", version.ref = "junit" }
