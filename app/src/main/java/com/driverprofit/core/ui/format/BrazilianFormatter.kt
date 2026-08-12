@@ -32,6 +32,16 @@ object BrazilianFormatter {
     }
 
     /**
+     * Valor monetário que pode não existir.
+     *
+     * `null` significa indicador indisponível — período sem quilômetros, sem
+     * horas ou sem corridas (PRD §21) — e vira [UNAVAILABLE]. Nunca
+     * `"R$ 0,00"`, que afirmaria que o indicador é zero.
+     */
+    fun moneyOrUnavailable(value: Money?): String =
+        if (value == null) UNAVAILABLE else money(value)
+
+    /**
      * Valor por unidade, com o sufixo já embutido: `"R$ 2,35/km"`.
      *
      * [value] nulo representa indicador indisponível — período sem

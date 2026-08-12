@@ -7,6 +7,7 @@ import androidx.lifecycle.viewmodel.initializer
 import androidx.lifecycle.viewmodel.viewModelFactory
 import com.driverprofit.DriverProfitApplication
 import com.driverprofit.core.di.AppContainer
+import com.driverprofit.feature.dashboard.DashboardViewModel
 import com.driverprofit.feature.earnings.form.EarningsFormViewModel
 import com.driverprofit.feature.earnings.list.EarningsListViewModel
 import com.driverprofit.feature.expenses.form.ExpenseFormViewModel
@@ -24,6 +25,11 @@ import com.driverprofit.feature.vehicle.list.VehicleListViewModel
 object DriverProfitViewModelFactory {
 
     val Factory: ViewModelProvider.Factory = viewModelFactory {
+        initializer {
+            DashboardViewModel(
+                observeDashboard = container().observeDashboard,
+            )
+        }
         initializer {
             VehicleListViewModel(
                 observeVehicles = container().observeVehicles,
