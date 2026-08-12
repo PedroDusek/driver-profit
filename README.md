@@ -156,6 +156,9 @@ Detalhes em [`docs/ARCHITECTURE.md`](docs/ARCHITECTURE.md).
 | Migração de schema 1→2 | ✅ v0.2.1 |
 | Registro de ganhos e histórico | ✅ v0.3.0 |
 | R$/hora e R$/km do histórico | ✅ v0.3.0 |
+| Despesas: abastecimento, recarga, manutenção e outras | ✅ v0.4.0 |
+| R$/litro, R$/m³ e R$/kWh | ✅ v0.4.0 |
+| Dashboard com lucro e custo/km | ⏳ v0.5.0 |
 | Registro de despesas | ⏳ v0.4.0 |
 | Dashboard com indicadores | ⏳ v0.5.0 |
 

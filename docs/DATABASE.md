@@ -2,7 +2,7 @@
 
 Room sobre SQLite, local ao aparelho. Nome do arquivo: `driver_profit.db`.
 
-**Versão atual do schema: 3**
+**Versão atual do schema: 4**
 
 O JSON do schema é exportado em `app/schemas/` e **é versionado no Git**. Ele é
 o que torna possível escrever testes de migração de verdade. Os schemas
@@ -61,6 +61,49 @@ O que a validação impede é a sessão inteira estar zerada.
 Adicionar uma plataforma nova é acrescentar uma constante no enum — não mexe no
 banco, porque a coluna guarda o `name`.
 
+### `expenses` (v4)
+
+Todas as despesas em **uma tabela só**, com as colunas de detalhe anuláveis.
+
+| Coluna | Tipo SQL | Nulo | Descrição |
+| --- | --- | --- | --- |
+| `id` | INTEGER PK AUTOINCREMENT | não | Identificador |
+| `vehicle_id` | INTEGER | **sim** | FK para `vehicles`, `ON DELETE SET NULL` |
+| `date` | INTEGER | não | Epoch day |
+| `category` | TEXT | não | `FUEL` \| `CHARGING` \| `MAINTENANCE` \| `CAR_WASH` \| `TOLL` \| `PARKING` \| `INSURANCE` \| `VEHICLE_TAX` \| `FINANCING` \| `OTHER` |
+| `amount_cents` | INTEGER | não | Valor pago, em centavos. **Zero é válido** |
+| `description` | TEXT | não | Observação; string vazia quando não informada |
+| `fuel_type` | TEXT | **sim** | `GASOLINE` \| `ETHANOL` \| `CNG` \| `ELECTRICITY` |
+| `quantity_thousandths` | INTEGER | **sim** | Milésimos da unidade (litro, m³ ou kWh) |
+| `charging_location` | TEXT | **sim** | `RESIDENTIAL` \| `COMMERCIAL` \| `PUBLIC` \| `OTHER` |
+| `maintenance_category` | TEXT | **sim** | Item da manutenção |
+| `place` | TEXT | **sim** | Posto, eletroposto ou oficina, conforme a categoria |
+| `created_at` | INTEGER | não | Epoch millis (UTC) |
+
+**Índices:** `date` e `vehicle_id`.
+
+**Por que uma tabela só:** o PRD §17 pede explicitamente que adicionar
+categoria não exija mudança estrutural. Com uma tabela por natureza de
+despesa, "pedágio" seria uma migração; assim é uma constante de enum. O preço
+são colunas nulas em boa parte das linhas — barato — e a coerência entre
+categoria e detalhe passar a ser responsabilidade do domínio
+(`ExpenseValidator` + `sealed ExpenseDetail`), não do schema.
+
+**`ON DELETE SET NULL`:** excluir um veículo não pode apagar o histórico
+financeiro. A despesa fica órfã e continua somando no dashboard, que é o
+comportamento correto para quem trocou de carro.
+
+**`amount_cents` aceita zero:** recarga gratuita é despesa de R$ 0,00 com kWh
+maior que zero (PRD §11).
+
+**Quantidade em milésimos**, não centésimos: a bomba de combustível exibe três
+casas decimais, e arredondar na entrada já introduziria erro no preço por
+litro.
+
+**`place` é uma coluna só** para posto, eletroposto e oficina. São três nomes
+para "onde isso aconteceu" e nunca coexistem na mesma linha; três colunas
+seriam duas sempre nulas.
+
 ## Convenções
 
 ### Nomes
@@ -96,6 +139,11 @@ Data como epoch day mantém consulta por período como comparação numérica �
 | `LocalDate` | `INTEGER` epoch day |
 | `VehicleFuel` | `TEXT` |
 | `Platform` | `TEXT` |
+| `ExpenseCategory` | `TEXT` |
+| `FuelType` | `TEXT` |
+| `ChargingLocation` | `TEXT` |
+| `MaintenanceCategory` | `TEXT` |
+| `Quantity` | `INTEGER` em milésimos |
 
 ## Migrações
 
@@ -123,6 +171,7 @@ Um PR que altera apenas a Entity está incompleto.
 | 1 | v0.1.0 | Schema inicial: `vehicles` com marca, modelo, ano, odômetro inicial, propulsão, combustível e capacidade de recarga |
 | 2 | v0.2.1 | Cadastro simplificado: remove `brand`, `model`, `year`, `initial_odometer_km`, `powertrain` e `charging_capability`; introduz `name` e `fuel` |
 | 3 | v0.3.0 | Adiciona `work_sessions` e o índice sobre `date` |
+| 4 | v0.4.0 | Adiciona `expenses`, com FK para `vehicles` e índices sobre `date` e `vehicle_id` |
 
 #### Migração 1 → 2
 
@@ -147,6 +196,15 @@ por lançamento, e a distinção plug-in deixou de existir no modelo.
 
 Puramente aditiva: cria `work_sessions` e seu índice. Nenhuma tabela existente
 é tocada, então não há risco para os dados já gravados.
+
+#### Migração 3 → 4
+
+Aditiva: cria `expenses` com a chave estrangeira para `vehicles` e os dois
+índices. Nenhuma tabela existente é alterada.
+
+O índice sobre `vehicle_id` não é opcional — o Room o exige para a chave
+estrangeira, e sem ele apagar um veículo faria varredura completa de
+`expenses`.
 
 ## Desvios registrados em relação ao PRD
 
