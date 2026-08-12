@@ -15,6 +15,7 @@ import com.driverprofit.domain.model.MaintenanceCategory
 import com.driverprofit.domain.model.Vehicle
 import com.driverprofit.domain.model.VehicleFuel
 import org.junit.Assert.assertEquals
+import org.junit.Assert.assertNull
 import org.junit.Assert.assertTrue
 import org.junit.Test
 import java.time.Clock
@@ -148,17 +149,22 @@ class ExpenseValidatorTest {
     }
 
     @Test
-    fun `abastecimento sem quantidade e rejeitado`() {
-        // Sem quantidade nao existe preco por litro, que e o motivo de
-        // abastecimento ser uma categoria separada.
-        assertTrue(
-            validator.validate(refuelDraft.copy(quantity = null), flexCar).contains(
-                ExpenseFieldError(
-                    ExpenseField.QUANTITY,
-                    ExpenseValidationError.QUANTITY_REQUIRED,
-                ),
-            ),
+    fun `abastecimento sem quantidade e valido`() {
+        // A quantidade e opcional: o indicador principal e custo/km, que sai
+        // do valor pago e dos km rodados, sem depender de quantos litros
+        // entraram no tanque.
+        assertEquals(
+            emptyList<ExpenseFieldError>(),
+            validator.validate(refuelDraft.copy(quantity = null), flexCar),
         )
+    }
+
+    @Test
+    fun `abastecimento sem quantidade nao tem preco por unidade`() {
+        val expense = validator.toExpense(refuelDraft.copy(quantity = null))
+
+        assertNull(expense.pricePerUnit)
+        assertEquals(FuelType.ETHANOL.unit, expense.unit)
     }
 
     @Test
@@ -247,14 +253,11 @@ class ExpenseValidatorTest {
     }
 
     @Test
-    fun `recarga sem kWh e rejeitada mesmo sendo gratuita`() {
+    fun `recarga sem kWh e valida`() {
         val gratis = chargingDraft.copy(amount = Money.ZERO, quantity = null)
 
-        assertTrue(
-            validator.validate(gratis, electricCar).any {
-                it.field == ExpenseField.QUANTITY
-            },
-        )
+        assertEquals(emptyList<ExpenseFieldError>(), validator.validate(gratis, electricCar))
+        assertNull(validator.toExpense(gratis).pricePerUnit)
     }
 
     // --- Manutenção ---

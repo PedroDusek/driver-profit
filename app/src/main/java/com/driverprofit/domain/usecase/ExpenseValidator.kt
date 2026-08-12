@@ -72,11 +72,11 @@ class ExpenseValidator(
         when (draft.category!!.detailKind) {
             ExpenseDetailKind.REFUEL -> ExpenseDetail.Refuel(
                 fuelType = draft.fuelType!!,
-                quantity = draft.quantity!!,
+                quantity = draft.quantity,
                 station = draft.station.trim(),
             )
             ExpenseDetailKind.CHARGING -> ExpenseDetail.Charging(
-                energy = draft.quantity!!,
+                energy = draft.quantity,
                 location = draft.chargingLocation!!,
                 place = draft.place.trim(),
             )
@@ -164,19 +164,23 @@ class ExpenseValidator(
     }
 
     /**
-     * A quantidade é obrigatória e não pode ser zero.
+     * A quantidade é **opcional**.
      *
-     * Sem ela não existe preço por litro, por m³ ou por kWh — e é justamente
-     * esse indicador que justifica separar abastecimento das outras despesas.
-     * Vale inclusive para recarga gratuita: o valor é zero, os kWh não.
+     * O indicador principal do produto é custo/km, que sai do valor pago e dos
+     * quilômetros rodados — não de quantos litros entraram no tanque. Exigir a
+     * quantidade a cada abastecimento cobraria um dado toda vez em troca de um
+     * número secundário (R$/litro), e um campo obrigatório a mais é uma
+     * barreira entre o motorista e o lançamento.
+     *
+     * Zero, porém, não é resposta: ou não foi informado — e aí fica em branco —
+     * ou é erro de digitação.
      */
-    private fun validateQuantity(draft: ExpenseDraft): List<ExpenseFieldError> = when {
-        draft.quantity == null ->
-            listOf(error(ExpenseField.QUANTITY, ExpenseValidationError.QUANTITY_REQUIRED))
-        draft.quantity.isZero ->
+    private fun validateQuantity(draft: ExpenseDraft): List<ExpenseFieldError> =
+        if (draft.quantity?.isZero == true) {
             listOf(error(ExpenseField.QUANTITY, ExpenseValidationError.QUANTITY_ZERO))
-        else -> emptyList()
-    }
+        } else {
+            emptyList()
+        }
 
     private fun error(field: ExpenseField, error: ExpenseValidationError) =
         ExpenseFieldError(field, error)

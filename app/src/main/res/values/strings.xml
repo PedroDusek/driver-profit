@@ -113,7 +113,7 @@
     <string name="expense_fuel_type">Combustível abastecido</string>
     <string name="expense_quantity">Quantidade</string>
     <string name="expense_quantity_with_unit">Quantidade (%1$s)</string>
-    <string name="expense_quantity_hint">Use vírgula para os decimais: 35,478</string>
+    <string name="expense_quantity_hint">Opcional — informe para ver o preço por unidade</string>
     <string name="expense_station">Posto</string>
     <string name="expense_charging_location">Tipo de carregamento</string>
     <string name="expense_place">Local da recarga</string>
@@ -166,7 +166,6 @@
     <string name="error_online_time_too_long">Um dia tem no máximo 24 horas</string>
     <string name="error_note_too_long">Observação muito longa</string>
     <string name="error_empty_session">Preencha ao menos um número da jornada</string>
-    <string name="error_quantity_required">Informe quanto foi abastecido</string>
     <string name="error_quantity_zero">A quantidade não pode ser zero</string>
     <string name="error_fuel_not_supported">Seu veículo não aceita esse combustível</string>
     <string name="error_vehicle_cannot_charge">Esse veículo não é recarregável</string>

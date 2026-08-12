@@ -111,25 +111,17 @@ fun ExpenseEntity.toDomain(): Expense = Expense(
  * derrubar a tela de histórico.
  */
 private fun ExpenseEntity.toDetail(): ExpenseDetail? = when (category.detailKind) {
-    com.driverprofit.domain.model.ExpenseDetailKind.REFUEL -> {
-        val type = fuelType
-        val amount = quantityThousandths
-        if (type != null && amount != null) {
-            ExpenseDetail.Refuel(type, Quantity(amount), place.orEmpty())
-        } else {
-            null
+    // A quantidade é opcional, então sua ausência não impede reconstruir o
+    // detalhe — só deixa o preço por unidade indisponível.
+    com.driverprofit.domain.model.ExpenseDetailKind.REFUEL ->
+        fuelType?.let {
+            ExpenseDetail.Refuel(it, quantityThousandths?.let(::Quantity), place.orEmpty())
         }
-    }
 
-    com.driverprofit.domain.model.ExpenseDetailKind.CHARGING -> {
-        val location = chargingLocation
-        val amount = quantityThousandths
-        if (location != null && amount != null) {
-            ExpenseDetail.Charging(Quantity(amount), location, place.orEmpty())
-        } else {
-            null
+    com.driverprofit.domain.model.ExpenseDetailKind.CHARGING ->
+        chargingLocation?.let {
+            ExpenseDetail.Charging(quantityThousandths?.let(::Quantity), it, place.orEmpty())
         }
-    }
 
     com.driverprofit.domain.model.ExpenseDetailKind.MAINTENANCE ->
         maintenanceCategory?.let { ExpenseDetail.Maintenance(it, place.orEmpty()) }
@@ -150,11 +142,11 @@ fun Expense.toEntity(): ExpenseEntity {
     return when (val detail = detail) {
         is ExpenseDetail.Refuel -> base.copy(
             fuelType = detail.fuelType,
-            quantityThousandths = detail.quantity.thousandths,
+            quantityThousandths = detail.quantity?.thousandths,
             place = detail.station,
         )
         is ExpenseDetail.Charging -> base.copy(
-            quantityThousandths = detail.energy.thousandths,
+            quantityThousandths = detail.energy?.thousandths,
             chargingLocation = detail.location,
             place = detail.place,
         )

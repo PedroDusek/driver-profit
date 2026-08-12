@@ -137,6 +137,7 @@ Detalhes em [`docs/ARCHITECTURE.md`](docs/ARCHITECTURE.md).
 | [ROADMAP.md](docs/ROADMAP.md) | Versões planejadas |
 | [CHANGELOG.md](docs/CHANGELOG.md) | Histórico de alterações |
 | [DEVELOPMENT.md](docs/DEVELOPMENT.md) | Como contribuir, branches, commits |
+| [HANDOFF.md](docs/HANDOFF.md) | Estado atual do projeto — leia ao retomar |
 
 ## Status atual
 

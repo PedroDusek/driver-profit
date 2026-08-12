@@ -74,7 +74,7 @@ Todas as despesas em **uma tabela só**, com as colunas de detalhe anuláveis.
 | `amount_cents` | INTEGER | não | Valor pago, em centavos. **Zero é válido** |
 | `description` | TEXT | não | Observação; string vazia quando não informada |
 | `fuel_type` | TEXT | **sim** | `GASOLINE` \| `ETHANOL` \| `CNG` \| `ELECTRICITY` |
-| `quantity_thousandths` | INTEGER | **sim** | Milésimos da unidade (litro, m³ ou kWh) |
+| `quantity_thousandths` | INTEGER | **sim** | Milésimos da unidade (litro, m³ ou kWh). Opcional desde a v0.4.1 |
 | `charging_location` | TEXT | **sim** | `RESIDENTIAL` \| `COMMERCIAL` \| `PUBLIC` \| `OTHER` |
 | `maintenance_category` | TEXT | **sim** | Item da manutenção |
 | `place` | TEXT | **sim** | Posto, eletroposto ou oficina, conforme a categoria |

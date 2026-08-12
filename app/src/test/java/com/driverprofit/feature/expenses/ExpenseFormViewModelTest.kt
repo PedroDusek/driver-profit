@@ -1,4 +1,4 @@
-package com.driverprofit.feature.expenses
+﻿package com.driverprofit.feature.expenses
 
 import androidx.lifecycle.SavedStateHandle
 import com.driverprofit.core.common.Money
@@ -71,6 +71,17 @@ class ExpenseFormViewModelTest {
             ),
             clock = clock,
         )
+    }
+
+    /**
+     * Simula o motorista limpando o campo e digitando os centavos, um toque
+     * por vez — que é como um `TextField` real se comporta.
+     */
+    private fun ExpenseFormViewModel.setAmount(digits: String) {
+        repeat(uiState.value.amountDigits.length) {
+            onAmountChange(uiState.value.amountText.dropLast(1))
+        }
+        digits.forEach { onAmountChange(uiState.value.amountText + it) }
     }
 
     @Test
@@ -185,7 +196,7 @@ class ExpenseFormViewModelTest {
         val viewModel = viewModel()
         advanceUntilIdle()
 
-        viewModel.onAmountChange("0")
+        viewModel.setAmount("0")
 
         // Recarga gratuita e R$ 0,00 (PRD 11), diferente de campo vazio.
         assertEquals(Money.ZERO, viewModel.uiState.value.amount)
@@ -208,7 +219,7 @@ class ExpenseFormViewModelTest {
         advanceUntilIdle()
 
         viewModel.onCategoryChange(ExpenseCategory.FUEL)
-        viewModel.onAmountChange("21000")
+        viewModel.setAmount("21000")
         viewModel.onFuelTypeChange(FuelType.ETHANOL)
         viewModel.onQuantityChange("35,4")
         viewModel.onPlaceChange("Posto Shell")
@@ -231,7 +242,7 @@ class ExpenseFormViewModelTest {
         advanceUntilIdle()
 
         viewModel.onCategoryChange(ExpenseCategory.MAINTENANCE)
-        viewModel.onAmountChange("32000")
+        viewModel.setAmount("32000")
         viewModel.onMaintenanceCategoryChange(MaintenanceCategory.OIL)
         viewModel.onPlaceChange("Oficina do Zé")
         viewModel.onSave()
@@ -250,7 +261,7 @@ class ExpenseFormViewModelTest {
         advanceUntilIdle()
 
         viewModel.onCategoryChange(ExpenseCategory.CHARGING)
-        viewModel.onAmountChange("0")
+        viewModel.setAmount("0")
         viewModel.onQuantityChange("42")
         viewModel.onChargingLocationChange(ChargingLocation.COMMERCIAL)
         viewModel.onSave()
@@ -310,7 +321,7 @@ class ExpenseFormViewModelTest {
         val viewModel = viewModel(expenses = expenses, expenseId = 1)
         advanceUntilIdle()
 
-        viewModel.onAmountChange("1500")
+        viewModel.setAmount("1500")
         viewModel.onSave()
         advanceUntilIdle()
 

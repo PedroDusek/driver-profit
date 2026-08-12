@@ -175,7 +175,7 @@ fun ExpenseFormScreen(
             }
 
             OutlinedTextField(
-                value = uiState.amount?.let(BrazilianFormatter::money).orEmpty(),
+                value = uiState.amountText,
                 onValueChange = viewModel::onAmountChange,
                 label = { Text(stringResource(R.string.expense_amount)) },
                 singleLine = true,

@@ -1,4 +1,4 @@
-package com.driverprofit.feature.earnings
+﻿package com.driverprofit.feature.earnings
 
 import androidx.lifecycle.SavedStateHandle
 import com.driverprofit.core.common.Money
@@ -97,7 +97,7 @@ class EarningsFormViewModelTest {
     fun `valor e digitado em centavos`() = runTest {
         val viewModel = viewModel()
 
-        viewModel.onRevenueChange("32050")
+        viewModel.setRevenue("32050")
 
         // Teclar 32050 significa R$ 320,50 - o padrao que evita briga com
         // virgula e ponto no teclado numerico.
@@ -163,7 +163,7 @@ class EarningsFormViewModelTest {
         assertNull(viewModel.uiState.value.revenue)
         assertNull(viewModel.uiState.value.onlineTime)
 
-        viewModel.onRevenueChange("0")
+        viewModel.setRevenue("0")
         viewModel.onHoursChange("0")
 
         // Zero digitado e uma resposta; campo vazio nao e.
@@ -185,7 +185,7 @@ class EarningsFormViewModelTest {
         val viewModel = viewModel()
 
         viewModel.onPlatformChange(Platform.UBER)
-        viewModel.onRevenueChange("0")
+        viewModel.setRevenue("0")
         viewModel.onRidesChange("0")
         viewModel.onHoursChange("0")
         viewModel.onDistanceChange("0")
@@ -203,7 +203,7 @@ class EarningsFormViewModelTest {
         val viewModel = viewModel()
 
         viewModel.onPlatformChange(Platform.UBER)
-        viewModel.onRevenueChange("0")
+        viewModel.setRevenue("0")
         viewModel.onRidesChange("0")
         viewModel.onHoursChange("0")
         viewModel.onDistanceChange("0")
@@ -261,7 +261,7 @@ class EarningsFormViewModelTest {
         val viewModel = viewModel(repository, sessionId = 1)
         advanceUntilIdle()
 
-        viewModel.onRevenueChange("40000")
+        viewModel.setRevenue("40000")
         viewModel.onSave()
         advanceUntilIdle()
 
@@ -293,9 +293,25 @@ class EarningsFormViewModelTest {
         assertNull(viewModel.uiState.value.savedSessionId)
     }
 
+    /**
+     * Simula o motorista limpando o campo e digitando os centavos, um toque
+     * por vez.
+     *
+     * O campo monetário raciocina por diferença entre o texto exibido e o
+     * devolvido, então mandar o valor inteiro de uma vez não representa o que
+     * um `TextField` realmente faz — e foi justamente confiar nisso que
+     * escondeu o defeito do campo travado em R$ 0,00.
+     */
+    private fun EarningsFormViewModel.setRevenue(digits: String) {
+        repeat(uiState.value.revenueDigits.length) {
+            onRevenueChange(uiState.value.revenueText.dropLast(1))
+        }
+        digits.forEach { onRevenueChange(uiState.value.revenueText + it) }
+    }
+
     private fun preencherValido(viewModel: EarningsFormViewModel) {
         viewModel.onPlatformChange(Platform.UBER)
-        viewModel.onRevenueChange("32050")
+        viewModel.setRevenue("32050")
         viewModel.onRidesChange("18")
         viewModel.onHoursChange("8")
         viewModel.onMinutesChange("20")

@@ -6,6 +6,7 @@ import androidx.lifecycle.viewModelScope
 import com.driverprofit.core.common.Money
 import com.driverprofit.core.common.Quantity
 import com.driverprofit.core.navigation.DriverProfitDestination
+import com.driverprofit.core.ui.format.MoneyInput
 import com.driverprofit.core.ui.format.QuantityInput
 import com.driverprofit.domain.model.ChargingLocation
 import com.driverprofit.domain.model.Expense
@@ -58,7 +59,10 @@ data class ExpenseFormUiState(
     val errors: Map<ExpenseField, ExpenseValidationError> = emptyMap(),
     val savedExpenseId: Long? = null,
 ) {
-    val amount: Money? get() = amountDigits.takeIf { it.isNotEmpty() }?.let { Money(it.toLong()) }
+    val amount: Money? get() = MoneyInput.toMoney(amountDigits)
+
+    /** Texto já formatado do campo de valor. */
+    val amountText: String get() = MoneyInput.display(amountDigits)
 
     val quantity: Quantity? get() = QuantityInput.parse(quantityInput)
 
@@ -171,9 +175,8 @@ class ExpenseFormViewModel(
     }
 
     fun onAmountChange(value: String) = updateField(ExpenseField.AMOUNT) {
-        val digits = value.filter(Char::isDigit).take(AMOUNT_MAX_DIGITS)
         // Preserva um "0" digitado: recarga gratuita é R$ 0,00 (PRD §11).
-        copy(amountDigits = digits.trimStart('0').ifEmpty { if (digits.isEmpty()) "" else "0" })
+        copy(amountDigits = MoneyInput.onTextChanged(amountDigits, value))
     }
 
     fun onDescriptionChange(value: String) =
@@ -221,9 +224,6 @@ class ExpenseFormViewModel(
         _uiState.update { it.transform().copy(errors = it.errors - field) }
     }
 
-    private companion object {
-        const val AMOUNT_MAX_DIGITS = 9
-    }
 }
 
 private fun List<ExpenseFieldError>.toMap(): Map<ExpenseField, ExpenseValidationError> =

@@ -30,10 +30,12 @@ enum class ExpenseValidationError {
     /** Valor negativo. Zero é aceito: recarga gratuita existe (PRD §11). */
     NEGATIVE,
 
-    /** Abastecimento sem quantidade informada. */
-    QUANTITY_REQUIRED,
-
-    /** Quantidade zerada em um abastecimento. */
+    /**
+     * Quantidade informada como zero.
+     *
+     * A quantidade em si é opcional — deixar em branco é aceito. Mas zero
+     * litros não é uma resposta: ou não foi informado, ou é erro de digitação.
+     */
     QUANTITY_ZERO,
 
     /** Combustível escolhido não é aceito pelo veículo selecionado. */
