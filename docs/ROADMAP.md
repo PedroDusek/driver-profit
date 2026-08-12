@@ -58,14 +58,21 @@ hora e por quilômetro.
 A plataforma é armazenada em cada registro desde já, para viabilizar
 comparação entre plataformas depois (PRD §16) sem migração.
 
-### v0.4.0 — Expenses
+### v0.4.0 — Expenses ✅ concluída
 
-- [ ] Abastecimento: gasolina, etanol, flex, GNV (m³)
-- [ ] Carregamento elétrico (kWh), incluindo carga gratuita (kWh > 0, valor = 0)
-- [ ] Híbridos: abastecimento e/ou carregamento conforme configuração
-- [ ] Manutenção por categoria
-- [ ] Outras despesas
-- [ ] Formulários dinâmicos conforme o veículo cadastrado
+- [x] Abastecimento: gasolina, etanol, flex, GNV (m³)
+- [x] Carregamento elétrico (kWh), incluindo carga gratuita (kWh > 0, valor = 0)
+- [x] Híbridos: abastecimento e/ou carregamento conforme configuração
+- [x] Manutenção por categoria
+- [x] Outras despesas
+- [x] Formulários dinâmicos conforme o veículo cadastrado
+- [x] Preço por unidade: R$/litro, R$/m³, R$/kWh
+- [x] Histórico com filtro por natureza
+
+**Critério de saída:** o motorista lança qualquer tipo de despesa, e o
+formulário só oferece o que faz sentido para o veículo dele.
+
+Odômetro por lançamento e consumo estimado ficaram para a v0.6.0.
 
 ### v0.5.0 — Dashboard
 

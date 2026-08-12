@@ -5,6 +5,68 @@ Versionamento conforme [Semantic Versioning](https://semver.org/lang/pt-BR/).
 
 ## [Não publicado]
 
+## [0.4.0] — Expenses
+
+Registro de despesas. Com ganhos e despesas no mesmo banco, a v0.5.0 pode
+finalmente calcular lucro em vez de só faturamento.
+
+### Adicionado
+
+**Domínio**
+- `Expense` com `ExpenseDetail` selado: `Refuel`, `Charging` e `Maintenance`
+- `pricePerUnit` — R$/litro, R$/m³ ou R$/kWh, conforme o insumo (PRD §7, §10, §11)
+- `ExpenseCategory` com as dez naturezas do PRD §17; `MaintenanceCategory` com
+  os treze itens do §18; `ChargingLocation` com os quatro tipos do §11
+- `Quantity` — quantidade em milésimos da unidade, para não usar `Double` num
+  divisor
+- `ExpenseValidator` e os use cases de escrita e leitura, incluindo consulta
+  por período
+
+**Dados**
+- Banco vai para a **versão 4**, com `expenses`, FK para `vehicles` e índices
+  sobre `date` e `vehicle_id`
+- Migração 3→4 aditiva
+
+**Interface**
+- Histórico com filtro por natureza e totais que acompanham o filtro
+- Formulário dinâmico: os campos mudam conforme a categoria escolhida
+- `QuantityInput` — entrada decimal com vírgula, sem depender de `Locale`
+
+**Testes**
+- 85 testes novos (218 no total)
+- Testes instrumentados de `ExpenseDao`, incluindo a exclusão de veículo que
+  preserva a despesa, e das migrações 3→4 e 1→4
+
+### Decisões registradas
+
+- **Uma tabela para todas as despesas.** O PRD §17 pede que adicionar
+  categoria não exija mudança estrutural; com tabelas separadas, "pedágio"
+  seria uma migração.
+- **`ON DELETE SET NULL` no veículo.** Trocar de carro não pode apagar o
+  histórico financeiro.
+- **Valor zero é válido, quantidade zero não.** Recarga gratuita é R$ 0,00 com
+  kWh maior que zero (PRD §11); abastecimento sem quantidade não tem preço por
+  litro, que é o motivo de ser uma categoria separada.
+- **O combustível é validado contra o veículo.** Etanol num carro a GNV é dado
+  impossível e contaminaria o custo por unidade.
+- **Seguro, IPVA e financiamento são marcados como custo fixo.** Eles não
+  variam com o quanto se roda; misturá-los no custo/km de um dia distorceria o
+  indicador (PRD §22).
+- **Quantidade em milésimos**, porque a bomba exibe três casas decimais.
+- **Quantidade é digitada com vírgula**, e não em dígitos puros como o
+  dinheiro: teclar `35` esperando 35 litros e obter 0,035 seria a pior
+  armadilha possível.
+
+### Não implementado nesta versão
+
+- **Odômetro por lançamento**, e portanto **consumo estimado** (PRD §23).
+  Ficaram para a v0.6.0 por decisão de produto: a quilometragem deixou de ser
+  atributo do veículo na v0.2.1 e volta como recurso de manutenção.
+
+### Não verificado
+
+Testes instrumentados exigem emulador e **não foram executados**.
+
 ## [0.3.1] — Campos da jornada obrigatórios
 
 Corrige uma regra de validação que produziria indicadores errados no dashboard.
