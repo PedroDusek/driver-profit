@@ -4,7 +4,7 @@ Documento de continuidade. Leia isto **antes** de qualquer coisa ao retomar o
 projeto em uma sessão nova, junto com `PRD.md`, `ARCHITECTURE.md` e
 `DEVELOPMENT.md`.
 
-**Última atualização:** v0.4.1
+**Última atualização:** v0.5.0
 
 ---
 
@@ -15,7 +15,7 @@ projeto em uma sessão nova, junto com `PRD.md`, `ARCHITECTURE.md` e
 | Código | `C:\Users\pedro\Desktop\driver-profit` |
 | Repositório | https://github.com/PedroDusek/driver-profit (público) |
 | Branch estável | `main`, protegida |
-| Última tag | `v0.4.1` |
+| Última tag | `v0.5.0` |
 | Versão do banco | **4** |
 
 ⚠️ **O caminho não pode conter acento.** O projeto nasceu em
@@ -47,7 +47,9 @@ dashboard:
   km. Histórico com totais e R$/hora, R$/km
 - **Despesas** — abastecimento, carregamento, manutenção e outras. Filtro por
   natureza, totais que acompanham o filtro
-- **Dashboard** — ainda um marcador; é a v0.5.0
+- **Dashboard** — tela principal. Indicadores do período escolhido: lucro em
+  destaque, faturamento e despesas, volume (km, horas, corridas), R$/km,
+  R$/hora, R$/corrida, custo/km, lucro/km, lucro/hora e despesas por natureza
 
 ## 4. Decisões de produto que divergem do PRD original
 
@@ -85,6 +87,15 @@ secundário e depende do odômetro por lançamento, que só chega na v0.6.0.
 - **Campos da jornada são obrigatórios** — zero é resposta válida, branco não.
   Isso existe porque campo em branco entrando como zero inflava o R$/hora
   agregado
+- **Custo/km usa só despesa operacional.** Seguro, IPVA e financiamento entram
+  no lucro, mas não na razão por quilômetro — eles não variam com o quanto se
+  roda (PRD §22). O rateio deles é da v1.4
+- **A semana do dashboard é ISO, segunda a domingo**, fixada no código e não
+  lida do `Locale`
+- **`Clock` é injetado** onde a regra depende da data corrente
+  (`DashboardViewModel`, `VehicleValidator`)
+- **O lint não roda a checagem `Typos`**: ela usa dicionário inglês e acusava
+  palavras portuguesas, quebrando o build com `warningsAsErrors`
 
 ## 6. Roadmap
 
@@ -94,40 +105,27 @@ secundário e depende do odômetro por lançamento, que só chega na v0.6.0.
 | v0.2.0 / v0.2.1 Vehicle | ✅ |
 | v0.3.0 / v0.3.1 Earnings | ✅ |
 | v0.4.0 / v0.4.1 Expenses | ✅ |
-| **v0.5.0 Dashboard** | ⬅️ **próxima** |
-| v0.6.0 Analytics + odômetro por lançamento + alertas de manutenção | |
+| v0.5.0 Dashboard | ✅ |
+| **v0.6.0 Analytics + odômetro por lançamento + alertas de manutenção** | ⬅️ **próxima** |
 | v0.7.0 UX polish · v0.8.0 Hardening · v0.9.0 RC · v1.0.0 MVP | |
 
-### O que a v0.5.0 precisa fazer
+### O que a v0.6.0 precisa fazer
 
-Indicadores por período (PRD §21), com filtros: hoje, ontem, semana, mês, mês
-anterior, personalizado.
+- **Odômetro por lançamento.** É o que falta para o consumo estimado (PRD §23)
+  e para os alertas de manutenção por quilometragem. Mexe no banco: entity,
+  DAO, migração 4→5, repository, testes e `DATABASE.md` no mesmo PR
+- **Consumo estimado** (km/L, km/kWh), sempre rotulado como *estimado* — o
+  cálculo por odômetro só é exato se o tanque for abastecido em condições
+  comparáveis
+- **Gráficos**: evolução de faturamento, R$/hora e R$/km entre períodos
+- **Custo por km separado por natureza** — o quadro do PRD §22
+  (combustível R$ 0,42/km, manutenção R$ 0,11/km, e assim por diante). Hoje o
+  dashboard mostra as despesas por natureza em reais, não por quilômetro
+- **Alertas de manutenção** por quilometragem (óleo, pneus)
 
-```
-Faturamento · Despesas · Lucro
-Km · Horas · Corridas
-R$/km · R$/hora · R$/corrida
-Custo/km · Lucro/km · Lucro/hora
-```
-
-**Tudo de que ela precisa já existe no banco.** Os dois use cases de consulta
-por período estão prontos e testados, sem tela que os use ainda:
-
-- `ObserveWorkSessionsBetweenUseCase`
-- `ObserveExpensesBetweenUseCase`
-
-Criar uma classe `DashboardMetrics` pura (PRD §29), testável sem Android, que
-receba as duas listas e produza os indicadores. **Não colocar cálculo em
-ViewModel nem em Composable.**
-
-Dois pontos de atenção:
-
-1. **Custos fixos.** `ExpenseCategory.isOperationalCost` já separa seguro, IPVA
-   e financiamento do resto. Custo/km deve usar só o operacional — seguro não
-   varia com o quanto se roda, e jogá-lo no custo/km de um dia distorce o
-   indicador (PRD §22).
-2. **Divisão por zero.** Use `Money.per()`, que devolve `null`. Exiba `—`, e
-   nunca `R$ 0,00`.
+Onde encaixar: `DashboardMetrics` já tem `expensesByCategory` e
+`totalKilometers`, então a razão por natureza é uma propriedade derivada nova,
+não uma refatoração.
 
 ## 7. Débito conhecido
 

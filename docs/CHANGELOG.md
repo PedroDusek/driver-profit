@@ -5,6 +5,84 @@ Versionamento conforme [Semantic Versioning](https://semver.org/lang/pt-BR/).
 
 ## [Não publicado]
 
+## [0.5.0] — Dashboard
+
+Os indicadores de rentabilidade. Ganhos e despesas já estavam no banco desde a
+v0.4.0; esta versão é a conta entre eles — a razão de o produto existir.
+
+### Adicionado
+
+**Domínio**
+- `DashboardMetrics` — classe pura com os doze indicadores do PRD §21:
+  faturamento, despesas, lucro, km, horas, corridas, R$/km, R$/hora,
+  R$/corrida, custo/km, lucro/km e lucro/hora (PRD §29)
+- `DashboardPeriod` — hoje, ontem, esta semana, este mês, mês anterior e
+  personalizado, com o dia de referência recebido por parâmetro
+- `DateRange` — intervalo de dias fechado nas duas pontas
+- `ObserveDashboardUseCase` — combina ganhos e despesas do mesmo período num
+  `Flow` só
+
+**Interface**
+- Dashboard substitui o marcador da v0.1.0: filtros de período, lucro em
+  destaque, volume, quanto rendeu, custo e lucro por unidade, e despesas
+  separadas por natureza
+- Seletor de intervalo personalizado
+- `BrazilianFormatter.moneyOrUnavailable` — indicador que não pode ser
+  calculado vira `—`, nunca `R$ 0,00`
+
+**Testes**
+- 52 testes novos (270 no total)
+
+### Decisões registradas
+
+- **Custo/km usa apenas despesa operacional** (PRD §22). Seguro, IPVA e
+  financiamento não variam com a distância: lançar o seguro anual num dia de
+  trabalho jogaria o custo/km daquele dia para as alturas e faria o motorista
+  concluir que rodar não compensa. Os três continuam dentro de "Despesas" e do
+  lucro — só ficam fora da razão por quilômetro, e a tela diz isso quando eles
+  existem no período.
+- **Lucro negativo é exibido como número negativo**, com cor de erro, e não
+  como zero. Prejuízo escrito com a mesma tinta do lucro passa despercebido
+  justamente no dia em que mais importa.
+- **`DashboardPeriod` é `sealed`, não `enum`.** "Personalizado" carrega um
+  intervalo e os demais não; com enum, esse intervalo viajaria num campo
+  anulável que só faz sentido para uma das constantes.
+- **A semana é ISO, de segunda a domingo**, fixada no código e não deduzida do
+  `Locale`. Um indicador que muda de intervalo conforme a configuração do
+  aparelho é impossível de conferir.
+- **Os presets devolvem a semana e o mês inteiros**, não até hoje. Data futura
+  é recusada na validação, então nenhum dia à frente tem registro e o número é
+  o mesmo — com a vantagem de "este mês" ter sempre o mesmo começo e fim.
+- **O `Clock` é injetado na ViewModel.** Com `LocalDate.now()` fixo no código,
+  o teste de "ontem" passaria hoje e falharia na virada do mês.
+- **Intervalo personalizado invertido é reordenado**, não recusado: tocar na
+  data final antes da inicial é engano de toque.
+- **`R$ 0,00` e "indisponível" são coisas diferentes.** Período sem
+  quilômetros não tem custo/km igual a zero; a tela exibe `—`.
+
+### Alterado
+
+- A verificação `Typos` do lint foi desligada. Ela compara cada palavra dos
+  textos com um dicionário **inglês**, e acusou "eles" como erro de digitação
+  de "eels". Num app inteiramente em português não existe acerto possível nessa
+  checagem, só falso positivo — e com `warningsAsErrors` o custo é uma frase
+  nova da interface derrubar o CI. `tools:locale="pt-BR"` não a desarma nesta
+  versão do lint.
+
+### Não implementado nesta versão
+
+- **Gráficos e evolução entre períodos** — v0.6.0.
+- **Custo por km separado por natureza** (o quadro do PRD §22 com
+  combustível R$ 0,42/km, manutenção R$ 0,11/km). A tela mostra as despesas
+  por natureza em reais; a razão por quilômetro de cada uma entra com os
+  gráficos da v0.6.0.
+- **Custos fixos rateados** — v1.4, como o PRD §47 já previa.
+
+### Não verificado
+
+Nenhuma tela foi aberta em aparelho. Testes instrumentados exigem emulador e
+**não foram executados**.
+
 ## [0.4.1] — Campo de valor corrigido e quantidade opcional
 
 ### Corrigido

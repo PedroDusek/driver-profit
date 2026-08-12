@@ -141,7 +141,7 @@ Detalhes em [`docs/ARCHITECTURE.md`](docs/ARCHITECTURE.md).
 
 ## Status atual
 
-**v0.2.0 — Vehicle** (em desenvolvimento)
+**v0.5.0 — Dashboard**
 
 | Item | Status |
 | --- | --- |
@@ -159,8 +159,9 @@ Detalhes em [`docs/ARCHITECTURE.md`](docs/ARCHITECTURE.md).
 | R$/hora e R$/km do histórico | ✅ v0.3.0 |
 | Despesas: abastecimento, recarga, manutenção e outras | ✅ v0.4.0 |
 | R$/litro, R$/m³ e R$/kWh | ✅ v0.4.0 |
-| Dashboard com lucro e custo/km | ⏳ v0.5.0 |
-| Registro de despesas | ⏳ v0.4.0 |
-| Dashboard com indicadores | ⏳ v0.5.0 |
+| Dashboard com lucro e custo/km | ✅ v0.5.0 |
+| Filtros de período no dashboard | ✅ v0.5.0 |
+| Gráficos e evolução por período | ⏳ v0.6.0 |
+| Odômetro por lançamento e consumo estimado | ⏳ v0.6.0 |
 
 Roadmap completo em [`docs/ROADMAP.md`](docs/ROADMAP.md).
