@@ -4,7 +4,9 @@ import androidx.room.Database
 import androidx.room.RoomDatabase
 import androidx.room.TypeConverters
 import com.driverprofit.data.local.dao.VehicleDao
+import com.driverprofit.data.local.dao.WorkSessionDao
 import com.driverprofit.data.local.entity.VehicleEntity
+import com.driverprofit.data.local.entity.WorkSessionEntity
 
 /**
  * Banco local do aplicativo (offline-first, PRD §1).
@@ -18,7 +20,7 @@ import com.driverprofit.data.local.entity.VehicleEntity
  * testá-la e atualizar `docs/DATABASE.md`.
  */
 @Database(
-    entities = [VehicleEntity::class],
+    entities = [VehicleEntity::class, WorkSessionEntity::class],
     version = DriverProfitDatabase.VERSION,
     exportSchema = true,
 )
@@ -27,12 +29,15 @@ abstract class DriverProfitDatabase : RoomDatabase() {
 
     abstract fun vehicleDao(): VehicleDao
 
+    abstract fun workSessionDao(): WorkSessionDao
+
     companion object {
         /**
-         * Versão 2 — cadastro de veículo simplificado para nome + combustível.
+         * Versão 3 — adiciona `work_sessions` (registro de ganhos).
+         * Versão 2 simplificou o veículo para nome + combustível.
          * Versão 1 tinha marca, modelo, ano, odômetro e três eixos de propulsão.
          */
-        const val VERSION = 2
+        const val VERSION = 3
 
         const val NAME = "driver_profit.db"
     }

@@ -1,6 +1,7 @@
 package com.driverprofit.data.local.database
 
 import androidx.room.TypeConverter
+import com.driverprofit.domain.model.Platform
 import com.driverprofit.domain.model.VehicleFuel
 import java.time.Instant
 import java.time.LocalDate
@@ -35,4 +36,10 @@ class Converters {
 
     @TypeConverter
     fun nameToVehicleFuel(value: String?): VehicleFuel? = value?.let(VehicleFuel::valueOf)
+
+    @TypeConverter
+    fun platformToName(value: Platform?): String? = value?.name
+
+    @TypeConverter
+    fun nameToPlatform(value: String?): Platform? = value?.let(Platform::valueOf)
 }
