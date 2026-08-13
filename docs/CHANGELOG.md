@@ -5,6 +5,50 @@ Versionamento conforme [Semantic Versioning](https://semver.org/lang/pt-BR/).
 
 ## [Não publicado]
 
+## [0.5.1] — Cursor ancorado e formulários acima do teclado
+
+Primeiros defeitos encontrados usando o app em aparelho — nenhuma tela tinha
+sido aberta de verdade até a v0.5.0.
+
+### Corrigido
+
+**O cursor andava sozinho no campo de valor.**
+
+O campo exibe o texto já formatado, então ele muda de comprimento a cada
+tecla: `R$ 3,00` vira `R$ 32,00`. Passando uma `String` simples ao
+`OutlinedTextField`, a seleção nunca é controlada, e o Compose preserva o
+**deslocamento numérico** do cursor — que no texto reformatado cai num lugar
+visual diferente.
+
+A lógica de dígitos da v0.4.1 estava correta; faltava fixar o cursor.
+
+**O teclado cobria o campo em digitação.**
+
+O manifesto declara `adjustResize`, mas `enableEdgeToEdge()` faz a janela
+deixar de encaixar nas system windows, e `adjustResize` para de encolher o
+layout. Quem precisa consumir o inset passa a ser o Compose, com
+`imePadding()`.
+
+### Decisões registradas
+
+- **Cursor ancorado no fim**, como aplicativo de banco, em vez de calcular a
+  posição correta. Não existe posição correta: ao teclar `5` em `R$ 3,00` os
+  dígitos deslizam e a vírgula fica parada, então toda regra de mapeamento erra
+  em algum canto. Ancorar elimina o problema em vez de administrá-lo — vírgula
+  e separador de milhar viram puramente visuais, e o número só cresce ou
+  encolhe pela direita
+- **Só em campo numérico.** Texto livre — nome, observação, posto, oficina —
+  mantém edição no meio, onde ela é legítima
+- **`imePadding()` antes do `verticalScroll`**, para encolher a área rolável em
+  vez do conteúdo: assim o campo focado entra em cena sozinho
+
+### Não coberto por teste
+
+As duas correções são comportamento de Compose. `MoneyInputTest` cobre a
+lógica de dígitos e continua verde, mas passaria igual com o cursor quebrado.
+O projeto ainda não tem teste de UI — é o candidato natural agora que os
+testes instrumentados provaram rodar.
+
 ## [0.5.0] — Dashboard
 
 Os indicadores de rentabilidade. Ganhos e despesas já estavam no banco desde a
