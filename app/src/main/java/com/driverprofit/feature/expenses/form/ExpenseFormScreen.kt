@@ -7,6 +7,7 @@ import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.text.KeyboardOptions
+import androidx.compose.foundation.layout.imePadding
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.ArrowBack
@@ -43,6 +44,7 @@ import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.lifecycle.viewmodel.compose.viewModel
 import com.driverprofit.R
 import com.driverprofit.core.ui.DriverProfitViewModelFactory
+import com.driverprofit.core.ui.component.CaretAtEndTextField
 import com.driverprofit.core.ui.format.BrazilianFormatter
 import com.driverprofit.core.ui.format.ExpenseLabels
 import com.driverprofit.core.ui.format.VehicleLabels
@@ -121,6 +123,12 @@ fun ExpenseFormScreen(
             modifier = Modifier
                 .fillMaxSize()
                 .padding(innerPadding)
+                // Consome o inset do teclado. O manifesto declara
+                // adjustResize, mas enableEdgeToEdge faz a janela deixar de
+                // encaixar nas system windows, e aí quem precisa encolher a
+                // área rolável é o Compose. Sem isto o teclado cobre o campo
+                // que está sendo digitado.
+                .imePadding()
                 .verticalScroll(rememberScrollState())
                 .padding(horizontal = 16.dp, vertical = 8.dp),
             verticalArrangement = Arrangement.spacedBy(16.dp),
@@ -174,21 +182,14 @@ fun ExpenseFormScreen(
                 )
             }
 
-            OutlinedTextField(
+            CaretAtEndTextField(
                 value = uiState.amountText,
                 onValueChange = viewModel::onAmountChange,
-                label = { Text(stringResource(R.string.expense_amount)) },
-                singleLine = true,
+                label = stringResource(R.string.expense_amount),
                 isError = uiState.errorFor(ExpenseField.AMOUNT) != null,
-                keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Number),
-                supportingText = {
-                    Text(
-                        uiState.errorFor(ExpenseField.AMOUNT)
-                            ?.let { stringResource(ExpenseLabels.error(it)) }
-                            ?: stringResource(R.string.expense_amount_hint),
-                    )
-                },
-                modifier = Modifier.fillMaxWidth(),
+                supportingText = uiState.errorFor(ExpenseField.AMOUNT)
+                    ?.let { stringResource(ExpenseLabels.error(it)) }
+                    ?: stringResource(R.string.expense_amount_hint),
             )
 
             when (uiState.detailKind) {
@@ -286,31 +287,24 @@ private fun QuantityField(
         ?.let { stringResource(ExpenseLabels.unit(it)) }
         .orEmpty()
 
-    OutlinedTextField(
+    CaretAtEndTextField(
         value = uiState.quantityInput,
         onValueChange = viewModel::onQuantityChange,
-        label = {
-            Text(
-                if (unitLabel.isEmpty()) {
-                    stringResource(R.string.expense_quantity)
-                } else {
-                    stringResource(R.string.expense_quantity_with_unit, unitLabel)
-                },
-            )
+        label = if (unitLabel.isEmpty()) {
+            stringResource(R.string.expense_quantity)
+        } else {
+            stringResource(R.string.expense_quantity_with_unit, unitLabel)
         },
-        singleLine = true,
         isError = uiState.errorFor(ExpenseField.QUANTITY) != null,
-        keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Decimal),
-        supportingText = {
-            Text(
-                uiState.errorFor(ExpenseField.QUANTITY)
-                    ?.let { stringResource(ExpenseLabels.error(it)) }
-                    ?: stringResource(R.string.expense_quantity_hint),
-            )
-        },
-        modifier = Modifier.fillMaxWidth(),
+        // Decimal, e não Number: a quantidade é digitada com vírgula, como o
+        // motorista lê na bomba (v0.4.0).
+        keyboardType = KeyboardType.Decimal,
+        supportingText = uiState.errorFor(ExpenseField.QUANTITY)
+            ?.let { stringResource(ExpenseLabels.error(it)) }
+            ?: stringResource(R.string.expense_quantity_hint),
     )
 }
+
 
 /** Posto, eletroposto ou oficina — o mesmo campo com rótulo diferente. */
 @Composable

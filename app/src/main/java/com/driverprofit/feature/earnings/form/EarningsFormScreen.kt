@@ -8,6 +8,7 @@ import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.text.KeyboardOptions
+import androidx.compose.foundation.layout.imePadding
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.ArrowBack
@@ -45,6 +46,7 @@ import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.lifecycle.viewmodel.compose.viewModel
 import com.driverprofit.R
 import com.driverprofit.core.ui.DriverProfitViewModelFactory
+import com.driverprofit.core.ui.component.CaretAtEndTextField
 import com.driverprofit.core.ui.format.BrazilianFormatter
 import com.driverprofit.core.ui.format.EarningsLabels
 import com.driverprofit.core.ui.theme.DriverProfitTheme
@@ -119,6 +121,12 @@ fun EarningsFormScreen(
             modifier = Modifier
                 .fillMaxSize()
                 .padding(innerPadding)
+                // Consome o inset do teclado. O manifesto declara
+                // adjustResize, mas enableEdgeToEdge faz a janela deixar de
+                // encaixar nas system windows, e aí quem precisa encolher a
+                // área rolável é o Compose. Sem isto o teclado cobre o campo
+                // que está sendo digitado.
+                .imePadding()
                 .verticalScroll(rememberScrollState())
                 .padding(horizontal = 16.dp, vertical = 8.dp),
             verticalArrangement = Arrangement.spacedBy(16.dp),
@@ -151,19 +159,16 @@ fun EarningsFormScreen(
                 },
             )
 
-            OutlinedTextField(
+            CaretAtEndTextField(
                 // Campo em branco fica em branco: mostrar "R$ 0,00" faria
                 // parecer preenchido, e o valor é obrigatório.
                 value = uiState.revenueText,
                 onValueChange = viewModel::onRevenueChange,
-                label = { Text(stringResource(R.string.session_revenue)) },
-                singleLine = true,
+                label = stringResource(R.string.session_revenue),
                 isError = uiState.errorFor(WorkSessionField.REVENUE) != null,
-                keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Number),
                 supportingText = uiState.errorFor(WorkSessionField.REVENUE)?.let {
-                    { Text(stringResource(EarningsLabels.error(it))) }
+                    stringResource(EarningsLabels.error(it))
                 },
-                modifier = Modifier.fillMaxWidth(),
             )
 
             NumberField(
@@ -329,15 +334,13 @@ private fun NumberField(
     modifier: Modifier = Modifier,
     error: String? = null,
 ) {
-    OutlinedTextField(
+    CaretAtEndTextField(
         value = value,
         onValueChange = onValueChange,
-        label = { Text(label) },
-        modifier = modifier.fillMaxWidth(),
-        singleLine = true,
+        label = label,
+        modifier = modifier,
         isError = error != null,
-        keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Number),
-        supportingText = error?.let { { Text(it) } },
+        supportingText = error,
     )
 }
 
