@@ -22,6 +22,7 @@ import com.driverprofit.domain.model.MeasurementUnit
 import com.driverprofit.domain.model.Vehicle
 import com.driverprofit.domain.model.toDraft
 import com.driverprofit.domain.usecase.GetExpenseUseCase
+import com.driverprofit.domain.usecase.ObserveVehicleOdometersUseCase
 import com.driverprofit.domain.usecase.ObserveVehiclesUseCase
 import com.driverprofit.domain.usecase.SaveExpenseResult
 import com.driverprofit.domain.usecase.SaveExpenseUseCase
@@ -50,6 +51,9 @@ data class ExpenseFormUiState(
     val date: LocalDate? = null,
     val category: ExpenseCategory? = null,
     val amountDigits: String = "",
+    val odometerInput: String = "",
+    /** Última leitura conhecida de cada veículo, para conferência na tela. */
+    val odometers: Map<Long, Long> = emptyMap(),
     val description: String = "",
     val fuelType: FuelType? = null,
     val quantityInput: String = "",
@@ -84,7 +88,21 @@ data class ExpenseFormUiState(
             else -> null
         }
 
+    val odometerKm: Long? get() = odometerInput.toLongOrNull()
+
+    /**
+     * Maior leitura já registrada para o veículo escolhido.
+     *
+     * Exibida como referência no formulário: ver "última leitura: 45.200 km"
+     * ao digitar é o que faz o motorista perceber um dígito trocado na hora,
+     * em vez de descobrir depois num consumo estimado absurdo.
+     */
+    val lastOdometerKm: Long? get() = vehicleId?.let { odometers[it] }
+
     val showVehicle: Boolean get() = category?.requiresVehicle == true
+
+    /** O odômetro só é pedido onde há veículo em jogo (PRD §23). */
+    val showOdometer: Boolean get() = showVehicle
 
     fun errorFor(field: ExpenseField): ExpenseValidationError? = errors[field]
 }
@@ -98,6 +116,7 @@ data class ExpenseFormUiState(
 class ExpenseFormViewModel(
     savedStateHandle: SavedStateHandle,
     observeVehicles: ObserveVehiclesUseCase,
+    observeVehicleOdometers: ObserveVehicleOdometersUseCase,
     private val getExpense: GetExpenseUseCase,
     private val saveExpense: SaveExpenseUseCase,
     private val clock: Clock = Clock.systemDefaultZone(),
@@ -118,6 +137,7 @@ class ExpenseFormViewModel(
             // formulário está aberto, e observá-la continuamente só traria o
             // risco de o campo trocar sozinho sob o dedo do motorista.
             val vehicles = observeVehicles().first()
+            val odometers = observeVehicleOdometers().first()
             val existing = expenseId.takeIf { it != Expense.UNSAVED_ID }?.let { getExpense(it) }
 
             _uiState.update { state ->
@@ -132,6 +152,8 @@ class ExpenseFormViewModel(
                     vehicleId = loaded?.vehicleId ?: vehicles.singleOrNull()?.id,
                     category = loaded?.category,
                     amountDigits = loaded?.amount?.cents?.toString().orEmpty(),
+                    odometerInput = loaded?.odometerKm?.toString().orEmpty(),
+                    odometers = odometers,
                     description = loaded?.description.orEmpty(),
                     fuelType = loaded?.fuelType,
                     quantityInput = loaded?.quantity?.let(QuantityInput::display).orEmpty(),
@@ -179,6 +201,11 @@ class ExpenseFormViewModel(
         copy(amountDigits = MoneyInput.onTextChanged(amountDigits, value))
     }
 
+    /** Só dígitos: odômetro é quilômetro inteiro, sem separador nem fração. */
+    fun onOdometerChange(value: String) = updateField(ExpenseField.ODOMETER) {
+        copy(odometerInput = value.filter(Char::isDigit).take(MAX_ODOMETER_DIGITS))
+    }
+
     fun onDescriptionChange(value: String) =
         updateField(ExpenseField.DESCRIPTION) { copy(description = value) }
 
@@ -224,6 +251,10 @@ class ExpenseFormViewModel(
         _uiState.update { it.transform().copy(errors = it.errors - field) }
     }
 
+    private companion object {
+        /** Sete dígitos cobrem o teto de `Expense.MAX_ODOMETER_KM`. */
+        const val MAX_ODOMETER_DIGITS = 7
+    }
 }
 
 private fun List<ExpenseFieldError>.toMap(): Map<ExpenseField, ExpenseValidationError> =
@@ -243,6 +274,7 @@ internal fun ExpenseFormUiState.toDraft(expenseId: Long = Expense.UNSAVED_ID): E
         category = category,
         amount = amount,
         description = description,
+        odometerKm = odometerKm.takeIf { showOdometer },
         fuelType = fuelType,
         quantity = quantity,
         station = if (detailKind == ExpenseDetailKind.REFUEL) place else "",

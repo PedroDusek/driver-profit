@@ -192,6 +192,27 @@ fun ExpenseFormScreen(
                     ?: stringResource(R.string.expense_amount_hint),
             )
 
+            if (uiState.showOdometer) {
+                CaretAtEndTextField(
+                    value = uiState.odometerInput,
+                    onValueChange = viewModel::onOdometerChange,
+                    label = stringResource(R.string.expense_odometer),
+                    isError = uiState.errorFor(ExpenseField.ODOMETER) != null,
+                    // A última leitura fica à vista enquanto ele digita: é o
+                    // que faz um dígito trocado saltar aos olhos na hora, em
+                    // vez de virar consumo absurdo depois.
+                    supportingText = uiState.errorFor(ExpenseField.ODOMETER)
+                        ?.let { stringResource(ExpenseLabels.error(it)) }
+                        ?: uiState.lastOdometerKm?.let {
+                            stringResource(
+                                R.string.expense_odometer_last,
+                                BrazilianFormatter.kilometers(it),
+                            )
+                        }
+                        ?: stringResource(R.string.expense_odometer_hint),
+                )
+            }
+
             when (uiState.detailKind) {
                 ExpenseDetailKind.REFUEL -> {
                     Dropdown(

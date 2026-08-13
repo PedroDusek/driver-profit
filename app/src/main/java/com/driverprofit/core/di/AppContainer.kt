@@ -20,6 +20,8 @@ import com.driverprofit.domain.usecase.GetWorkSessionUseCase
 import com.driverprofit.domain.usecase.ObserveDashboardUseCase
 import com.driverprofit.domain.usecase.ObserveExpensesBetweenUseCase
 import com.driverprofit.domain.usecase.ObserveExpensesUseCase
+import com.driverprofit.domain.usecase.ObserveVehicleOdometerUseCase
+import com.driverprofit.domain.usecase.ObserveVehicleOdometersUseCase
 import com.driverprofit.domain.usecase.ObserveVehiclesUseCase
 import com.driverprofit.domain.usecase.ObserveWorkSessionsBetweenUseCase
 import com.driverprofit.domain.usecase.ObserveWorkSessionsUseCase
@@ -58,6 +60,9 @@ interface AppContainer {
     val deleteExpense: DeleteExpenseUseCase
 
     val observeDashboard: ObserveDashboardUseCase
+
+    val observeVehicleOdometer: ObserveVehicleOdometerUseCase
+    val observeVehicleOdometers: ObserveVehicleOdometersUseCase
 }
 
 class DefaultAppContainer(private val context: Context) : AppContainer {
@@ -137,6 +142,14 @@ class DefaultAppContainer(private val context: Context) : AppContainer {
 
     override val deleteExpense: DeleteExpenseUseCase by lazy {
         DeleteExpenseUseCase(expenseRepository)
+    }
+
+    override val observeVehicleOdometer: ObserveVehicleOdometerUseCase by lazy {
+        ObserveVehicleOdometerUseCase(expenseRepository)
+    }
+
+    override val observeVehicleOdometers: ObserveVehicleOdometersUseCase by lazy {
+        ObserveVehicleOdometersUseCase(expenseRepository)
     }
 
     override val observeDashboard: ObserveDashboardUseCase by lazy {

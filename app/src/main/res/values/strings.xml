@@ -151,6 +151,9 @@
     <string name="expense_amount_hint">Zero é válido: recarga gratuita conta</string>
     <string name="expense_vehicle">Veículo</string>
     <string name="expense_vehicle_none">Cadastre um veículo antes de lançar esta despesa</string>
+    <string name="expense_odometer">Odômetro (km)</string>
+    <string name="expense_odometer_hint">Quilometragem do painel neste momento</string>
+    <string name="expense_odometer_last">Última leitura: %1$s</string>
     <string name="expense_description">Observação</string>
     <string name="expense_fuel_type">Combustível abastecido</string>
     <string name="expense_quantity">Quantidade</string>
@@ -212,4 +215,9 @@
     <string name="error_fuel_not_supported">Seu veículo não aceita esse combustível</string>
     <string name="error_vehicle_cannot_charge">Esse veículo não é recarregável</string>
     <string name="error_text_too_long">Texto muito longo</string>
+    <string name="error_odometer_out_of_range">Quilometragem inválida</string>
+
+    <!-- Veículos: quilometragem -->
+    <string name="vehicle_odometer">%1$s rodados</string>
+    <string name="vehicle_odometer_unknown">Sem leitura de odômetro ainda</string>
 </resources>
