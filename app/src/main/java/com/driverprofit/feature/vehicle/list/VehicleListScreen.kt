@@ -38,6 +38,7 @@ import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.lifecycle.viewmodel.compose.viewModel
 import com.driverprofit.R
 import com.driverprofit.core.ui.DriverProfitViewModelFactory
+import com.driverprofit.core.ui.format.BrazilianFormatter
 import com.driverprofit.core.ui.format.VehicleLabels
 import com.driverprofit.core.ui.theme.DriverProfitTheme
 import com.driverprofit.domain.model.Vehicle
@@ -98,6 +99,7 @@ fun VehicleListScreen(
             ) {
                 items(items = state.vehicles, key = { it.id }) { vehicle ->
                     VehicleCard(
+                        odometerKm = state.odometers[vehicle.id],
                         vehicle = vehicle,
                         onEdit = { onEditVehicle(vehicle.id) },
                         onDelete = { viewModel.onDeleteRequested(vehicle) },
@@ -131,6 +133,7 @@ private fun VehicleCard(
     vehicle: Vehicle,
     onEdit: () -> Unit,
     onDelete: () -> Unit,
+    odometerKm: Long? = null,
 ) {
     Card(modifier = Modifier.fillMaxWidth()) {
         Row(
@@ -147,6 +150,20 @@ private fun VehicleCard(
                 Text(
                     text = stringResource(VehicleLabels.fuel(vehicle.fuel)),
                     style = MaterialTheme.typography.bodyLarge,
+                    color = MaterialTheme.colorScheme.onSurfaceVariant,
+                )
+                // Quilometragem segundo o app: a maior leitura já lançada.
+                // Ausente enquanto nenhum abastecimento registrou odômetro.
+                Text(
+                    text = odometerKm
+                        ?.let {
+                            stringResource(
+                                R.string.vehicle_odometer,
+                                BrazilianFormatter.kilometers(it),
+                            )
+                        }
+                        ?: stringResource(R.string.vehicle_odometer_unknown),
+                    style = MaterialTheme.typography.labelMedium,
                     color = MaterialTheme.colorScheme.onSurfaceVariant,
                 )
             }

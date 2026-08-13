@@ -65,6 +65,7 @@ object ExpenseLabels {
         ExpenseField.CATEGORY -> R.string.expense_category
         ExpenseField.AMOUNT -> R.string.expense_amount
         ExpenseField.VEHICLE -> R.string.expense_vehicle
+        ExpenseField.ODOMETER -> R.string.expense_odometer
         ExpenseField.DESCRIPTION -> R.string.expense_description
         ExpenseField.FUEL_TYPE -> R.string.expense_fuel_type
         ExpenseField.QUANTITY -> R.string.expense_quantity
@@ -84,6 +85,7 @@ object ExpenseLabels {
         ExpenseValidationError.FUEL_NOT_SUPPORTED_BY_VEHICLE ->
             R.string.error_fuel_not_supported
         ExpenseValidationError.VEHICLE_CANNOT_CHARGE -> R.string.error_vehicle_cannot_charge
+        ExpenseValidationError.ODOMETER_OUT_OF_RANGE -> R.string.error_odometer_out_of_range
         ExpenseValidationError.TEXT_TOO_LONG -> R.string.error_text_too_long
     }
 }

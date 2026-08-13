@@ -4,12 +4,13 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.driverprofit.domain.model.Vehicle
 import com.driverprofit.domain.usecase.DeleteVehicleUseCase
+import com.driverprofit.domain.usecase.ObserveVehicleOdometersUseCase
 import com.driverprofit.domain.usecase.ObserveVehiclesUseCase
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
-import kotlinx.coroutines.flow.map
+import kotlinx.coroutines.flow.combine
 import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.launch
 
@@ -22,7 +23,15 @@ sealed interface VehicleListUiState {
     /** Nenhum veículo cadastrado — a tela mostra o estado vazio. */
     data object Empty : VehicleListUiState
 
-    data class Content(val vehicles: List<Vehicle>) : VehicleListUiState
+    /**
+     * @param odometers última leitura conhecida de cada veículo, por id. Um
+     *   veículo ausente do mapa ainda não tem leitura — o que inclui todo
+     *   lançamento anterior à v0.6.0.
+     */
+    data class Content(
+        val vehicles: List<Vehicle>,
+        val odometers: Map<Long, Long> = emptyMap(),
+    ) : VehicleListUiState
 }
 
 /**
@@ -33,6 +42,7 @@ sealed interface VehicleListUiState {
  */
 class VehicleListViewModel(
     observeVehicles: ObserveVehiclesUseCase,
+    observeVehicleOdometers: ObserveVehicleOdometersUseCase,
     private val deleteVehicle: DeleteVehicleUseCase,
 ) : ViewModel() {
 
@@ -41,10 +51,10 @@ class VehicleListViewModel(
 
     val vehiclePendingDeletion: StateFlow<Vehicle?> = pendingDeletion.asStateFlow()
 
-    val uiState: StateFlow<VehicleListUiState> = observeVehicles()
-        .map { vehicles ->
+    val uiState: StateFlow<VehicleListUiState> =
+        combine(observeVehicles(), observeVehicleOdometers()) { vehicles, odometers ->
             if (vehicles.isEmpty()) VehicleListUiState.Empty
-            else VehicleListUiState.Content(vehicles)
+            else VehicleListUiState.Content(vehicles, odometers)
         }
         .stateIn(
             scope = viewModelScope,

@@ -33,6 +33,7 @@ object DriverProfitViewModelFactory {
         initializer {
             VehicleListViewModel(
                 observeVehicles = container().observeVehicles,
+                observeVehicleOdometers = container().observeVehicleOdometers,
                 deleteVehicle = container().deleteVehicle,
             )
         }
@@ -66,6 +67,7 @@ object DriverProfitViewModelFactory {
             ExpenseFormViewModel(
                 savedStateHandle = createSavedStateHandle(),
                 observeVehicles = container().observeVehicles,
+                observeVehicleOdometers = container().observeVehicleOdometers,
                 getExpense = container().getExpense,
                 saveExpense = container().saveExpense,
             )
