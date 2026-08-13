@@ -17,6 +17,7 @@ import com.driverprofit.domain.model.Vehicle
 import com.driverprofit.domain.model.VehicleFuel
 import com.driverprofit.domain.usecase.ExpenseValidator
 import com.driverprofit.domain.usecase.GetExpenseUseCase
+import com.driverprofit.domain.usecase.ObserveVehicleOdometersUseCase
 import com.driverprofit.domain.usecase.ObserveVehiclesUseCase
 import com.driverprofit.domain.usecase.SaveExpenseUseCase
 import com.driverprofit.feature.expenses.form.ExpenseFormViewModel
@@ -63,6 +64,7 @@ class ExpenseFormViewModelTest {
         return ExpenseFormViewModel(
             savedStateHandle = handle,
             observeVehicles = ObserveVehiclesUseCase(vehicleRepository),
+            observeVehicleOdometers = ObserveVehicleOdometersUseCase(expenses),
             getExpense = GetExpenseUseCase(expenses),
             saveExpense = SaveExpenseUseCase(
                 expenses,
@@ -213,6 +215,88 @@ class ExpenseFormViewModelTest {
     }
 
     @Test
+    fun `o campo de odometro so aparece onde ha veiculo`() = runTest {
+        val viewModel = viewModel()
+        advanceUntilIdle()
+
+        viewModel.onCategoryChange(ExpenseCategory.FUEL)
+        assertTrue(viewModel.uiState.value.showOdometer)
+
+        viewModel.onCategoryChange(ExpenseCategory.TOLL)
+        assertFalse(viewModel.uiState.value.showOdometer)
+    }
+
+    @Test
+    fun `odometro aceita so digitos`() = runTest {
+        val viewModel = viewModel()
+        advanceUntilIdle()
+
+        // Quilometro e inteiro: sem separador, sem fracao, sem sinal.
+        viewModel.onOdometerChange("45.200,7 km")
+
+        assertEquals("452007", viewModel.uiState.value.odometerInput)
+        assertEquals(452_007L, viewModel.uiState.value.odometerKm)
+    }
+
+    @Test
+    fun `a ultima leitura do veiculo fica visivel no formulario`() = runTest {
+        // Ver "ultima leitura" enquanto digita e o que faz um digito trocado
+        // saltar aos olhos na hora.
+        val expenses = FakeExpenseRepository(
+            listOf(
+                Expense(
+                    id = 1,
+                    vehicleId = 1,
+                    date = hoje,
+                    category = ExpenseCategory.FUEL,
+                    amount = Money.of(200, 0),
+                    odometerKm = 44_000,
+                    createdAt = Instant.EPOCH,
+                ),
+                Expense(
+                    id = 2,
+                    vehicleId = 1,
+                    date = hoje.minusDays(5),
+                    category = ExpenseCategory.FUEL,
+                    amount = Money.of(180, 0),
+                    odometerKm = 45_500,
+                    createdAt = Instant.EPOCH,
+                ),
+            ),
+        )
+        val viewModel = viewModel(expenses = expenses)
+        advanceUntilIdle()
+
+        // A maior, e nao a mais recente por data: o motorista pode lancar o
+        // abastecimento da semana passada hoje.
+        assertEquals(45_500L, viewModel.uiState.value.lastOdometerKm)
+    }
+
+    @Test
+    fun `sem leitura anterior o formulario nao inventa referencia`() = runTest {
+        val viewModel = viewModel()
+        advanceUntilIdle()
+
+        assertNull(viewModel.uiState.value.lastOdometerKm)
+    }
+
+    @Test
+    fun `abastecimento sem odometro nao salva`() = runTest {
+        val expenses = FakeExpenseRepository()
+        val viewModel = viewModel(expenses = expenses)
+        advanceUntilIdle()
+
+        viewModel.onCategoryChange(ExpenseCategory.FUEL)
+        viewModel.setAmount("21000")
+        viewModel.onFuelTypeChange(FuelType.ETHANOL)
+        viewModel.onSave()
+        advanceUntilIdle()
+
+        assertTrue(expenses.current.isEmpty())
+        assertNotNull(viewModel.uiState.value.errorFor(ExpenseField.ODOMETER))
+    }
+
+    @Test
     fun `abastecimento valido persiste com o detalhe certo`() = runTest {
         val expenses = FakeExpenseRepository()
         val viewModel = viewModel(expenses = expenses)
@@ -220,6 +304,7 @@ class ExpenseFormViewModelTest {
 
         viewModel.onCategoryChange(ExpenseCategory.FUEL)
         viewModel.setAmount("21000")
+        viewModel.onOdometerChange("45200")
         viewModel.onFuelTypeChange(FuelType.ETHANOL)
         viewModel.onQuantityChange("35,4")
         viewModel.onPlaceChange("Posto Shell")
@@ -243,6 +328,7 @@ class ExpenseFormViewModelTest {
 
         viewModel.onCategoryChange(ExpenseCategory.MAINTENANCE)
         viewModel.setAmount("32000")
+        viewModel.onOdometerChange("45200")
         viewModel.onMaintenanceCategoryChange(MaintenanceCategory.OIL)
         viewModel.onPlaceChange("Oficina do Zé")
         viewModel.onSave()
@@ -262,6 +348,7 @@ class ExpenseFormViewModelTest {
 
         viewModel.onCategoryChange(ExpenseCategory.CHARGING)
         viewModel.setAmount("0")
+        viewModel.onOdometerChange("12800")
         viewModel.onQuantityChange("42")
         viewModel.onChargingLocationChange(ChargingLocation.COMMERCIAL)
         viewModel.onSave()

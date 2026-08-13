@@ -3,9 +3,11 @@
 import com.driverprofit.domain.model.Vehicle
 import com.driverprofit.domain.model.VehicleFuel
 import com.driverprofit.domain.usecase.DeleteVehicleUseCase
+import com.driverprofit.domain.usecase.ObserveVehicleOdometersUseCase
 import com.driverprofit.domain.usecase.ObserveVehiclesUseCase
 import com.driverprofit.feature.vehicle.list.VehicleListUiState
 import com.driverprofit.feature.vehicle.list.VehicleListViewModel
+import com.driverprofit.testing.FakeExpenseRepository
 import com.driverprofit.testing.FakeVehicleRepository
 import com.driverprofit.testing.MainDispatcherRule
 import kotlinx.coroutines.ExperimentalCoroutinesApi
@@ -34,8 +36,12 @@ class VehicleListViewModelTest {
         createdAt = createdAt,
     )
 
-    private fun viewModel(repository: FakeVehicleRepository) = VehicleListViewModel(
+    private fun viewModel(
+        repository: FakeVehicleRepository,
+        expenses: FakeExpenseRepository = FakeExpenseRepository(),
+    ) = VehicleListViewModel(
         observeVehicles = ObserveVehiclesUseCase(repository),
+        observeVehicleOdometers = ObserveVehicleOdometersUseCase(expenses),
         deleteVehicle = DeleteVehicleUseCase(repository),
     )
 

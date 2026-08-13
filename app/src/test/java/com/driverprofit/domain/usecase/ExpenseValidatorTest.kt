@@ -43,6 +43,7 @@ class ExpenseValidatorTest {
         date = hoje,
         category = ExpenseCategory.FUEL,
         amount = Money.of(210, 0),
+        odometerKm = 45_200,
         fuelType = FuelType.ETHANOL,
         quantity = Quantity.of(35, 400),
         station = "Posto Shell",
@@ -90,6 +91,97 @@ class ExpenseValidatorTest {
                 ExpenseFieldError(ExpenseField.AMOUNT, ExpenseValidationError.NEGATIVE),
             ),
         )
+    }
+
+    // --- Odômetro (v0.6.0) ---
+
+    @Test
+    fun `abastecimento exige odometro`() {
+        assertTrue(
+            validator.validate(refuelDraft.copy(odometerKm = null), flexCar).contains(
+                ExpenseFieldError(ExpenseField.ODOMETER, ExpenseValidationError.REQUIRED),
+            ),
+        )
+    }
+
+    @Test
+    fun `recarga e manutencao tambem exigem odometro`() {
+        val recarga = chargingDraft.copy(odometerKm = null)
+        val manutencao = ExpenseDraft(
+            vehicleId = 1,
+            date = hoje,
+            category = ExpenseCategory.MAINTENANCE,
+            amount = Money.of(320, 0),
+            maintenanceCategory = MaintenanceCategory.OIL,
+        )
+
+        listOf(recarga to electricCar, manutencao to flexCar).forEach { (draft, car) ->
+            assertTrue(
+                "sem odometro deveria ser rejeitado: ${draft.category}",
+                validator.validate(draft, car).contains(
+                    ExpenseFieldError(ExpenseField.ODOMETER, ExpenseValidationError.REQUIRED),
+                ),
+            )
+        }
+    }
+
+    @Test
+    fun `pedagio nao exige odometro`() {
+        // Nao ha veiculo em jogo; cobrar a leitura ali so criaria atrito.
+        assertEquals(emptyList<ExpenseFieldError>(), validator.validate(tollDraft, null))
+    }
+
+    @Test
+    fun `odometro zero e rejeitado`() {
+        // Diferente de ausente: aqui ele respondeu, e a resposta nao pode ser
+        // uma leitura de painel.
+        assertTrue(
+            validator.validate(refuelDraft.copy(odometerKm = 0), flexCar).contains(
+                ExpenseFieldError(
+                    ExpenseField.ODOMETER,
+                    ExpenseValidationError.ODOMETER_OUT_OF_RANGE,
+                ),
+            ),
+        )
+    }
+
+    @Test
+    fun `odometro absurdamente alto e rejeitado`() {
+        // Pega digito a mais na digitacao, que envenenaria a conciliacao de
+        // uso pessoal da v0.7.0.
+        assertTrue(
+            validator.validate(
+                refuelDraft.copy(odometerKm = Expense.MAX_ODOMETER_KM + 1),
+                flexCar,
+            ).contains(
+                ExpenseFieldError(
+                    ExpenseField.ODOMETER,
+                    ExpenseValidationError.ODOMETER_OUT_OF_RANGE,
+                ),
+            ),
+        )
+    }
+
+    @Test
+    fun `odometro no teto ainda e aceito`() {
+        assertEquals(
+            emptyList<ExpenseFieldError>(),
+            validator.validate(refuelDraft.copy(odometerKm = Expense.MAX_ODOMETER_KM), flexCar),
+        )
+    }
+
+    @Test
+    fun `odometro chega na despesa gravada`() {
+        assertEquals(45_200L, validator.toExpense(refuelDraft).odometerKm)
+    }
+
+    @Test
+    fun `odometro digitado num pedagio nao e gravado`() {
+        // Trocar de categoria depois de digitar nao pode deixar leitura
+        // pendurada numa despesa que nao tem veiculo.
+        val draft = tollDraft.copy(odometerKm = 45_200)
+
+        assertNull(validator.toExpense(draft).odometerKm)
     }
 
     // --- Pedágio e afins: sem veículo, sem detalhe ---
@@ -209,6 +301,7 @@ class ExpenseValidatorTest {
         date = hoje,
         category = ExpenseCategory.CHARGING,
         amount = Money.of(45, 0),
+        odometerKm = 12_800,
         quantity = Quantity.of(42),
         chargingLocation = ChargingLocation.PUBLIC,
         place = "Eletroposto",
@@ -269,6 +362,7 @@ class ExpenseValidatorTest {
             date = hoje,
             category = ExpenseCategory.MAINTENANCE,
             amount = Money.of(320, 0),
+            odometerKm = 45_200,
         )
 
         assertTrue(
@@ -288,6 +382,7 @@ class ExpenseValidatorTest {
             date = hoje,
             category = ExpenseCategory.MAINTENANCE,
             amount = Money.of(320, 0),
+            odometerKm = 45_200,
             maintenanceCategory = MaintenanceCategory.OIL,
             workshop = "Oficina do Zé",
         )
