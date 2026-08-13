@@ -48,7 +48,37 @@ class ExpenseValidator(
 
         if (category != null) {
             addAll(validateVehicle(category, draft, vehicle))
+            addAll(validateOdometer(category, draft))
             addAll(validateDetail(category, draft, vehicle))
+        }
+    }
+
+    /**
+     * A leitura do painel é **obrigatória** nas categorias ligadas ao veículo
+     * — abastecimento, recarga e manutenção (PRD §23).
+     *
+     * Obrigatória, e não opcional, pelo mesmo motivo da v0.3.1: um campo em
+     * branco que o cálculo trata como ausente produz indicador incompleto sem
+     * avisar ninguém. Aqui o preço de deixar passar é maior ainda — o odômetro
+     * é a fundação do consumo estimado, do uso pessoal e do alerta de
+     * manutenção, e um alerta de troca de óleo atrasado desgasta motor.
+     *
+     * Pedágio, estacionamento, seguro e IPVA não pedem: não há veículo em jogo
+     * e cobrar a leitura ali só criaria atrito.
+     */
+    private fun validateOdometer(
+        category: com.driverprofit.domain.model.ExpenseCategory,
+        draft: ExpenseDraft,
+    ): List<ExpenseFieldError> {
+        if (!category.requiresVehicle) return emptyList()
+
+        val odometer = draft.odometerKm
+            ?: return listOf(error(ExpenseField.ODOMETER, ExpenseValidationError.REQUIRED))
+
+        return if (odometer <= 0L || odometer > Expense.MAX_ODOMETER_KM) {
+            listOf(error(ExpenseField.ODOMETER, ExpenseValidationError.ODOMETER_OUT_OF_RANGE))
+        } else {
+            emptyList()
         }
     }
 
@@ -65,6 +95,9 @@ class ExpenseValidator(
         amount = draft.amount!!,
         description = draft.description.trim(),
         detail = toDetail(draft),
+        // Guardada só quando a categoria a exige: uma leitura digitada num
+        // pedágio e depois abandonada não deve virar dado do veículo.
+        odometerKm = draft.odometerKm.takeIf { draft.category.requiresVehicle },
         createdAt = createdAt,
     )
 

@@ -29,6 +29,14 @@ class OfflineExpenseRepository(
             .map { entities -> entities.map { it.toDomain() } }
             .flowOn(ioDispatcher)
 
+    override fun observeLatestOdometer(vehicleId: Long): Flow<Long?> =
+        expenseDao.observeLatestOdometer(vehicleId).flowOn(ioDispatcher)
+
+    override fun observeOdometers(): Flow<Map<Long, Long>> =
+        expenseDao.observeOdometers()
+            .map { rows -> rows.associate { it.vehicleId to it.odometerKm } }
+            .flowOn(ioDispatcher)
+
     override suspend fun getExpense(id: Long): Expense? =
         withContext(ioDispatcher) { expenseDao.findById(id)?.toDomain() }
 
