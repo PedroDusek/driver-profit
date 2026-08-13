@@ -2,7 +2,7 @@
 
 Room sobre SQLite, local ao aparelho. Nome do arquivo: `driver_profit.db`.
 
-**Versão atual do schema: 4**
+**Versão atual do schema: 5**
 
 O JSON do schema é exportado em `app/schemas/` e **é versionado no Git**. Ele é
 o que torna possível escrever testes de migração de verdade. Os schemas
@@ -61,7 +61,7 @@ O que a validação impede é a sessão inteira estar zerada.
 Adicionar uma plataforma nova é acrescentar uma constante no enum — não mexe no
 banco, porque a coluna guarda o `name`.
 
-### `expenses` (v4)
+### `expenses` (v5)
 
 Todas as despesas em **uma tabela só**, com as colunas de detalhe anuláveis.
 
@@ -78,9 +78,20 @@ Todas as despesas em **uma tabela só**, com as colunas de detalhe anuláveis.
 | `charging_location` | TEXT | **sim** | `RESIDENTIAL` \| `COMMERCIAL` \| `PUBLIC` \| `OTHER` |
 | `maintenance_category` | TEXT | **sim** | Item da manutenção |
 | `place` | TEXT | **sim** | Posto, eletroposto ou oficina, conforme a categoria |
+| `odometer_km` | INTEGER | **sim** | Leitura do painel, em km inteiros. Desde a v0.6.0 |
 | `created_at` | INTEGER | não | Epoch millis (UTC) |
 
 **Índices:** `date` e `vehicle_id`.
+
+**`odometer_km` é anulável no schema, mas obrigatório no domínio** para
+abastecimento, recarga e manutenção — as categorias que exigem veículo. A
+coluna aceita nulo por duas razões: pedágio e estacionamento não têm leitura, e
+as despesas gravadas antes da v0.6.0 nunca tiveram. Exigir `NOT NULL`
+obrigaria a inventar um valor na migração, e valor inventado de odômetro
+contamina consumo estimado, quilômetro pessoal e alerta de manutenção.
+
+A obrigatoriedade vive em `ExpenseValidator`: ela vale para o que se grava de
+agora em diante e não invalida retroativamente o histórico.
 
 **Por que uma tabela só:** o PRD §17 pede explicitamente que adicionar
 categoria não exija mudança estrutural. Com uma tabela por natureza de
@@ -172,6 +183,7 @@ Um PR que altera apenas a Entity está incompleto.
 | 2 | v0.2.1 | Cadastro simplificado: remove `brand`, `model`, `year`, `initial_odometer_km`, `powertrain` e `charging_capability`; introduz `name` e `fuel` |
 | 3 | v0.3.0 | Adiciona `work_sessions` e o índice sobre `date` |
 | 4 | v0.4.0 | Adiciona `expenses`, com FK para `vehicles` e índices sobre `date` e `vehicle_id` |
+| 5 | v0.6.0 | Adiciona `odometer_km` em `expenses` (odômetro por lançamento) |
 
 #### Migração 1 → 2
 
@@ -205,6 +217,20 @@ Aditiva: cria `expenses` com a chave estrangeira para `vehicles` e os dois
 O índice sobre `vehicle_id` não é opcional — o Room o exige para a chave
 estrangeira, e sem ele apagar um veículo faria varredura completa de
 `expenses`.
+
+#### Migração 4 → 5
+
+`ALTER TABLE expenses ADD COLUMN odometer_km INTEGER`. Aditiva e sem reescrita
+de tabela — barata mesmo com histórico grande.
+
+A coluna é **anulável e sem default**, de propósito. As despesas já gravadas
+não têm leitura de painel, e preencher com zero ou repetir a anterior
+envenenaria justamente o que o odômetro serve para calcular. `NULL` diz a
+verdade: "não sei".
+
+Consequência prática: o consumo estimado (v0.8.0) e os alertas de manutenção
+(v0.9.0) só passam a funcionar a partir do primeiro lançamento com leitura.
+Isso é correto — não há como reconstruir um dado que nunca foi coletado.
 
 ## Desvios registrados em relação ao PRD
 
