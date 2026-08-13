@@ -175,6 +175,20 @@ desenvolvedor: **Depuração USB**, **Instalar via USB** e **Depuração USB
 estado, reiniciar o aparelho destrava — alternar a chave já não resolve depois
 que o `adbd` engasga.
 
+**Quando o Gradle falhar com `INSTALL_FAILED_USER_RESTRICTED`** — a MIUI
+recusando a instalação — instale os dois APKs à mão e chame o runner direto.
+Isso contorna o instalador do Gradle sem perder nenhum teste:
+
+```bash
+adb install -r -t app/build/outputs/apk/debug/app-debug.apk
+adb install -r -t app/build/outputs/apk/androidTest/debug/app-debug-androidTest.apk
+adb shell am instrument -w com.driverprofit.debug.test/androidx.test.runner.AndroidJUnitRunner
+```
+
+⚠️ O `connectedDebugAndroidTest` **desinstala os dois pacotes ao terminar**. Se
+o app sumir do celular depois de rodar os testes, não é defeito — é só
+reinstalar.
+
 O que **continua sem verificação**: nenhuma tela foi usada de verdade. O app é
 instalável e roda, mas os fluxos de interface só foram exercitados por teste
 unitário de ViewModel, lint e build.
