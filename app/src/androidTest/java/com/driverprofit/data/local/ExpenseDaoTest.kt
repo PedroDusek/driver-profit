@@ -37,12 +37,14 @@ class ExpenseDaoTest {
         category: ExpenseCategory = ExpenseCategory.TOLL,
         amountCents: Long = 1_250,
         vehicleId: Long? = null,
+        odometerKm: Long? = null,
     ) = ExpenseEntity(
         vehicleId = vehicleId,
         date = date,
         category = category,
         amountCents = amountCents,
         description = "",
+        odometerKm = odometerKm,
         createdAt = Instant.ofEpochMilli(1_000_000),
     )
 
@@ -189,5 +191,70 @@ class ExpenseDaoTest {
     @Test
     fun observeAllComecaVazio() = runTest {
         assertEquals(emptyList<ExpenseEntity>(), dao.observeAll().first())
+    }
+
+    // --- Odômetro (v0.6.0) ---
+
+    @Test
+    fun odometroAtualEOMaiorEnaoODoLancamentoMaisRecente() = runTest {
+        val carro = vehicleDao.insert(
+            VehicleEntity(
+                name = "Onix",
+                fuel = VehicleFuel.FLEX,
+                createdAt = Instant.ofEpochMilli(1),
+            ),
+        )
+        // Lançar hoje o abastecimento da semana passada é comum: ordenar por
+        // data devolveria uma leitura menor que a real.
+        dao.insert(
+            expense(
+                date = LocalDate.of(2026, 8, 11),
+                vehicleId = carro,
+                odometerKm = 44_000,
+            ),
+        )
+        dao.insert(
+            expense(
+                date = LocalDate.of(2026, 8, 5),
+                vehicleId = carro,
+                odometerKm = 45_500,
+            ),
+        )
+
+        assertEquals(45_500L, dao.observeLatestOdometer(carro).first())
+    }
+
+    @Test
+    fun odometroAtualENuloSemNenhumaLeitura() = runTest {
+        val carro = vehicleDao.insert(
+            VehicleEntity(
+                name = "Onix",
+                fuel = VehicleFuel.FLEX,
+                createdAt = Instant.ofEpochMilli(1),
+            ),
+        )
+        // Despesa sem leitura: é o caso de todo o histórico anterior à v0.6.0.
+        dao.insert(expense(vehicleId = carro, odometerKm = null))
+
+        assertNull(dao.observeLatestOdometer(carro).first())
+    }
+
+    @Test
+    fun observeOdometersAgrupaPorVeiculo() = runTest {
+        val onix = vehicleDao.insert(
+            VehicleEntity(name = "Onix", fuel = VehicleFuel.FLEX, createdAt = Instant.EPOCH),
+        )
+        val dolphin = vehicleDao.insert(
+            VehicleEntity(name = "Dolphin", fuel = VehicleFuel.ELECTRIC, createdAt = Instant.EPOCH),
+        )
+        dao.insert(expense(vehicleId = onix, odometerKm = 44_000))
+        dao.insert(expense(vehicleId = onix, odometerKm = 45_500))
+        dao.insert(expense(vehicleId = dolphin, odometerKm = 12_800))
+        // Sem veículo e sem leitura: não pode aparecer no agrupamento.
+        dao.insert(expense(vehicleId = null, odometerKm = null))
+
+        val odometros = dao.observeOdometers().first().associate { it.vehicleId to it.odometerKm }
+
+        assertEquals(mapOf(onix to 45_500L, dolphin to 12_800L), odometros)
     }
 }

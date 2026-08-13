@@ -32,6 +32,17 @@ class FakeExpenseRepository(
     override fun observeExpensesBetween(start: LocalDate, end: LocalDate): Flow<List<Expense>> =
         expenses.map { list -> list.filter { it.date >= start && it.date <= end }.sorted() }
 
+    /** `MAX`, como o DAO: odômetro só cresce e o lançamento pode vir fora de ordem. */
+    override fun observeLatestOdometer(vehicleId: Long): Flow<Long?> = expenses.map { list ->
+        list.filter { it.vehicleId == vehicleId }.mapNotNull { it.odometerKm }.maxOrNull()
+    }
+
+    override fun observeOdometers(): Flow<Map<Long, Long>> = expenses.map { list ->
+        list.filter { it.vehicleId != null && it.odometerKm != null }
+            .groupBy { it.vehicleId!! }
+            .mapValues { (_, rows) -> rows.maxOf { it.odometerKm!! } }
+    }
+
     override suspend fun getExpense(id: Long): Expense? =
         expenses.value.firstOrNull { it.id == id }
 

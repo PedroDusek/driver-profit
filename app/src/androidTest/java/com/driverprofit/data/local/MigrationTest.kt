@@ -189,6 +189,84 @@ class MigrationTest {
     }
 
     @Test
+    fun migracao4para5AcrescentaOdometroSemTocarNasDespesas() {
+        helper.createDatabase(TEST_DB, 4).use { db ->
+            db.execSQL(
+                """
+                INSERT INTO expenses
+                    (id, vehicle_id, date, category, amount_cents, description, created_at)
+                VALUES (1, NULL, 20000, 'FUEL', 21000, 'Posto Shell', 1000)
+                """.trimIndent(),
+            )
+        }
+
+        val db = helper.runMigrationsAndValidate(TEST_DB, 5, true, Migrations.MIGRATION_4_5)
+
+        // A despesa continua inteira, e a leitura fica NULL — que é a verdade:
+        // ninguém registrou odômetro antes da v0.6.0. Inventar um valor aqui
+        // envenenaria consumo estimado e alerta de manutenção.
+        db.query("SELECT amount_cents, description, odometer_km FROM expenses").use { cursor ->
+            assertTrue(cursor.moveToFirst())
+            assertEquals(21000, cursor.getInt(0))
+            assertEquals("Posto Shell", cursor.getString(1))
+            assertTrue(cursor.isNull(2))
+        }
+    }
+
+    @Test
+    fun migracao4para5AceitaOdometroDepoisDeMigrar() {
+        helper.createDatabase(TEST_DB, 4).close()
+
+        val db = helper.runMigrationsAndValidate(TEST_DB, 5, true, Migrations.MIGRATION_4_5)
+
+        db.execSQL(
+            """
+            INSERT INTO expenses
+                (id, vehicle_id, date, category, amount_cents, description,
+                 odometer_km, created_at)
+            VALUES (1, NULL, 20000, 'FUEL', 21000, '', 45200, 1000)
+            """.trimIndent(),
+        )
+
+        db.query("SELECT odometer_km FROM expenses WHERE id = 1").use { cursor ->
+            assertTrue(cursor.moveToFirst())
+            assertEquals(45200, cursor.getInt(0))
+        }
+    }
+
+    @Test
+    fun migracao1para5AtravessaTodasAsEtapas() {
+        helper.createDatabase(TEST_DB, 1).use { db ->
+            db.execSQL(
+                """
+                INSERT INTO vehicles
+                    (id, brand, model, year, initial_odometer_km, powertrain,
+                     combustion_fuel, charging_capability, created_at)
+                VALUES
+                    (1, 'Chevrolet', 'Onix', 2020, 50000, 'COMBUSTION', 'FLEX', NULL, 1000)
+                """.trimIndent(),
+            )
+        }
+
+        // Quem instalou a v0.1.0 e só agora atualiza precisa chegar inteiro.
+        val db = helper.runMigrationsAndValidate(
+            TEST_DB,
+            5,
+            true,
+            Migrations.MIGRATION_1_2,
+            Migrations.MIGRATION_2_3,
+            Migrations.MIGRATION_3_4,
+            Migrations.MIGRATION_4_5,
+        )
+
+        db.query("SELECT name, fuel FROM vehicles").use { cursor ->
+            assertTrue(cursor.moveToFirst())
+            assertEquals("Chevrolet Onix", cursor.getString(0))
+            assertEquals("FLEX", cursor.getString(1))
+        }
+    }
+
+    @Test
     fun migracao1para4AtravessaTodasAsEtapas() {
         helper.createDatabase(TEST_DB, 1).use { db ->
             db.execSQL(

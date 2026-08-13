@@ -41,6 +41,7 @@ class SaveExpenseUseCaseTest {
         date = hoje,
         category = ExpenseCategory.FUEL,
         amount = Money.of(210, 0),
+        odometerKm = 45_200,
         fuelType = FuelType.ETHANOL,
         quantity = Quantity.of(35, 400),
     )
@@ -150,6 +151,7 @@ class SaveExpenseUseCaseTest {
                 date = hoje,
                 category = ExpenseCategory.CHARGING,
                 amount = Money.ZERO,
+                odometerKm = 12_800,
                 quantity = Quantity.of(42),
                 chargingLocation = com.driverprofit.domain.model.ChargingLocation.COMMERCIAL,
             ),
