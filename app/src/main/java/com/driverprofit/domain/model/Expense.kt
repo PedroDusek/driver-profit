@@ -54,6 +54,11 @@ sealed interface ExpenseDetail {
  *   e estacionamento não dependem de veículo, e porque excluir um veículo não
  *   pode apagar o histórico financeiro — a despesa fica, órfã.
  * @param detail `null` para categorias que são só valor e descrição.
+ * @param odometerKm leitura do painel no momento do lançamento (PRD §23).
+ *   Fica fora de [ExpenseDetail] de propósito: ela vale para abastecimento,
+ *   recarga e manutenção igualmente, e dentro do `sealed` estaria repetida nas
+ *   três variantes. Anulável porque pedágio e estacionamento não a exigem, e
+ *   porque as despesas gravadas antes da v0.6.0 não têm leitura nenhuma.
  */
 data class Expense(
     val id: Long = UNSAVED_ID,
@@ -63,6 +68,7 @@ data class Expense(
     val amount: Money,
     val description: String = "",
     val detail: ExpenseDetail? = null,
+    val odometerKm: Long? = null,
     val createdAt: Instant,
 ) {
     /**
@@ -107,5 +113,15 @@ data class Expense(
 
         /** Nome de posto, oficina ou local de recarga. */
         const val MAX_PLACE_LENGTH: Int = 80
+
+        /**
+         * Teto do odômetro, para pegar dígito a mais na digitação.
+         *
+         * Um carro de aplicativo roda muito, mas não dez milhões de
+         * quilômetros. O limite não protege o banco — protege a conciliação de
+         * uso pessoal da v0.7.0, onde uma leitura absurda viraria centenas de
+         * milhares de quilômetros "pessoais".
+         */
+        const val MAX_ODOMETER_KM: Long = 9_999_999L
     }
 }

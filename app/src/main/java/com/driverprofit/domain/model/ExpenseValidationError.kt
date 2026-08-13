@@ -6,6 +6,7 @@ enum class ExpenseField {
     CATEGORY,
     AMOUNT,
     VEHICLE,
+    ODOMETER,
     DESCRIPTION,
     FUEL_TYPE,
     QUANTITY,
@@ -43,6 +44,14 @@ enum class ExpenseValidationError {
 
     /** Veículo selecionado não aceita recarga elétrica. */
     VEHICLE_CANNOT_CHARGE,
+
+    /**
+     * Odômetro zerado, negativo ou absurdamente alto.
+     *
+     * Diferente de [REQUIRED]: aqui o motorista respondeu, mas a resposta não
+     * pode ser uma leitura de painel.
+     */
+    ODOMETER_OUT_OF_RANGE,
 
     TEXT_TOO_LONG,
 }

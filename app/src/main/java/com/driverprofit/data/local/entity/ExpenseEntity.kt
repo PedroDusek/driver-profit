@@ -86,6 +86,18 @@ data class ExpenseEntity(
     @ColumnInfo(name = "place")
     val place: String? = null,
 
+    /**
+     * Leitura do painel, em quilômetros inteiros.
+     *
+     * Anulável no schema mesmo sendo obrigatória no domínio para as categorias
+     * ligadas ao veículo: pedágio e estacionamento não a têm, e as despesas
+     * gravadas antes da v0.6.0 nunca tiveram. Exigir NOT NULL obrigaria a
+     * inventar um valor na migração — e valor inventado de odômetro
+     * contaminaria consumo estimado e alerta de manutenção.
+     */
+    @ColumnInfo(name = "odometer_km")
+    val odometerKm: Long? = null,
+
     /** Epoch millis em UTC. */
     @ColumnInfo(name = "created_at")
     val createdAt: Instant,
@@ -99,6 +111,7 @@ fun ExpenseEntity.toDomain(): Expense = Expense(
     amount = Money(amountCents),
     description = description,
     detail = toDetail(),
+    odometerKm = odometerKm,
     createdAt = createdAt,
 )
 
@@ -137,6 +150,7 @@ fun Expense.toEntity(): ExpenseEntity {
         category = category,
         amountCents = amount.cents,
         description = description,
+        odometerKm = odometerKm,
         createdAt = createdAt,
     )
     return when (val detail = detail) {

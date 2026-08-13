@@ -69,6 +69,27 @@ class ObserveExpensesBetweenUseCase(
         repository.observeExpensesBetween(start, end)
 }
 
+/**
+ * Quilometragem atual de um veículo (PRD §23).
+ *
+ * É a maior leitura de odômetro já lançada para ele. `null` enquanto não
+ * houver nenhuma — inclusive para todo o histórico anterior à v0.6.0, que não
+ * tem leitura.
+ */
+class ObserveVehicleOdometerUseCase(
+    private val repository: ExpenseRepository,
+) {
+    operator fun invoke(vehicleId: Long): Flow<Long?> =
+        repository.observeLatestOdometer(vehicleId)
+}
+
+/** Quilometragem atual de todos os veículos, para a lista. */
+class ObserveVehicleOdometersUseCase(
+    private val repository: ExpenseRepository,
+) {
+    operator fun invoke(): Flow<Map<Long, Long>> = repository.observeOdometers()
+}
+
 /** Busca uma despesa específica para edição. */
 class GetExpenseUseCase(
     private val repository: ExpenseRepository,

@@ -139,6 +139,33 @@ object Migrations {
         }
     }
 
+    /**
+     * 4 → 5: odômetro por lançamento.
+     *
+     * Acrescenta `odometer_km` a `expenses`. Aditiva e sem reescrita de
+     * tabela: `ALTER TABLE ADD COLUMN` é barato mesmo com histórico grande.
+     *
+     * A coluna é **anulável e sem default**. As despesas já gravadas não têm
+     * leitura de painel, e inventar uma — zero, ou repetir a anterior —
+     * envenenaria justamente o que o odômetro serve para calcular: consumo
+     * estimado, quilômetro pessoal e alerta de manutenção. `NULL` diz a
+     * verdade, que é "não sei", e o domínio sabe lidar com isso.
+     *
+     * A obrigatoriedade nas categorias ligadas ao veículo vive em
+     * `ExpenseValidator`, não aqui: ela vale para o que se grava de agora em
+     * diante, e não pode invalidar retroativamente o histórico do motorista.
+     */
+    val MIGRATION_4_5 = object : Migration(4, 5) {
+        override fun migrate(db: SupportSQLiteDatabase) {
+            db.execSQL("ALTER TABLE `expenses` ADD COLUMN `odometer_km` INTEGER")
+        }
+    }
+
     /** Todas as migrações conhecidas, na ordem. */
-    val ALL: Array<Migration> = arrayOf(MIGRATION_1_2, MIGRATION_2_3, MIGRATION_3_4)
+    val ALL: Array<Migration> = arrayOf(
+        MIGRATION_1_2,
+        MIGRATION_2_3,
+        MIGRATION_3_4,
+        MIGRATION_4_5,
+    )
 }

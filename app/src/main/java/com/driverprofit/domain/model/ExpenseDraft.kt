@@ -20,6 +20,9 @@ data class ExpenseDraft(
     val amount: Money? = null,
     val description: String = "",
 
+    /** Leitura do painel. Obrigatória para as categorias ligadas ao veículo. */
+    val odometerKm: Long? = null,
+
     // --- Abastecimento ---
     val fuelType: FuelType? = null,
     val quantity: Quantity? = null,
@@ -46,6 +49,7 @@ fun Expense.toDraft(): ExpenseDraft {
         category = category,
         amount = amount,
         description = description,
+        odometerKm = odometerKm,
     )
     return when (val detail = detail) {
         is ExpenseDetail.Refuel -> base.copy(

@@ -37,12 +37,13 @@ abstract class DriverProfitDatabase : RoomDatabase() {
 
     companion object {
         /**
-         * Versão 4 — adiciona `expenses` (registro de despesas).
+         * Versão 5 — adiciona `odometer_km` em `expenses` (odômetro por lançamento).
+         * Versão 4 adicionou `expenses` (registro de despesas).
          * Versão 3 adicionou `work_sessions` (registro de ganhos).
          * Versão 2 simplificou o veículo para nome + combustível.
          * Versão 1 tinha marca, modelo, ano, odômetro e três eixos de propulsão.
          */
-        const val VERSION = 4
+        const val VERSION = 5
 
         const val NAME = "driver_profit.db"
     }

@@ -21,6 +21,18 @@ interface ExpenseRepository {
      */
     fun observeExpensesBetween(start: LocalDate, end: LocalDate): Flow<List<Expense>>
 
+    /**
+     * Maior leitura de odômetro registrada para um veículo, ou `null` quando
+     * ainda não há nenhuma.
+     *
+     * É a quilometragem atual do carro segundo o app — a base do consumo
+     * estimado, do quilômetro pessoal e dos alertas de manutenção.
+     */
+    fun observeLatestOdometer(vehicleId: Long): Flow<Long?>
+
+    /** Última leitura de cada veículo, indexada por id. */
+    fun observeOdometers(): Flow<Map<Long, Long>>
+
     suspend fun getExpense(id: Long): Expense?
 
     suspend fun addExpense(expense: Expense): Long
