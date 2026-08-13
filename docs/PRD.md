@@ -246,6 +246,113 @@ Outros:            R$ 0,05/km
 Custo operacional: R$ 0,58/km
 ```
 
+#### Uso pessoal do veículo
+
+> **Decisão de produto registrada.** Vale a partir da v0.7.0 e substitui o
+> comportamento das v0.5.0 e v0.6.0.
+
+O mesmo carro serve ao trabalho e à vida do motorista. Até a v0.6.0 o custo/km
+divide **despesa total** por quilômetros **apenas profissionais** — o
+combustível queimado no fim de semana entra no numerador e não no denominador,
+inflando o indicador central do produto.
+
+A correção não é classificar despesas. Combustível é fungível: um tanque não é
+"pessoal" nem "profissional", ele queima nos dois. O rateio proporcional se
+cancela algebricamente:
+
+```
+(E × Kp/K) ÷ Kp  =  E ÷ K
+```
+
+Ou seja: **basta o denominador ser o quilômetro total.** Não é necessário
+estimar consumo (km/L) nem preço médio de combustível, e nenhuma despesa
+gravada é alterada.
+
+A tela exibe uma taxa e dois valores, que somam a despesa do período:
+
+```
+Custo real por km                  R$ 0,90
+
+  Trabalho     800 km              R$ 720
+  Pessoal      200 km              R$ 180
+                                   ──────
+                                   R$ 900
+```
+
+**A base do custo por km e a base do rateio são a mesma:** todo o custo
+operacional — combustível, energia, manutenção, lavagem — e não apenas
+combustível. Rodar por lazer também consome pneu e antecipa a troca de óleo;
+deixar manutenção fora do rateio a cobraria integralmente do trabalho, que é a
+mesma distorção que esta seção corrige.
+
+O lucro desconta apenas a parcela profissional: `Faturamento − E × Kp ÷ K`.
+
+**Como o quilômetro pessoal é conhecido.** Dois mecanismos que se abatem, para
+não haver dupla contagem:
+
+1. **Lançamento explícito** — data ou intervalo mais quilômetros. Põe a viagem
+   no período em que ela aconteceu, em vez de borrá-la entre meses.
+2. **Conciliação por odômetro** — o resíduo entre a leitura, os quilômetros de
+   trabalho lançados e os pessoais já declarados. Captura o que ele nunca
+   registrou, sem depender de memória.
+
+O resíduo é distribuído proporcionalmente aos dias do intervalo, e o app
+**pergunta** se ele é uso pessoal ou jornada não lançada — os dois têm sinais
+opostos no custo/km.
+
+Sem dado de uso pessoal, o app calcula com o que tem e **declara a limitação
+na tela**. O estado "sem correção" é ausência de dado, nunca uma chave que o
+motorista liga e desliga: um indicador que muda de definição conforme um botão
+deixa de ser conferível, e a versão desligada é sempre a errada.
+
+#### Atribuição por natureza de custo
+
+Nem todo custo se rateia da mesma forma, porque nem todo custo é causado pelo
+uso:
+
+| Natureza | Atribuição | Motivo |
+| --- | --- | --- |
+| Combustível, energia, manutenção, lavagem, pedágio, estacionamento | proporcional aos km | o uso é que consome |
+| **Financiamento, seguro, IPVA** | **100% ao trabalho** | existem pela decisão de ter o carro para trabalhar |
+
+Dirigir no domingo consome combustível e desgasta pneu, então esses custos se
+rateiam. Mas levar o carro ao mercado **não gera parcela de financiamento**,
+não aumenta o prêmio do seguro e não muda o IPVA — esses valores existiriam
+idênticos se o carro ficasse parado. Ratear um custo fixo pelo uso é atribuí-lo
+a algo que não o causou.
+
+Os três custos fixos seguem uma regra única, e não duas, para que a explicação
+ao motorista caiba numa frase e o cálculo caiba num teste.
+
+> **Simplificação assumida.** Pedágio e estacionamento são rateados junto com o
+> combustível, embora sejam atribuíveis — o motorista sabe de qual viagem foram.
+> Marcá-los individualmente é refinamento pós-MVP; o erro é pequeno diante do
+> combustível.
+
+#### Competência dos custos fixos
+
+Custo fixo é pago em bloco e serve a um período. Sem separar as duas coisas, o
+IPVA de R$ 1.200 pago em janeiro faz janeiro parecer catastrófico e o resto do
+ano parecer isento — e nenhum dos doze meses diz a verdade.
+
+Toda despesa tem uma data (quando o dinheiro saiu). Custos fixos ganham também
+um **período de competência** (a que intervalo o valor se refere), e o custo
+diário é o valor dividido pelos dias desse intervalo:
+
+| Lançamento | Pago em | Competência | Custo diário |
+| --- | --- | --- | --- |
+| IPVA R$ 1.200 | 15/01 | 01/01 – 31/12 | R$ 3,29 |
+| Seguro R$ 300 | 05/03 | 01/03 – 31/03 | R$ 9,68 |
+| Parcela R$ 1.200 | 10/04 | 01/04 – 30/04 | R$ 40,00 |
+| Combustível R$ 150 | 12/04 | — | conta no dia |
+
+Sem competência declarada, a despesa conta no próprio dia — o comportamento
+que já existe.
+
+**Histórico e "Despesas" continuam exibindo caixa**, para conferir com o
+extrato; apenas os indicadores por quilômetro usam competência. Resultado por
+competência é assunto pós-MVP.
+
 ## 23. Consumo
 
 Calculado pela diferença de odômetro entre abastecimentos:
@@ -257,6 +364,24 @@ Calculado pela diferença de odômetro entre abastecimentos:
 
 Esse número **não** representa consumo exato se o tanque não foi abastecido em
 condições comparáveis. No MVP, apresentar sempre como **consumo estimado**.
+
+> O odômetro por lançamento chega na **v0.6.0**, e é obrigatório em
+> abastecimento e recarga. Ele é a fundação de três funcionalidades — consumo
+> estimado, uso pessoal (§22) e alertas de manutenção — e nenhuma delas existe
+> sem ele. Ser obrigatório, e não opcional, segue a regra da v0.3.1: campo em
+> branco entrando como zero produz indicador errado e invisível.
+>
+> O consumo continua **secundário**. O indicador principal é custo/km, que sai
+> do valor pago e dos quilômetros rodados, sem depender de quantos litros
+> entraram no tanque.
+>
+> **Combustível comprado é prova de distância percorrida.** Litros multiplicados
+> pelo consumo histórico dão uma distância mínima implícita, independente de o
+> motorista atualizar o odômetro ou não. Esse piso protege os alertas de
+> manutenção, onde subestimar quilometragem atrasa o aviso — e alerta de troca
+> de óleo atrasado desgasta motor, enquanto quilometragem subestimada no
+> custo/km apenas o deixa pessimista. As duas tolerâncias a erro são
+> diferentes, e o tratamento também.
 
 Para elétricos: km/kWh ou kWh/100 km — a unidade pode ser definida na camada de
 apresentação.
@@ -368,10 +493,15 @@ Ver [`ROADMAP.md`](ROADMAP.md).
 
 ## 47. Versões futuras
 
-v1.1 comparações · v1.2 metas · v1.3 manutenção preventiva · v1.4 custos fixos ·
-v1.5 depreciação · v2.0 login, cloud backup, sincronização, backend.
+v1.1 comparações · v1.2 metas · v1.3 pedágio e estacionamento marcáveis como
+pessoais · v1.4 meta de quilometragem para o carro se pagar · v1.5 depreciação ·
+v2.0 login, cloud backup, sincronização, backend.
 
 Não implementar agora; manter a arquitetura preparada.
+
+> **Manutenção preventiva e custos fixos foram antecipados** para v0.9.0 e
+> v0.10.0. Sem eles o custo/km fica incompleto, e o custo/km é o produto
+> (§2). Ver [`ROADMAP.md`](ROADMAP.md).
 
 ## 48. Funcionalidades não autorizadas
 
@@ -381,6 +511,48 @@ pagamentos, APIs externas.**
 
 Podem ser discutidas depois. O objetivo é evitar aumento desnecessário da
 complexidade do MVP.
+
+O manifesto não declara **nenhuma** permissão. `INTERNET` entraria em PR
+próprio, justificado.
+
+### Autorização condicional: cadastro e assinatura
+
+> **Decisão registrada.** Login e assinatura mensal **estão autorizados a
+> partir da v2.0**, e seguem proibidos até lá. A intenção fica registrada para
+> ser rastreável; a proibição continua valendo para toda versão anterior.
+
+A arquitetura já comporta isso sem retrabalho: os cálculos são Kotlin puro e
+não sabem de onde vêm os dados, os contratos de repositório vivem no domínio,
+e telas novas são destinos novos no grafo de navegação. **Assinatura é uma
+verificação de direito de uso na frente de um app que continua funcionando
+igual** — não exige `user_id` nas tabelas, porque um celular tem um motorista.
+
+O que é caro é **sincronização**, não assinatura: ids globais estáveis, marcas
+de exclusão e `updated_at` por linha. Nada disso é exigido para cobrar, e
+mesmo para sincronizar existe a saída de começar do presente, sem reconstruir
+o passado. Por isso **não** se antecipam colunas de sincronização: seria
+complexidade sem uso, contra o §54.
+
+### Distribuição para grupo de teste
+
+Antes do lançamento oficial, o app será entregue a um grupo restrito. Três
+armadilhas, todas com prazo na **primeira instalação de terceiro** — até lá
+tudo é reversível de graça:
+
+1. **Teste interno e fechado da Play Console são upload para a Play**, e
+   reservam o `applicationId` para sempre naquela conta, mesmo sem publicar e
+   mesmo apagando o rascunho depois. Distribuir por fora (link da release,
+   Drive, App Distribution) não reserva nada.
+2. **Trocar o `applicationId` apaga os dados dos testadores**, porque o banco
+   vive no armazenamento privado do pacote.
+3. **Assinatura de debug e de release não se atualizam entre si.** Hoje a
+   release publica um APK de debug (`com.driverprofit.debug`); um build de
+   release assinado seria outro pacote, sem herdar nada.
+
+Se o grupo for usar o app para valer, entregar **build de release assinado**
+desde o primeiro dia — o que exige keystore, `signingConfig` e o segredo no CI
+(§56). E o nome do produto, hoje um placeholder, precisa estar decidido antes
+disso.
 
 ## 49–53. Regras de trabalho
 

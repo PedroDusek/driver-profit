@@ -106,26 +106,44 @@ secundário e depende do odômetro por lançamento, que só chega na v0.6.0.
 | v0.3.0 / v0.3.1 Earnings | ✅ |
 | v0.4.0 / v0.4.1 Expenses | ✅ |
 | v0.5.0 Dashboard | ✅ |
-| **v0.6.0 Analytics + odômetro por lançamento + alertas de manutenção** | ⬅️ **próxima** |
-| v0.7.0 UX polish · v0.8.0 Hardening · v0.9.0 RC · v1.0.0 MVP | |
+| **v0.6.0 Odômetro** | ⬅️ **próxima** |
+| v0.7.0 Uso pessoal · v0.8.0 Consumo estimado · v0.9.0 Manutenção preventiva | |
+| v0.10.0 Custos fixos · v0.11.0 Analytics | |
+| v0.12.0 UX polish · v0.13.0 Hardening · v0.14.0 RC · v1.0.0 MVP | |
+
+O bloco v0.6.0–v0.10.0 foi desenhado em conjunto: cada versão é pequena,
+testável e reversível, e a ordem é de dependência, não de preferência. O
+detalhamento com critério de saída e impacto no banco está em
+[`ROADMAP.md`](ROADMAP.md); as regras de produto que sustentam tudo isso estão
+no PRD §22 e §23.
 
 ### O que a v0.6.0 precisa fazer
 
-- **Odômetro por lançamento.** É o que falta para o consumo estimado (PRD §23)
-  e para os alertas de manutenção por quilometragem. Mexe no banco: entity,
-  DAO, migração 4→5, repository, testes e `DATABASE.md` no mesmo PR
-- **Consumo estimado** (km/L, km/kWh), sempre rotulado como *estimado* — o
-  cálculo por odômetro só é exato se o tanque for abastecido em condições
-  comparáveis
-- **Gráficos**: evolução de faturamento, R$/hora e R$/km entre períodos
-- **Custo por km separado por natureza** — o quadro do PRD §22
-  (combustível R$ 0,42/km, manutenção R$ 0,11/km, e assim por diante). Hoje o
-  dashboard mostra as despesas por natureza em reais, não por quilômetro
-- **Alertas de manutenção** por quilometragem (óleo, pneus)
+**Só o odômetro.** Nada mais. Ele é a fundação de consumo estimado, uso pessoal
+e alertas de manutenção, e nenhum dos três existe sem ele.
 
-Onde encaixar: `DashboardMetrics` já tem `expensesByCategory` e
-`totalKilometers`, então a razão por natureza é uma propriedade derivada nova,
-não uma refatoração.
+- Odômetro por lançamento, **obrigatório** em abastecimento e recarga
+- Odômetro na manutenção, fechando o PRD §18
+- Mexe no banco: entity, DAO, migração 4→5, repository, testes e
+  `DATABASE.md` no mesmo PR
+
+⚠️ Os testes instrumentados **não rodam no CI**. A migração 4→5 exige a
+execução manual com aparelho conectado antes do merge — ver seção 7.
+
+### A limitação que a v0.7.0 corrige
+
+Vale saber ao mexer no dashboard: hoje o custo/km divide despesa **total** por
+quilômetros **apenas profissionais**. Combustível gasto em uso pessoal está no
+numerador e não no denominador, então o indicador central do produto está
+inflado para quem usa o carro fora do trabalho.
+
+A correção não é classificar despesas — combustível é fungível. Basta o
+denominador virar o quilômetro **total**, porque o rateio proporcional se
+cancela: `(E × Kp/K) ÷ Kp = E ÷ K`. Sem estimar consumo, sem preço médio, sem
+alterar despesa gravada. Detalhes em PRD §22.
+
+**Financiamento, seguro e IPVA são 100% do trabalho** e ficam fora desse
+rateio: passear no domingo não gera parcela nem aumenta o IPVA.
 
 ## 7. Débito conhecido
 
