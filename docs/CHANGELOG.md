@@ -5,6 +5,48 @@ Versionamento conforme [Semantic Versioning](https://semver.org/lang/pt-BR/).
 
 ## [Não publicado]
 
+## [0.6.0] — Odômetro
+
+Fundação das três versões seguintes: consumo estimado, uso pessoal e alertas
+de manutenção dependem todos da leitura de odômetro, e nenhum deles existe sem
+ela.
+
+### Adicionado
+
+**Domínio**
+- `Expense.odometerKm` — leitura do painel no lançamento (PRD §23)
+- `ExpenseValidator` passa a exigir a leitura em abastecimento, recarga e
+  manutenção, com teto de `MAX_ODOMETER_KM` para pegar dígito a mais
+- `ObserveVehicleOdometerUseCase` e `ObserveVehicleOdometersUseCase`
+
+**Dados**
+- Banco vai para a **versão 5**, com `odometer_km` em `expenses`
+- Migração 4→5 aditiva
+- `MAX(odometer_km)` por veículo, não a leitura do lançamento mais recente
+
+**Interface**
+- Campo de odômetro nas categorias ligadas ao veículo
+- Última leitura conhecida exibida enquanto o motorista digita
+- Quilometragem atual de cada carro na lista de veículos
+
+### Decisões registradas
+
+- **Obrigatório, e não opcional.** Mesmo motivo da v0.3.1: campo em branco que
+  o cálculo trata como ausente produz indicador incompleto sem avisar. Aqui o
+  preço é maior — um alerta de troca de óleo atrasado desgasta motor.
+- **Fora de `ExpenseDetail`.** A leitura vale igualmente para abastecimento,
+  recarga e manutenção; dentro do `sealed` estaria repetida nas três variantes.
+- **Coluna anulável, regra no domínio.** As despesas anteriores à v0.6.0 não
+  têm leitura, e inventar um valor na migração envenenaria exatamente o que o
+  odômetro serve para calcular. `NULL` diz a verdade.
+- **`MAX`, não "a mais recente por data".** Odômetro só cresce, e lançar hoje o
+  abastecimento da semana passada é comum — ordenar por data devolveria uma
+  leitura menor que a real.
+- **A última leitura fica visível no formulário.** É o que faz um dígito
+  trocado saltar aos olhos na hora, em vez de virar consumo absurdo depois.
+- **Leitura digitada e depois abandonada não é gravada.** Trocar a categoria
+  para pedágio descarta o odômetro, que não tem veículo a que se referir.
+
 ### Decisões de produto registradas
 
 Nenhuma alteração de código — apenas o desenho das próximas versões, fechado

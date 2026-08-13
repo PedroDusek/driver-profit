@@ -96,16 +96,17 @@ da v0.10.0.
 > pessoal está no numerador e não está no denominador, o que infla o indicador
 > central do produto. Corrigido na v0.7.0 (PRD §22).
 
-### v0.6.0 — Odômetro
+### v0.6.0 — Odômetro ✅ concluída
 
 Fundação das três versões seguintes. Consumo estimado, uso pessoal e alertas
 de manutenção dependem todos da leitura de odômetro, e nenhum deles existe sem
 ela.
 
-- [ ] Odômetro por lançamento, **obrigatório** em abastecimento e recarga
-- [ ] Odômetro no lançamento de manutenção, fechando o PRD §18
-- [ ] Quilometragem atual do veículo visível na tela de veículos
-- [ ] Migração 4→5 + testes instrumentados
+- [x] Odômetro por lançamento, **obrigatório** em abastecimento e recarga
+- [x] Odômetro no lançamento de manutenção, fechando o PRD §18
+- [x] Quilometragem atual do veículo visível na tela de veículos
+- [x] Última leitura exibida no formulário, para o motorista conferir enquanto digita
+- [x] Migração 4→5 + testes instrumentados
 
 **Critério de saída:** todo abastecimento registra o km do painel, e o app sabe
 quantos quilômetros o carro tem.

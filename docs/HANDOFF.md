@@ -60,12 +60,13 @@ o PRD diz. Não "corrija" o código de volta para o PRD.
 | --- | --- | --- |
 | Cadastro de veículo mínimo | §5, §14 pediam marca, modelo, ano, odômetro | Só nome + combustível |
 | Combustível em lista plana | §13 pedia três eixos (powertrain + fuel + charging) | Um enum `VehicleFuel` com 7 opções, incluindo elétrico e híbrido |
-| Quilometragem | §14 a punha no veículo | Não é atributo do veículo; volta na v0.6.0 como recurso de manutenção (troca de óleo, pneus) |
+| Quilometragem | §14 a punha no veículo | Não é atributo do veículo. Voltou na v0.6.0 como leitura **por lançamento**, obrigatória em abastecimento, recarga e manutenção |
 | Quantidade de combustível | §7 a tratava como essencial | **Opcional**. O indicador principal é custo/km, não consumo/km |
 | `user_id` | §14 listava | Não existe — sem login no MVP |
 
 **O indicador principal do produto é custo/km.** Consumo (km/L, km/kWh) é
-secundário e depende do odômetro por lançamento, que só chega na v0.6.0.
+secundário; o odômetro por lançamento já existe desde a v0.6.0, e o consumo
+estimado em si chega na v0.8.0.
 
 ## 5. Decisões técnicas que não devem ser revertidas
 
@@ -106,8 +107,9 @@ secundário e depende do odômetro por lançamento, que só chega na v0.6.0.
 | v0.3.0 / v0.3.1 Earnings | ✅ |
 | v0.4.0 / v0.4.1 Expenses | ✅ |
 | v0.5.0 Dashboard | ✅ |
-| **v0.6.0 Odômetro** | ⬅️ **próxima** |
-| v0.7.0 Uso pessoal · v0.8.0 Consumo estimado · v0.9.0 Manutenção preventiva | |
+| v0.6.0 Odômetro | ✅ |
+| **v0.7.0 Uso pessoal** | ⬅️ **próxima** |
+| v0.8.0 Consumo estimado · v0.9.0 Manutenção preventiva | |
 | v0.10.0 Custos fixos · v0.11.0 Analytics | |
 | v0.12.0 UX polish · v0.13.0 Hardening · v0.14.0 RC · v1.0.0 MVP | |
 
@@ -117,18 +119,25 @@ detalhamento com critério de saída e impacto no banco está em
 [`ROADMAP.md`](ROADMAP.md); as regras de produto que sustentam tudo isso estão
 no PRD §22 e §23.
 
-### O que a v0.6.0 precisa fazer
+### O que a v0.7.0 precisa fazer
 
-**Só o odômetro.** Nada mais. Ele é a fundação de consumo estimado, uso pessoal
-e alertas de manutenção, e nenhum dos três existe sem ele.
+**Uso pessoal do veículo**, corrigindo a limitação descrita logo abaixo.
 
-- Odômetro por lançamento, **obrigatório** em abastecimento e recarga
-- Odômetro na manutenção, fechando o PRD §18
-- Mexe no banco: entity, DAO, migração 4→5, repository, testes e
-  `DATABASE.md` no mesmo PR
+- Lançamento explícito de uso pessoal: data ou intervalo + km
+- Conciliação por odômetro: resíduo = leitura − km de trabalho − km pessoais
+  já declarados. Os dois mecanismos **se abatem**, senão o motorista desconta
+  duas vezes
+- O resíduo é perguntado, não presumido: uso pessoal e jornada não lançada têm
+  sinais opostos no custo/km
+- Custo real por km sobre o km **total**; repartição em reais entre trabalho e
+  pessoal; lucro descontando só a parcela profissional
+- Mexe no banco: migração 5→6
 
-⚠️ Os testes instrumentados **não rodam no CI**. A migração 4→5 exige a
-execução manual com aparelho conectado antes do merge — ver seção 7.
+A base já está pronta: `Expense.odometerKm`, `ObserveVehicleOdometersUseCase` e
+`MAX(odometer_km)` por veículo chegaram na v0.6.0.
+
+⚠️ Os testes instrumentados **não rodam no CI**. Toda migração exige execução
+manual com aparelho conectado antes do merge — ver seção 7.
 
 ### A limitação que a v0.7.0 corrige
 
