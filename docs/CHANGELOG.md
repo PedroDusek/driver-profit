@@ -5,6 +5,32 @@ Versionamento conforme [Semantic Versioning](https://semver.org/lang/pt-BR/).
 
 ## [Não publicado]
 
+### Decisões de produto registradas
+
+Nenhuma alteração de código — apenas o desenho das próximas versões, fechado
+antes de implementar para não custar migração dupla.
+
+- **Uso pessoal do veículo** (PRD §22). O custo/km hoje divide despesa total
+  por km apenas profissionais; a correção é o denominador virar o km total,
+  porque o rateio proporcional se cancela. Sem estimar consumo, sem preço
+  médio, sem alterar despesa gravada
+- **Financiamento, seguro e IPVA são 100% do trabalho.** Custo fixo não é
+  causado pelo uso: levar o carro ao mercado não gera parcela nem aumenta o
+  IPVA. Os demais custos operacionais se rateiam por quilometragem
+- **A base do custo/km e a base do rateio são a mesma** — todo o custo
+  operacional, não só combustível. Rodar por lazer também consome pneu
+- **Competência dos custos fixos**, separando quando o dinheiro saiu de a que
+  período ele se refere
+- **Odômetro obrigatório no abastecimento**, e combustível comprado como prova
+  independente de distância para proteger os alertas de manutenção (PRD §23)
+- **Sem chave de ligar/desligar** em indicador. O estado "sem correção" é
+  ausência de dado, nunca um botão — um indicador que muda de definição
+  conforme um switch deixa de ser conferível
+- **Roadmap resegmentado**: v0.6.0 Odômetro · v0.7.0 Uso pessoal · v0.8.0
+  Consumo estimado · v0.9.0 Manutenção preventiva · v0.10.0 Custos fixos ·
+  v0.11.0 Analytics. Manutenção preventiva e custos fixos foram antecipados do
+  pós-MVP, porque sem eles o custo/km fica incompleto
+
 ## [0.5.1] — Cursor ancorado e formulários acima do teclado
 
 Primeiros defeitos encontrados usando o app em aparelho — nenhuma tela tinha

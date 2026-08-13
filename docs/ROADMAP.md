@@ -89,21 +89,112 @@ quanto lhe custa cada quilômetro.
 
 Custo/km usa apenas despesa operacional: seguro, IPVA e financiamento entram
 no lucro, mas não na razão por quilômetro (PRD §22). O rateio de custo fixo é
-da v1.4.
+da v0.10.0.
 
-### v0.6.0 — Analytics
+> ⚠️ **Limitação conhecida desta versão.** O custo/km divide despesa **total**
+> por quilômetros **apenas profissionais**. O combustível queimado em uso
+> pessoal está no numerador e não está no denominador, o que infla o indicador
+> central do produto. Corrigido na v0.7.0 (PRD §22).
+
+### v0.6.0 — Odômetro
+
+Fundação das três versões seguintes. Consumo estimado, uso pessoal e alertas
+de manutenção dependem todos da leitura de odômetro, e nenhum deles existe sem
+ela.
+
+- [ ] Odômetro por lançamento, **obrigatório** em abastecimento e recarga
+- [ ] Odômetro no lançamento de manutenção, fechando o PRD §18
+- [ ] Quilometragem atual do veículo visível na tela de veículos
+- [ ] Migração 4→5 + testes instrumentados
+
+**Critério de saída:** todo abastecimento registra o km do painel, e o app sabe
+quantos quilômetros o carro tem.
+
+**Banco:** versão 5, migração aditiva.
+
+Obrigatório, e não opcional, pelo mesmo motivo da v0.3.1: campo em branco
+entrando como zero produz indicador errado e invisível. Acoplar o km ao
+lançamento do dinheiro é o que garante leitura frequente sem exigir ritual do
+motorista.
+
+### v0.7.0 — Uso pessoal
+
+Corrige a limitação registrada na v0.5.0.
+
+- [ ] Lançamento de uso pessoal: data ou intervalo + km
+- [ ] Conciliação por odômetro — resíduo = leitura − km de trabalho − km
+      pessoais já declarados
+- [ ] Pergunta explícita sobre o resíduo: uso pessoal ou jornada não lançada?
+- [ ] Resíduo distribuído proporcionalmente aos dias do intervalo
+- [ ] Custo real por km calculado sobre o km **total**
+- [ ] Repartição em reais entre trabalho e pessoal
+- [ ] Lucro descontando apenas a parcela profissional
+- [ ] Migração 5→6 + testes instrumentados
+
+**Critério de saída:** o motorista que usa o carro no fim de semana vê um
+custo/km que não pune o trabalho por isso, e os dois valores da repartição
+somam a despesa do período.
+
+**Banco:** versão 6.
+
+Dois mecanismos de entrada porque um só não basta: a declaração explícita põe
+a viagem no mês em que ela aconteceu, e a conciliação captura o que ele nunca
+registrou. Um abate o outro para não haver dupla contagem (PRD §22).
+
+### v0.8.0 — Consumo estimado
+
+- [ ] km/L, km/m³ e km/kWh a partir de odômetro e quantidade
+- [ ] Sempre rotulado **estimado** (PRD §23)
+- [ ] Comparação com o consumo que o painel do carro indica
+
+Consumo é sempre rotulado como estimado: o cálculo por odômetro só é exato se
+o tanque for abastecido em condições comparáveis.
+
+Depende da quantidade em litros, que é opcional desde a v0.4.1 — o formulário
+deve explicar o que se ganha ao preenchê-la.
+
+### v0.9.0 — Manutenção preventiva
+
+- [ ] Alertas por quilometragem: óleo, filtros, pneus, freios, revisão
+- [ ] Intervalo configurável por item
+- [ ] Distância mínima implícita por combustível comprado, como piso
+      independente do odômetro
+- [ ] Alerta silencia, ou se declara incompleto, quando o dado não sustenta a
+      afirmação
+
+**Critério de saída:** o app avisa da troca de óleo sem nunca afirmar com base
+em quilometragem que ele não tem.
+
+Assimetria que rege esta versão: subestimar km infla o custo/km, o que é
+apenas pessimista; mas **atrasa** o alerta de manutenção, o que desgasta
+motor. Por isso o alerta não herda a degradação graciosa das outras
+funcionalidades — na dúvida ele pede a leitura, em vez de estimar.
+
+### v0.10.0 — Custos fixos por competência
+
+- [ ] Período de competência na despesa (início e fim), separando "quando
+      paguei" de "a que período se refere"
+- [ ] Diluição do valor pelos dias do período
+- [ ] Financiamento, seguro e IPVA atribuídos **100% ao trabalho** (PRD §22)
+- [ ] Custo fixo por km trabalhado
+- [ ] Migração 6→7 + testes instrumentados
+
+**Critério de saída:** o IPVA pago em janeiro não faz janeiro parecer
+catastrófico nem o resto do ano parecer isento.
+
+**Banco:** versão 7. Colunas anuláveis — despesas existentes ficam com `NULL`,
+que significa "competência é a própria data", o comportamento atual.
+
+Histórico e "Despesas" continuam exibindo **caixa**, para conferir com o
+extrato. Só os indicadores por km usam competência.
+
+### v0.11.0 — Analytics
 
 - [ ] Gráficos
 - [ ] Custo por km separado por natureza (PRD §22)
-- [ ] Evolução de faturamento, R$/hora e R$/km
-- [ ] Odômetro por lançamento
-- [ ] Consumo estimado (km/L, km/kWh)
-- [ ] Alertas de manutenção por quilometragem (óleo, pneus)
+- [ ] Evolução de faturamento, R$/hora e R$/km entre períodos
 
-Consumo é sempre rotulado como **estimado**: o cálculo por odômetro só é exato
-se o tanque for abastecido em condições comparáveis (PRD §23).
-
-### v0.7.0 — UX Polish
+### v0.12.0 — UX Polish
 
 - [ ] Estados vazios, loading e erro
 - [ ] Animações moderadas
@@ -111,7 +202,7 @@ se o tanque for abastecido em condições comparáveis (PRD §23).
 - [ ] Acessibilidade
 - [ ] Formatação brasileira em toda a interface
 
-### v0.8.0 — Hardening
+### v0.13.0 — Hardening
 
 - [ ] Cobertura de testes ampliada
 - [ ] Performance
@@ -120,7 +211,7 @@ se o tanque for abastecido em condições comparáveis (PRD §23).
 - [ ] Backup local
 - [ ] Crash handling
 
-### v0.9.0 — Release Candidate
+### v0.14.0 — Release Candidate
 
 Congelamento de funcionalidades. A partir daqui: apenas correções,
 performance, segurança, UX, testes e estabilidade.
@@ -138,10 +229,23 @@ Não implementar agora. A arquitetura já está preparada para receber:
 | --- | --- |
 | v1.1 | Comparação entre meses e entre plataformas; histórico de consumo |
 | v1.2 | Metas diárias e mensais |
-| v1.3 | Manutenção preventiva e alertas (óleo, pneus, freios, revisão) |
-| v1.4 | Custos fixos: seguro, IPVA, financiamento |
+| v1.3 | Pedágio e estacionamento marcáveis como pessoais, em vez de rateados |
+| v1.4 | Meta de quilometragem: quanto rodar para o carro se pagar |
 | v1.5 | Depreciação e custo real do veículo por km |
 | v2.0 | Login, backup na nuvem, sincronização, multi-device, backend |
+| v2.1 | Assinatura mensal (Play Billing) |
+
+> **Login e assinatura estão autorizados a partir da v2.0**, e proibidos até
+> lá (PRD §48). Assinatura é verificação de direito de uso e não exige
+> `user_id` nas tabelas; o que é caro é sincronização — ids estáveis, marcas
+> de exclusão e `updated_at`. Nada disso é antecipado.
+>
+> Antes de distribuir a **qualquer terceiro**, ver a seção de distribuição no
+> PRD §48: o `applicationId` congela na primeira instalação, e trocá-lo depois
+> apaga os dados dos testadores.
+
+> Manutenção preventiva e custos fixos saíram do pós-MVP: viraram v0.9.0 e
+> v0.10.0. Sem eles o custo/km fica incompleto, e o custo/km é o produto.
 
 ## Fora de escopo até autorização explícita
 
