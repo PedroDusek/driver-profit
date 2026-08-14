@@ -9,6 +9,7 @@ import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
 import androidx.navigation.navArgument
 import com.driverprofit.domain.model.Expense
+import com.driverprofit.domain.model.PersonalUsage
 import com.driverprofit.domain.model.Vehicle
 import com.driverprofit.domain.model.WorkSession
 import com.driverprofit.feature.dashboard.DashboardScreen
@@ -16,6 +17,8 @@ import com.driverprofit.feature.earnings.form.EarningsFormScreen
 import com.driverprofit.feature.earnings.list.EarningsListScreen
 import com.driverprofit.feature.expenses.form.ExpenseFormScreen
 import com.driverprofit.feature.expenses.list.ExpensesListScreen
+import com.driverprofit.feature.personal.form.PersonalUsageFormScreen
+import com.driverprofit.feature.personal.list.PersonalUsageListScreen
 import com.driverprofit.feature.vehicle.form.VehicleFormScreen
 import com.driverprofit.feature.vehicle.list.VehicleListScreen
 
@@ -38,6 +41,9 @@ fun DriverProfitNavHost(
                 onOpenVehicles = { navController.navigate(DriverProfitDestination.VEHICLE_LIST) },
                 onOpenEarnings = { navController.navigate(DriverProfitDestination.EARNINGS_LIST) },
                 onOpenExpenses = { navController.navigate(DriverProfitDestination.EXPENSES_LIST) },
+                onOpenPersonalUsage = {
+                    navController.navigate(DriverProfitDestination.PERSONAL_USAGE_LIST)
+                },
             )
         }
 
@@ -106,6 +112,33 @@ fun DriverProfitNavHost(
                 onEditExpense = { expenseId ->
                     navController.navigate(DriverProfitDestination.expenseForm(expenseId))
                 },
+            )
+        }
+
+        composable(route = DriverProfitDestination.PERSONAL_USAGE_LIST) {
+            PersonalUsageListScreen(
+                onBack = navController::popBackStack,
+                onAddUsage = {
+                    navController.navigate(DriverProfitDestination.personalUsageForm())
+                },
+                onEditUsage = { usageId ->
+                    navController.navigate(DriverProfitDestination.personalUsageForm(usageId))
+                },
+            )
+        }
+
+        composable(
+            route = DriverProfitDestination.PERSONAL_USAGE_FORM,
+            arguments = listOf(
+                navArgument(DriverProfitDestination.ARG_PERSONAL_USAGE_ID) {
+                    type = NavType.LongType
+                    defaultValue = PersonalUsage.UNSAVED_ID
+                },
+            ),
+        ) {
+            PersonalUsageFormScreen(
+                onBack = navController::popBackStack,
+                onSaved = { navController.popBackStack() },
             )
         }
 

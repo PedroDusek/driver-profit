@@ -1,6 +1,7 @@
 package com.driverprofit.core.navigation
 
 import com.driverprofit.domain.model.Expense
+import com.driverprofit.domain.model.PersonalUsage
 import com.driverprofit.domain.model.Vehicle
 import com.driverprofit.domain.model.WorkSession
 
@@ -52,6 +53,19 @@ object DriverProfitDestination {
 
     fun expenseForm(expenseId: Long = Expense.UNSAVED_ID): String =
         "expense_form?$ARG_EXPENSE_ID=$expenseId"
+
+    // --- Uso pessoal ---
+
+    /** Quilometragem rodada fora do trabalho (PRD §22). */
+    const val PERSONAL_USAGE_LIST = "personal_usage_list"
+
+    const val ARG_PERSONAL_USAGE_ID = "personalUsageId"
+
+    const val PERSONAL_USAGE_FORM =
+        "personal_usage_form?$ARG_PERSONAL_USAGE_ID={$ARG_PERSONAL_USAGE_ID}"
+
+    fun personalUsageForm(usageId: Long = PersonalUsage.UNSAVED_ID): String =
+        "personal_usage_form?$ARG_PERSONAL_USAGE_ID=$usageId"
 
     /** Destino inicial do grafo de navegação. */
     const val START = DASHBOARD

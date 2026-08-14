@@ -15,6 +15,7 @@ import androidx.compose.material.icons.automirrored.filled.ReceiptLong
 import androidx.compose.material.icons.filled.DateRange
 import androidx.compose.material.icons.filled.DirectionsCar
 import androidx.compose.material.icons.filled.Payments
+import androidx.compose.material.icons.filled.Weekend
 import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.CircularProgressIndicator
@@ -76,6 +77,7 @@ fun DashboardScreen(
     onOpenVehicles: () -> Unit,
     onOpenEarnings: () -> Unit,
     onOpenExpenses: () -> Unit,
+    onOpenPersonalUsage: () -> Unit,
     modifier: Modifier = Modifier,
     viewModel: DashboardViewModel = viewModel(factory = DriverProfitViewModelFactory.Factory),
 ) {
@@ -98,6 +100,12 @@ fun DashboardScreen(
                         Icon(
                             imageVector = Icons.AutoMirrored.Filled.ReceiptLong,
                             contentDescription = stringResource(R.string.expenses_list_title),
+                        )
+                    }
+                    IconButton(onClick = onOpenPersonalUsage) {
+                        Icon(
+                            imageVector = Icons.Default.Weekend,
+                            contentDescription = stringResource(R.string.personal_usage_title),
                         )
                     }
                     IconButton(onClick = onOpenVehicles) {
@@ -288,7 +296,10 @@ private fun ResultCard(metrics: DashboardMetrics) {
             )
             MetricRow(
                 label = stringResource(R.string.dashboard_expenses),
-                value = BrazilianFormatter.money(metrics.totalExpenses),
+                // O que e cobrado do trabalho, e nao o total gasto: assim
+                // faturamento menos despesas fecha com o lucro exibido acima.
+                // Sem uso pessoal os dois numeros sao iguais.
+                value = BrazilianFormatter.money(metrics.workExpenses),
             )
         }
     }
@@ -299,7 +310,7 @@ private fun VolumeCard(metrics: DashboardMetrics) {
     MetricsCard(title = stringResource(R.string.dashboard_section_volume)) {
         MetricRow(
             label = stringResource(R.string.dashboard_distance),
-            value = BrazilianFormatter.kilometers(metrics.totalKilometers),
+            value = BrazilianFormatter.kilometers(metrics.workKilometers),
         )
         MetricRow(
             label = stringResource(R.string.dashboard_online_time),
@@ -344,6 +355,28 @@ private fun CostRatiosCard(metrics: DashboardMetrics) {
             label = stringResource(R.string.dashboard_cost_per_km),
             value = BrazilianFormatter.moneyOrUnavailable(metrics.costPerKm),
         )
+
+        // A repartição só aparece quando há uso pessoal: sem ele os dois
+        // valores seriam "tudo" e "zero", o que não informa nada.
+        if (metrics.hasPersonalUsage) {
+            SplitRow(
+                label = stringResource(R.string.dashboard_split_work),
+                kilometers = metrics.workKilometers,
+                amount = metrics.workOperationalCost,
+            )
+            SplitRow(
+                label = stringResource(R.string.dashboard_split_personal),
+                kilometers = metrics.personalKilometers,
+                amount = metrics.personalOperationalCost,
+            )
+            Text(
+                text = stringResource(R.string.dashboard_personal_note),
+                style = MaterialTheme.typography.bodySmall,
+                color = MaterialTheme.colorScheme.onSurfaceVariant,
+            )
+            HorizontalDivider()
+        }
+
         MetricRow(
             label = stringResource(R.string.dashboard_profit_per_km),
             value = BrazilianFormatter.moneyOrUnavailable(metrics.profitPerKm),
@@ -394,6 +427,36 @@ private fun MetricsCard(title: String, content: @Composable () -> Unit) {
             Text(text = title, style = MaterialTheme.typography.labelMedium)
             content()
         }
+    }
+}
+
+/**
+ * Linha da repartição: quilômetros e reais lado a lado.
+ *
+ * Os dois números na mesma linha para o motorista ver de onde saiu o valor,
+ * em vez de precisar confiar. As duas linhas somam exatamente a despesa
+ * operacional do período.
+ */
+@Composable
+private fun SplitRow(label: String, kilometers: Long, amount: Money) {
+    Row(
+        modifier = Modifier.fillMaxWidth(),
+        horizontalArrangement = Arrangement.SpaceBetween,
+        verticalAlignment = Alignment.CenterVertically,
+    ) {
+        Text(
+            text = stringResource(
+                R.string.dashboard_split_line,
+                label,
+                BrazilianFormatter.kilometers(kilometers),
+            ),
+            style = MaterialTheme.typography.bodyMedium,
+            color = MaterialTheme.colorScheme.onSurfaceVariant,
+        )
+        Text(
+            text = BrazilianFormatter.money(amount),
+            style = MaterialTheme.typography.bodyLarge,
+        )
     }
 }
 
@@ -489,7 +552,8 @@ private fun DashboardCardsPreview() {
                     ExpenseCategory.INSURANCE to Money.of(180, 0),
                 ),
                 totalRides = 62,
-                totalKilometers = 980,
+                workKilometers = 980,
+                personalKilometers = 220,
                 totalOnlineTime = WorkDuration.of(38, 30),
             )
             ResultCard(metrics)

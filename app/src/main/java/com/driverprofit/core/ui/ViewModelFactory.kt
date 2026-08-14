@@ -12,6 +12,8 @@ import com.driverprofit.feature.earnings.form.EarningsFormViewModel
 import com.driverprofit.feature.earnings.list.EarningsListViewModel
 import com.driverprofit.feature.expenses.form.ExpenseFormViewModel
 import com.driverprofit.feature.expenses.list.ExpensesListViewModel
+import com.driverprofit.feature.personal.form.PersonalUsageFormViewModel
+import com.driverprofit.feature.personal.list.PersonalUsageListViewModel
 import com.driverprofit.feature.vehicle.form.VehicleFormViewModel
 import com.driverprofit.feature.vehicle.list.VehicleListViewModel
 
@@ -28,6 +30,23 @@ object DriverProfitViewModelFactory {
         initializer {
             DashboardViewModel(
                 observeDashboard = container().observeDashboard,
+            )
+        }
+        initializer {
+            PersonalUsageListViewModel(
+                observePersonalUsage = container().observePersonalUsage,
+                observeVehicles = container().observeVehicles,
+                deletePersonalUsage = container().deletePersonalUsage,
+                reconcileOdometer = container().reconcileOdometer,
+                saveReconciled = container().saveReconciledPersonalUsage,
+            )
+        }
+        initializer {
+            PersonalUsageFormViewModel(
+                savedStateHandle = createSavedStateHandle(),
+                observeVehicles = container().observeVehicles,
+                getPersonalUsage = container().getPersonalUsage,
+                savePersonalUsage = container().savePersonalUsage,
             )
         }
         initializer {
