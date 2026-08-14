@@ -8,6 +8,51 @@ projeto em uma sessão nova, junto com `PRD.md`, `ARCHITECTURE.md` e
 
 ---
 
+## 0. Comece por aqui
+
+O estado não é "tudo na `main`". Duas versões estão prontas, empurradas e
+**fora da `main` de propósito**:
+
+| Branch | Versão | Banco | Estado |
+| --- | --- | --- | --- |
+| `main` | v0.6.0 (última tag) | 5 | estável |
+| `feature/personal-usage` | v0.7.0 | **6** | gate verde, **migração 5→6 não testada** |
+| `feature/fuel-consumption` | v0.8.0 | 6 | empilhada sobre a v0.7.0, gate verde |
+
+**Por que não foram mergeadas:** a v0.7.0 traz a migração 5→6, e o CI **não
+roda testes de migração** (seção 7). A regra do projeto é exercitar toda
+migração num SQLite real antes do merge — foi assim que se descobriu, na
+v0.5.0, que nenhum teste de migração conseguia sequer começar por causa de um
+conflito de dependência.
+
+### O que fazer primeiro
+
+1. Rodar os testes instrumentados em `feature/fuel-consumption` — ela contém
+   as duas versões, e a v0.8.0 não mexe no banco, então **uma rodada valida as
+   duas**
+2. Se passarem: PR da v0.7.0 → merge → tag `v0.7.0`; depois PR da v0.8.0 →
+   merge → tag `v0.8.0`
+3. Só então seguir para a v0.9.0
+
+### O impedimento
+
+Não há aparelho nem emulador disponível agora.
+
+- **Celular** (Redmi Note 8 Pro, Android 9): funciona, mas desconecta com
+  frequência e a MIUI bloqueia a instalação. Contornos na seção 7
+- **Emulador:** `emulator.exe` existe, mas **não há imagem de sistema, nem AVD,
+  nem `cmdline-tools`**. A instalação foi interrompida antes de baixar
+  qualquer coisa. Máquina apertada: **7,7 GB de RAM e ~18 GB livres em C:** —
+  se for por esse caminho, usar imagem AOSP da API 28 (sem Google Play), perfil
+  de tela pequena e 1536 MB no AVD
+- **Robolectric — não investigado, e é a melhor pista.** Se o
+  `MigrationTestHelper` do Room 2.8.4 rodar sob ele, as migrações passam a
+  rodar em `testDebugUnitTest`, ou seja **no CI, em todo PR, para sempre**.
+  Isso resolveria de vez o gargalo que trava toda versão com schema novo. Vale
+  verificar antes de investir em emulador
+
+---
+
 ## 1. Onde tudo está
 
 | Item | Valor |
