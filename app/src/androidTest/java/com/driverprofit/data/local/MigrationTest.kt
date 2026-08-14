@@ -1,5 +1,6 @@
 package com.driverprofit.data.local
 
+import android.database.sqlite.SQLiteConstraintException
 import androidx.room.testing.MigrationTestHelper
 import androidx.sqlite.db.framework.FrameworkSQLiteOpenHelperFactory
 import androidx.test.ext.junit.runners.AndroidJUnit4
@@ -281,6 +282,150 @@ class MigrationTest {
             assertEquals(20002, cursor.getInt(1))
             assertEquals(1200, cursor.getInt(2))
             assertEquals("DECLARED", cursor.getString(3))
+        }
+    }
+
+    @Test
+    fun migracao6para7CriaIntervalosSemTocarNoQueJaExiste() {
+        helper.createDatabase(TEST_DB, 6).use { db ->
+            db.execSQL(
+                "INSERT INTO vehicles (id, name, fuel, created_at) " +
+                    "VALUES (1, 'Onix branco', 'FLEX', 1000)",
+            )
+            db.execSQL(
+                """
+                INSERT INTO expenses
+                    (id, vehicle_id, date, category, amount_cents, description,
+                     maintenance_category, odometer_km, created_at)
+                VALUES (1, 1, 20000, 'MAINTENANCE', 30000, '', 'OIL', 100000, 1000)
+                """.trimIndent(),
+            )
+        }
+
+        val db = helper.runMigrationsAndValidate(TEST_DB, 7, true, Migrations.MIGRATION_6_7)
+
+        // O marco dos alertas vem do histórico que já existe — a migração não
+        // precisa criar dado nenhum para a v0.9.0 funcionar.
+        db.query("SELECT maintenance_category, odometer_km FROM expenses WHERE id = 1")
+            .use { cursor ->
+                assertTrue(cursor.moveToFirst())
+                assertEquals("OIL", cursor.getString(0))
+                assertEquals(100000, cursor.getInt(1))
+            }
+
+        // Nasce vazia: linha ausente significa "intervalo padrão do app", então
+        // o veículo já existente passa a ser acompanhado sem a migração gravar
+        // uma decisão que o motorista não tomou.
+        db.query("SELECT COUNT(*) FROM maintenance_schedules").use { cursor ->
+            assertTrue(cursor.moveToFirst())
+            assertEquals(0, cursor.getInt(0))
+        }
+    }
+
+    @Test
+    fun migracao6para7AceitaIntervaloEImpedeItemDuplicado() {
+        helper.createDatabase(TEST_DB, 6).use { db ->
+            db.execSQL(
+                "INSERT INTO vehicles (id, name, fuel, created_at) " +
+                    "VALUES (1, 'Onix branco', 'FLEX', 1000)",
+            )
+        }
+
+        val db = helper.runMigrationsAndValidate(TEST_DB, 7, true, Migrations.MIGRATION_6_7)
+
+        db.execSQL(
+            """
+            INSERT INTO maintenance_schedules
+                (id, vehicle_id, item, interval_km, monitored, created_at)
+            VALUES (1, 1, 'OIL', 5000, 1, 1000)
+            """.trimIndent(),
+        )
+
+        db.query("SELECT item, interval_km, monitored FROM maintenance_schedules WHERE id = 1")
+            .use { cursor ->
+                assertTrue(cursor.moveToFirst())
+                assertEquals("OIL", cursor.getString(0))
+                assertEquals(5000, cursor.getInt(1))
+                assertEquals(1, cursor.getInt(2))
+            }
+
+        // O índice único é o que garante um intervalo por item, e é ele que
+        // sustenta o REPLACE do DAO.
+        var recusou = false
+        try {
+            db.execSQL(
+                """
+                INSERT INTO maintenance_schedules
+                    (id, vehicle_id, item, interval_km, monitored, created_at)
+                VALUES (2, 1, 'OIL', 8000, 1, 2000)
+                """.trimIndent(),
+            )
+        } catch (expected: SQLiteConstraintException) {
+            recusou = true
+        }
+        assertTrue(recusou)
+    }
+
+    @Test
+    fun migracao6para7ApagaIntervalosAoExcluirOVeiculo() {
+        helper.createDatabase(TEST_DB, 6).use { db ->
+            db.execSQL(
+                "INSERT INTO vehicles (id, name, fuel, created_at) " +
+                    "VALUES (1, 'Onix branco', 'FLEX', 1000)",
+            )
+        }
+
+        val db = helper.runMigrationsAndValidate(TEST_DB, 7, true, Migrations.MIGRATION_6_7)
+        db.execSQL("PRAGMA foreign_keys = ON")
+        db.execSQL(
+            """
+            INSERT INTO maintenance_schedules
+                (id, vehicle_id, item, interval_km, monitored, created_at)
+            VALUES (1, 1, 'OIL', 5000, 1, 1000)
+            """.trimIndent(),
+        )
+
+        db.execSQL("DELETE FROM vehicles WHERE id = 1")
+
+        // CASCADE, e não SET NULL como em expenses: aquelas guardam histórico
+        // financeiro e sobrevivem à troca de carro; esta guarda uma preferência
+        // sobre um carro que deixou de existir.
+        db.query("SELECT COUNT(*) FROM maintenance_schedules").use { cursor ->
+            assertTrue(cursor.moveToFirst())
+            assertEquals(0, cursor.getInt(0))
+        }
+    }
+
+    @Test
+    fun migracao1para7AtravessaTodasAsEtapas() {
+        helper.createDatabase(TEST_DB, 1).use { db ->
+            db.execSQL(
+                """
+                INSERT INTO vehicles
+                    (id, brand, model, year, initial_odometer_km, powertrain,
+                     combustion_fuel, charging_capability, created_at)
+                VALUES
+                    (1, 'Chevrolet', 'Onix', 2020, 50000, 'COMBUSTION', 'FLEX', NULL, 1000)
+                """.trimIndent(),
+            )
+        }
+
+        val db = helper.runMigrationsAndValidate(
+            TEST_DB,
+            7,
+            true,
+            Migrations.MIGRATION_1_2,
+            Migrations.MIGRATION_2_3,
+            Migrations.MIGRATION_3_4,
+            Migrations.MIGRATION_4_5,
+            Migrations.MIGRATION_5_6,
+            Migrations.MIGRATION_6_7,
+        )
+
+        db.query("SELECT name, fuel FROM vehicles").use { cursor ->
+            assertTrue(cursor.moveToFirst())
+            assertEquals("Chevrolet Onix", cursor.getString(0))
+            assertEquals("FLEX", cursor.getString(1))
         }
     }
 

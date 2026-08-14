@@ -226,6 +226,22 @@ private fun AlertRow(
             color = MaterialTheme.colorScheme.onSurfaceVariant,
         )
 
+        // De onde a contagem parte. Sem isso o motorista não tem como conferir
+        // o número contra a nota da oficina.
+        val serviceKm = alert.lastServiceKm
+        val serviceDate = alert.lastServiceDate
+        if (serviceKm != null && serviceDate != null) {
+            Text(
+                text = stringResource(
+                    R.string.maintenance_last_service,
+                    BrazilianFormatter.date(serviceDate),
+                    BrazilianFormatter.kilometers(serviceKm),
+                ),
+                style = MaterialTheme.typography.bodySmall,
+                color = MaterialTheme.colorScheme.onSurfaceVariant,
+            )
+        }
+
         // O piso por combustível avisa que o número é mínimo, não medido — e
         // pede a leitura em vez de deixar o motorista confiar nele.
         if (alert.distanceIsImplied && alert.monitored) {
