@@ -10,10 +10,13 @@ import com.driverprofit.domain.model.Platform
 import com.driverprofit.domain.model.WorkSession
 import com.driverprofit.domain.usecase.ObserveDashboardUseCase
 import com.driverprofit.domain.usecase.ObserveExpensesBetweenUseCase
+import com.driverprofit.domain.usecase.ObserveMaintenanceUseCase
 import com.driverprofit.domain.usecase.ObservePersonalUsageInPeriodUseCase
 import com.driverprofit.domain.usecase.ObserveWorkSessionsBetweenUseCase
 import com.driverprofit.testing.FakeExpenseRepository
+import com.driverprofit.testing.FakeMaintenanceScheduleRepository
 import com.driverprofit.testing.FakePersonalUsageRepository
+import com.driverprofit.testing.FakeVehicleRepository
 import com.driverprofit.testing.FakeWorkSessionRepository
 import com.driverprofit.testing.MainDispatcherRule
 import kotlinx.coroutines.ExperimentalCoroutinesApi
@@ -93,12 +96,19 @@ class DashboardViewModelTest {
 
     private val personalUsage = FakePersonalUsageRepository()
 
+    // Sem veiculo cadastrado nao ha manutencao a acompanhar, que e o estado
+    // certo para os testes de rentabilidade: o aviso nao interfere neles.
+    private val vehicles = FakeVehicleRepository()
+
+    private val schedules = FakeMaintenanceScheduleRepository()
+
     private fun viewModel() = DashboardViewModel(
         observeDashboard = ObserveDashboardUseCase(
             observeWorkSessionsBetween = ObserveWorkSessionsBetweenUseCase(sessions),
             observeExpensesBetween = ObserveExpensesBetweenUseCase(expenses),
             observePersonalUsageInPeriod = ObservePersonalUsageInPeriodUseCase(personalUsage),
         ),
+        observeMaintenance = ObserveMaintenanceUseCase(vehicles, expenses, schedules),
         clock = clock,
     )
 
