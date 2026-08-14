@@ -49,6 +49,7 @@ import com.driverprofit.core.ui.format.BrazilianFormatter
 import com.driverprofit.core.ui.format.ExpenseLabels
 import com.driverprofit.core.ui.format.QuantityInput
 import com.driverprofit.core.ui.theme.DriverProfitTheme
+import com.driverprofit.domain.model.ConsumptionEstimate
 import com.driverprofit.domain.model.Expense
 import com.driverprofit.domain.model.ExpenseCategory
 import com.driverprofit.domain.model.ExpenseDetail
@@ -134,6 +135,7 @@ fun ExpensesListScreen(
                     items(items = state.expenses, key = { it.id }) { expense ->
                         ExpenseCard(
                             expense = expense,
+                            consumption = state.consumption[expense.id],
                             onEdit = { onEditExpense(expense.id) },
                             onDelete = { viewModel.onDeleteRequested(expense) },
                         )
@@ -247,6 +249,7 @@ private fun ExpenseCard(
     expense: Expense,
     onEdit: () -> Unit,
     onDelete: () -> Unit,
+    consumption: ConsumptionEstimate? = null,
 ) {
     Card(modifier = Modifier.fillMaxWidth()) {
         Row(
@@ -269,6 +272,22 @@ private fun ExpenseCard(
                 expenseDetails(expense)?.let {
                     Text(
                         text = it,
+                        style = MaterialTheme.typography.labelMedium,
+                        color = MaterialTheme.colorScheme.onSurfaceVariant,
+                    )
+                }
+                // Sempre rotulado como estimado (PRD §23): o numero so seria
+                // exato se os dois abastecimentos tivessem enchido o tanque
+                // nas mesmas condicoes, e ninguem garante isso.
+                consumption?.let { estimate ->
+                    Text(
+                        text = stringResource(
+                            R.string.consumption_estimated,
+                            BrazilianFormatter.consumption(
+                                estimate.consumption,
+                                stringResource(ExpenseLabels.unit(estimate.unit)),
+                            ),
+                        ),
                         style = MaterialTheme.typography.labelMedium,
                         color = MaterialTheme.colorScheme.onSurfaceVariant,
                     )
