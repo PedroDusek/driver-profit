@@ -103,6 +103,14 @@ data class MaintenanceAlert(
     val traveledKm: Long?,
     val status: MaintenanceStatus,
     val distanceIsImplied: Boolean = false,
+    /**
+     * Falso quando o motorista desligou este item.
+     *
+     * Ele continua no resultado, e não some: a tela precisa oferecer o caminho
+     * de volta, e um item que desaparece ao ser desligado não tem como ser
+     * religado.
+     */
+    val monitored: Boolean = true,
 ) {
     /**
      * Quanto falta para o intervalo. Negativo significa atraso.
@@ -115,7 +123,8 @@ data class MaintenanceAlert(
 
     /** Itens que merecem aparecer no dashboard. */
     val needsAttention: Boolean
-        get() = status == MaintenanceStatus.OVERDUE || status == MaintenanceStatus.DUE_SOON
+        get() = monitored &&
+            (status == MaintenanceStatus.OVERDUE || status == MaintenanceStatus.DUE_SOON)
 }
 
 /** Um veículo e a situação de cada item acompanhado dele. */
