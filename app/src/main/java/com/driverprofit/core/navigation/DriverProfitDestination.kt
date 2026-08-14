@@ -67,6 +67,11 @@ object DriverProfitDestination {
     fun personalUsageForm(usageId: Long = PersonalUsage.UNSAVED_ID): String =
         "personal_usage_form?$ARG_PERSONAL_USAGE_ID=$usageId"
 
+    // --- Manutenção ---
+
+    /** Alertas de manutenção preventiva por quilometragem (PRD §18). */
+    const val MAINTENANCE = "maintenance"
+
     /** Destino inicial do grafo de navegação. */
     const val START = DASHBOARD
 }

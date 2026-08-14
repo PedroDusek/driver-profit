@@ -17,6 +17,7 @@ import com.driverprofit.feature.earnings.form.EarningsFormScreen
 import com.driverprofit.feature.earnings.list.EarningsListScreen
 import com.driverprofit.feature.expenses.form.ExpenseFormScreen
 import com.driverprofit.feature.expenses.list.ExpensesListScreen
+import com.driverprofit.feature.maintenance.MaintenanceScreen
 import com.driverprofit.feature.personal.form.PersonalUsageFormScreen
 import com.driverprofit.feature.personal.list.PersonalUsageListScreen
 import com.driverprofit.feature.vehicle.form.VehicleFormScreen
@@ -44,7 +45,14 @@ fun DriverProfitNavHost(
                 onOpenPersonalUsage = {
                     navController.navigate(DriverProfitDestination.PERSONAL_USAGE_LIST)
                 },
+                onOpenMaintenance = {
+                    navController.navigate(DriverProfitDestination.MAINTENANCE)
+                },
             )
+        }
+
+        composable(route = DriverProfitDestination.MAINTENANCE) {
+            MaintenanceScreen(onBack = navController::popBackStack)
         }
 
         composable(route = DriverProfitDestination.VEHICLE_LIST) {

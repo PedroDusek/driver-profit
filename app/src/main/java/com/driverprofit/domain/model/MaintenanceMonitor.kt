@@ -50,13 +50,13 @@ object MaintenanceMonitor {
         val currentOdometer = expenses.mapNotNull { it.odometerKm }.maxOrNull()
         val consumptionByFuel = historicConsumption(expenses)
 
-        return MaintenanceItem.entries.mapNotNull { item ->
+        return MaintenanceItem.entries.map { item ->
             val override = overrides[item]
-            if (override?.monitored == false) return@mapNotNull null
 
             alertFor(
                 item = item,
                 intervalKm = override?.intervalKm ?: item.defaultIntervalKm,
+                monitored = override?.monitored ?: true,
                 expenses = expenses,
                 currentOdometer = currentOdometer,
                 consumptionByFuel = consumptionByFuel,
@@ -67,6 +67,7 @@ object MaintenanceMonitor {
     private fun alertFor(
         item: MaintenanceItem,
         intervalKm: Long,
+        monitored: Boolean,
         expenses: List<Expense>,
         currentOdometer: Long?,
         consumptionByFuel: Map<FuelType, Consumption>,
@@ -82,6 +83,7 @@ object MaintenanceMonitor {
                 lastServiceDate = marker?.date,
                 traveledKm = null,
                 status = MaintenanceStatus.UNKNOWN,
+                monitored = monitored,
             )
         }
 
@@ -100,6 +102,7 @@ object MaintenanceMonitor {
             traveledKm = traveled,
             status = statusFor(traveled, intervalKm),
             distanceIsImplied = byFuel > byOdometer,
+            monitored = monitored,
         )
     }
 

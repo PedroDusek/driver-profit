@@ -12,6 +12,7 @@ import com.driverprofit.feature.earnings.form.EarningsFormViewModel
 import com.driverprofit.feature.earnings.list.EarningsListViewModel
 import com.driverprofit.feature.expenses.form.ExpenseFormViewModel
 import com.driverprofit.feature.expenses.list.ExpensesListViewModel
+import com.driverprofit.feature.maintenance.MaintenanceViewModel
 import com.driverprofit.feature.personal.form.PersonalUsageFormViewModel
 import com.driverprofit.feature.personal.list.PersonalUsageListViewModel
 import com.driverprofit.feature.vehicle.form.VehicleFormViewModel
@@ -30,6 +31,14 @@ object DriverProfitViewModelFactory {
         initializer {
             DashboardViewModel(
                 observeDashboard = container().observeDashboard,
+                observeMaintenance = container().observeMaintenance,
+            )
+        }
+        initializer {
+            MaintenanceViewModel(
+                observeMaintenance = container().observeMaintenance,
+                saveInterval = container().saveMaintenanceInterval,
+                resetInterval = container().resetMaintenanceInterval,
             )
         }
         initializer {

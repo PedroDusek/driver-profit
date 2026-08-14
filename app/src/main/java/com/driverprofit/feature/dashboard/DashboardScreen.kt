@@ -12,6 +12,7 @@ import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.ReceiptLong
+import androidx.compose.material.icons.filled.Build
 import androidx.compose.material.icons.filled.DateRange
 import androidx.compose.material.icons.filled.DirectionsCar
 import androidx.compose.material.icons.filled.Payments
@@ -57,6 +58,7 @@ import com.driverprofit.domain.model.DashboardMetrics
 import com.driverprofit.domain.model.DashboardPeriod
 import com.driverprofit.domain.model.DateRange
 import com.driverprofit.domain.model.ExpenseCategory
+import com.driverprofit.feature.maintenance.MaintenanceWarningCard
 import java.time.Instant
 import java.time.LocalDate
 import java.time.ZoneOffset
@@ -78,10 +80,12 @@ fun DashboardScreen(
     onOpenEarnings: () -> Unit,
     onOpenExpenses: () -> Unit,
     onOpenPersonalUsage: () -> Unit,
+    onOpenMaintenance: () -> Unit,
     modifier: Modifier = Modifier,
     viewModel: DashboardViewModel = viewModel(factory = DriverProfitViewModelFactory.Factory),
 ) {
     val uiState by viewModel.uiState.collectAsStateWithLifecycle()
+    val maintenanceWarnings by viewModel.maintenanceWarnings.collectAsStateWithLifecycle()
     var showRangePicker by remember { mutableStateOf(false) }
 
     Scaffold(
@@ -108,6 +112,12 @@ fun DashboardScreen(
                             contentDescription = stringResource(R.string.personal_usage_title),
                         )
                     }
+                    IconButton(onClick = onOpenMaintenance) {
+                        Icon(
+                            imageVector = Icons.Default.Build,
+                            contentDescription = stringResource(R.string.maintenance_title),
+                        )
+                    }
                     IconButton(onClick = onOpenVehicles) {
                         Icon(
                             imageVector = Icons.Default.DirectionsCar,
@@ -128,6 +138,17 @@ fun DashboardScreen(
             ),
             verticalArrangement = Arrangement.spacedBy(12.dp),
         ) {
+            // Antes do seletor de período: o aviso não pertence a um período, e
+            // um alerta abaixo dos cartões só seria visto por quem rolasse.
+            if (maintenanceWarnings.isNotEmpty()) {
+                item {
+                    MaintenanceWarningCard(
+                        warnings = maintenanceWarnings,
+                        onOpen = onOpenMaintenance,
+                    )
+                }
+            }
+
             item {
                 PeriodRow(
                     selected = uiState.period,

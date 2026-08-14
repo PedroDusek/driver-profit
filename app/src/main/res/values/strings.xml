@@ -259,4 +259,29 @@
     <!-- Veículos: quilometragem -->
     <string name="vehicle_odometer">%1$s rodados</string>
     <string name="vehicle_odometer_unknown">Sem leitura de odômetro ainda</string>
+
+    <!-- Manutenção preventiva -->
+    <string name="maintenance_title">Manutenção</string>
+    <string name="maintenance_empty_title">Nenhum veículo cadastrado</string>
+    <string name="maintenance_empty_message">Cadastre seu veículo para acompanhar troca de óleo, filtros, freios, pneus e revisão.</string>
+    <string name="maintenance_status_ok">Em dia</string>
+    <string name="maintenance_status_due_soon">Se aproximando</string>
+    <string name="maintenance_status_overdue">Vencido</string>
+    <string name="maintenance_status_unknown">Sem dados</string>
+    <string name="maintenance_remaining">Faltam %1$s</string>
+    <string name="maintenance_overdue_by">%1$s além do intervalo</string>
+    <string name="maintenance_since_service">%1$s desde a última troca, a cada %2$s</string>
+    <string name="maintenance_last_service">Última em %1$s, com %2$s</string>
+    <string name="maintenance_unknown_message">Lance uma manutenção desta categoria com a leitura do odômetro para o app saber de onde contar.</string>
+    <string name="maintenance_implied_note">Distância mínima calculada pelo combustível comprado — o odômetro está atrasado. Confirme a leitura do painel.</string>
+    <string name="maintenance_interval_title">Intervalo de %1$s</string>
+    <string name="maintenance_interval_label">A cada quantos km</string>
+    <string name="maintenance_interval_default">Padrão do app: %1$s</string>
+    <string name="maintenance_action_reset">Usar o padrão</string>
+    <string name="maintenance_action_stop">Parar de acompanhar</string>
+    <string name="maintenance_action_resume">Voltar a acompanhar</string>
+    <string name="maintenance_not_monitored">Não acompanhado</string>
+    <string name="maintenance_dashboard_title">Manutenção pede atenção</string>
+    <string name="maintenance_dashboard_line">%1$s · %2$s</string>
+    <string name="error_interval_out_of_range">Intervalo inválido</string>
 </resources>

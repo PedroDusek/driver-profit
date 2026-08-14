@@ -5,7 +5,9 @@ import androidx.lifecycle.viewModelScope
 import com.driverprofit.domain.model.DashboardMetrics
 import com.driverprofit.domain.model.DashboardPeriod
 import com.driverprofit.domain.model.DateRange
+import com.driverprofit.domain.model.VehicleMaintenance
 import com.driverprofit.domain.usecase.ObserveDashboardUseCase
+import com.driverprofit.domain.usecase.ObserveMaintenanceUseCase
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.SharingStarted
@@ -46,10 +48,29 @@ sealed interface DashboardUiState {
 @OptIn(ExperimentalCoroutinesApi::class)
 class DashboardViewModel(
     observeDashboard: ObserveDashboardUseCase,
+    observeMaintenance: ObserveMaintenanceUseCase,
     private val clock: Clock = Clock.systemDefaultZone(),
 ) : ViewModel() {
 
     private val period = MutableStateFlow<DashboardPeriod>(DEFAULT_PERIOD)
+
+    /**
+     * Veículos com item de manutenção vencido ou próximo.
+     *
+     * Fora do [uiState] de propósito: manutenção não depende do período
+     * escolhido. Um óleo vencido continua vencido quando o motorista troca o
+     * filtro para "ontem", e reagir ao seletor faria o aviso piscar sem motivo.
+     *
+     * Lista vazia quando não há o que avisar — o dashboard é a tela de
+     * rentabilidade, e "está tudo em dia" não é notícia.
+     */
+    val maintenanceWarnings: StateFlow<List<VehicleMaintenance>> = observeMaintenance()
+        .map { vehicles -> vehicles.filter { it.needingAttention.isNotEmpty() } }
+        .stateIn(
+            scope = viewModelScope,
+            started = SharingStarted.WhileSubscribed(STOP_TIMEOUT_MILLIS),
+            initialValue = emptyList(),
+        )
 
     /**
      * Dia de referência dos períodos.
