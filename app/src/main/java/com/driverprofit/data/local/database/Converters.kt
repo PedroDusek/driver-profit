@@ -5,6 +5,7 @@ import com.driverprofit.domain.model.ChargingLocation
 import com.driverprofit.domain.model.ExpenseCategory
 import com.driverprofit.domain.model.FuelType
 import com.driverprofit.domain.model.MaintenanceCategory
+import com.driverprofit.domain.model.MaintenanceItem
 import com.driverprofit.domain.model.PersonalUsageSource
 import com.driverprofit.domain.model.Platform
 import com.driverprofit.domain.model.VehicleFuel
@@ -74,6 +75,13 @@ class Converters {
     @TypeConverter
     fun nameToMaintenanceCategory(value: String?): MaintenanceCategory? =
         value?.let(MaintenanceCategory::valueOf)
+
+    @TypeConverter
+    fun maintenanceItemToName(value: MaintenanceItem?): String? = value?.name
+
+    @TypeConverter
+    fun nameToMaintenanceItem(value: String?): MaintenanceItem? =
+        value?.let(MaintenanceItem::valueOf)
 
     @TypeConverter
     fun personalUsageSourceToName(value: PersonalUsageSource?): String? = value?.name

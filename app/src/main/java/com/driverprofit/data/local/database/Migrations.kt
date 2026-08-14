@@ -207,6 +207,51 @@ object Migrations {
         }
     }
 
+    /**
+     * 6 → 7: intervalos de manutenção preventiva.
+     *
+     * Cria `maintenance_schedules`. Aditiva — nenhuma tabela existente é
+     * tocada, e o histórico de manutenção que alimenta os alertas já está em
+     * `expenses` desde a v0.4.0.
+     *
+     * **A tabela nasce vazia, e isso é o comportamento correto.** Linha
+     * ausente significa "intervalo padrão do app", então todo veículo já
+     * existente passa a ser acompanhado sem que a migração precise inventar
+     * cinco linhas por carro — que seria escrever no banco uma decisão que o
+     * motorista não tomou.
+     *
+     * `ON DELETE CASCADE`, diferente de `expenses` e `personal_usage`: aquelas
+     * guardam histórico financeiro e sobrevivem à exclusão do veículo; esta
+     * guarda uma preferência sobre um carro que deixou de existir.
+     *
+     * Um índice só, único, sobre `(vehicle_id, item)`: ele impede dois
+     * intervalos para o mesmo item e, por começar em `vehicle_id`, também
+     * atende a exigência do Room para a chave estrangeira.
+     */
+    val MIGRATION_6_7 = object : Migration(6, 7) {
+        override fun migrate(db: SupportSQLiteDatabase) {
+            db.execSQL(
+                """
+                CREATE TABLE IF NOT EXISTS `maintenance_schedules` (
+                    `id` INTEGER PRIMARY KEY AUTOINCREMENT NOT NULL,
+                    `vehicle_id` INTEGER NOT NULL,
+                    `item` TEXT NOT NULL,
+                    `interval_km` INTEGER NOT NULL,
+                    `monitored` INTEGER NOT NULL,
+                    `created_at` INTEGER NOT NULL,
+                    FOREIGN KEY(`vehicle_id`) REFERENCES `vehicles`(`id`)
+                        ON UPDATE NO ACTION ON DELETE CASCADE
+                )
+                """.trimIndent(),
+            )
+            db.execSQL(
+                "CREATE UNIQUE INDEX IF NOT EXISTS " +
+                    "`index_maintenance_schedules_vehicle_id_item` " +
+                    "ON `maintenance_schedules` (`vehicle_id`, `item`)",
+            )
+        }
+    }
+
     /** Todas as migrações conhecidas, na ordem. */
     val ALL: Array<Migration> = arrayOf(
         MIGRATION_1_2,
@@ -214,5 +259,6 @@ object Migrations {
         MIGRATION_3_4,
         MIGRATION_4_5,
         MIGRATION_5_6,
+        MIGRATION_6_7,
     )
 }
