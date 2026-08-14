@@ -120,8 +120,14 @@ object ConsumptionEstimator {
     }
 }
 
-/** Combustível efetivo do lançamento — energia elétrica no caso da recarga. */
-private val Expense.fuelTypeOrNull: FuelType?
+/**
+ * Combustível efetivo do lançamento — energia elétrica no caso da recarga.
+ *
+ * `internal` porque o piso de distância dos alertas de manutenção (v0.9.0)
+ * precisa da mesma regra: um lançamento só entra na conta de combustível
+ * comprado se for possível dizer **qual** combustível era.
+ */
+internal val Expense.fuelTypeOrNull: FuelType?
     get() = when (val detail = detail) {
         is ExpenseDetail.Refuel -> detail.fuelType
         is ExpenseDetail.Charging -> FuelType.ELECTRICITY
