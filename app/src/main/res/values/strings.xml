@@ -232,6 +232,9 @@
     <string name="charging_public">Público</string>
     <string name="charging_other">Outro</string>
 
+    <!-- Consumo estimado -->
+    <string name="consumption_estimated">≈ %1$s estimado</string>
+
     <!-- Unidades -->
     <string name="unit_liter">L</string>
     <string name="unit_cubic_meter">m³</string>

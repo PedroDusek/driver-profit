@@ -3,6 +3,8 @@ package com.driverprofit.feature.expenses.list
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.driverprofit.core.common.Money
+import com.driverprofit.domain.model.ConsumptionEstimate
+import com.driverprofit.domain.model.ConsumptionEstimator
 import com.driverprofit.domain.model.Expense
 import com.driverprofit.domain.model.ExpenseCategory
 import com.driverprofit.domain.usecase.DeleteExpenseUseCase
@@ -78,6 +80,14 @@ sealed interface ExpensesListUiState {
         val filter: ExpenseFilter,
         /** `true` quando existem despesas, mas nenhuma passa no filtro atual. */
         val filteredOut: Boolean,
+        /**
+         * Consumo estimado por lançamento (PRD §23).
+         *
+         * Calculado sobre o histórico **inteiro**, e não sobre o que o filtro
+         * mostra: o trecho de um abastecimento nasce da diferença para o
+         * anterior, que pode estar fora do filtro.
+         */
+        val consumption: Map<Long, ConsumptionEstimate> = emptyMap(),
     ) : ExpensesListUiState
 }
 
@@ -108,6 +118,7 @@ class ExpensesListViewModel(
                     summary = ExpensesSummary.of(visible),
                     filter = activeFilter,
                     filteredOut = visible.isEmpty(),
+                    consumption = estimateConsumption(expenses),
                 )
             }
         }.stateIn(
@@ -135,6 +146,20 @@ class ExpensesListViewModel(
             deleteExpense(expense.id)
         }
     }
+
+    /**
+     * Consumo por veículo, indexado pelo lançamento.
+     *
+     * Agrupado por veículo porque a diferença de odômetro só faz sentido
+     * dentro do mesmo carro — dois veículos têm painéis independentes.
+     */
+    private fun estimateConsumption(expenses: List<Expense>): Map<Long, ConsumptionEstimate> =
+        expenses
+            .filter { it.vehicleId != null }
+            .groupBy { it.vehicleId }
+            .values
+            .flatMap { ConsumptionEstimator.estimate(it) }
+            .associateBy { it.expenseId }
 
     private companion object {
         const val STOP_TIMEOUT_MILLIS = 5_000L

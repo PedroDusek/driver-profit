@@ -2,6 +2,7 @@ package com.driverprofit.core.ui.format
 
 import com.driverprofit.core.common.Money
 import com.driverprofit.core.common.WorkDuration
+import com.driverprofit.domain.model.Consumption
 import java.time.LocalDate
 import java.time.format.DateTimeFormatter
 
@@ -67,6 +68,23 @@ object BrazilianFormatter {
 
     /** Quilometragem inteira com separador de milhar: `"50.350 km"`. */
     fun kilometers(value: Long): String = "${groupThousands(value)} km"
+
+    /**
+     * Consumo com a unidade embutida: `"8,75 km/L"`.
+     *
+     * Zeros à direita são cortados — `8,750` vira `8,75` e `8,000` vira `8`.
+     * Casa decimal que não informa nada só rouba espaço numa linha que já é
+     * secundária.
+     */
+    fun consumption(value: Consumption, unit: String): String {
+        val decimals = value.fraction.toString().padStart(3, '0').trimEnd('0')
+        val number = if (decimals.isEmpty()) {
+            value.whole.toString()
+        } else {
+            "${value.whole},$decimals"
+        }
+        return "$number km/$unit"
+    }
 
     private fun groupThousands(value: Long): String {
         val digits = value.toString()
