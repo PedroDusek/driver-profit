@@ -169,17 +169,29 @@ o tanque for abastecido em condições comparáveis.
 Depende da quantidade em litros, que é opcional desde a v0.4.1 — o formulário
 deve explicar o que se ganha ao preenchê-la.
 
-### v0.9.0 — Manutenção preventiva
+### v0.9.0 — Manutenção preventiva ✅ concluída
 
-- [ ] Alertas por quilometragem: óleo, filtros, pneus, freios, revisão
-- [ ] Intervalo configurável por item
-- [ ] Distância mínima implícita por combustível comprado, como piso
+- [x] Alertas por quilometragem: óleo, filtros, pneus, freios, revisão
+- [x] Intervalo configurável por item, com padrão sugerido e caminho de volta
+- [x] Distância mínima implícita por combustível comprado, como piso
       independente do odômetro
-- [ ] Alerta silencia, ou se declara incompleto, quando o dado não sustenta a
-      afirmação
+- [x] Alerta se declara sem dados quando não há marco de onde contar
+- [x] Tela própria e aviso no dashboard só quando há item vencido ou próximo
+- [x] Migração 6→7 + testes instrumentados
 
 **Critério de saída:** o app avisa da troca de óleo sem nunca afirmar com base
 em quilometragem que ele não tem.
+
+**Banco:** versão 7.
+
+O marco vem do histórico de manutenção que já existia — nenhuma coluna nova
+guarda "quando foi a última troca", porque duplicá-la criaria duas verdades que
+divergiriam na primeira correção de lançamento. Consequência assumida: um item
+só passa a alertar depois do primeiro serviço lançado **com odômetro**.
+
+Intervalo é preferência, e só o que o motorista alterou vira linha no banco.
+Isso faz veículo novo nascer acompanhado e permite revisar um padrão numa versão
+futura sem sobrescrever escolha de ninguém.
 
 Assimetria que rege esta versão: subestimar km infla o custo/km, o que é
 apenas pessimista; mas **atrasa** o alerta de manutenção, o que desgasta
@@ -193,12 +205,12 @@ funcionalidades — na dúvida ele pede a leitura, em vez de estimar.
 - [ ] Diluição do valor pelos dias do período
 - [ ] Financiamento, seguro e IPVA atribuídos **100% ao trabalho** (PRD §22)
 - [ ] Custo fixo por km trabalhado
-- [ ] Migração 6→7 + testes instrumentados
+- [ ] Migração 7→8 + testes instrumentados
 
 **Critério de saída:** o IPVA pago em janeiro não faz janeiro parecer
 catastrófico nem o resto do ano parecer isento.
 
-**Banco:** versão 7. Colunas anuláveis — despesas existentes ficam com `NULL`,
+**Banco:** versão 8. Colunas anuláveis — despesas existentes ficam com `NULL`,
 que significa "competência é a própria data", o comportamento atual.
 
 Histórico e "Despesas" continuam exibindo **caixa**, para conferir com o

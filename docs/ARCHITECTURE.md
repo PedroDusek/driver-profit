@@ -179,6 +179,38 @@ quilômetro, e a tela informa isso quando eles existem no período.
 
 O rateio de custo fixo ao longo do tempo é da v1.4 (PRD §47).
 
+### O alerta de manutenção não degrada como o resto do app
+
+`domain/model/MaintenanceMonitor.kt`. É a única funcionalidade que se recusa a
+trabalhar com o que tem.
+
+Todas as outras degradam com elegância: sem uso pessoal, o custo/km sai
+pessimista e a tela avisa. Aqui a mesma postura seria errada, porque os dois
+lados do erro custam coisas diferentes — subestimar quilometragem deixa o
+custo/km pessimista, mas **atrasa** o alerta de troca de óleo, e óleo velho
+desgasta motor.
+
+Duas regras saem daí:
+
+- **Piso por combustível comprado.** Litros multiplicados pelo consumo histórico
+  (`ConsumptionEstimator`, v0.8.0) dão distância que o carro necessariamente
+  percorreu, independente de o painel estar atualizado. Quando o piso passa da
+  diferença de odômetro, é ele que vale — e a tela declara o número como mínimo,
+  pedindo a leitura.
+- **Sem marco, sem afirmação.** Item que nunca teve manutenção lançada com
+  odômetro fica em `UNKNOWN`. Nunca "em dia": das duas mentiras possíveis, essa é
+  a que custa motor.
+
+O consumo usado no piso é a **mediana** por combustível, não a média nem o
+máximo: um par tanque-a-tanque estragado desloca a média e domina o máximo. E os
+abastecimentos são recortados por data, não por odômetro — o piso existe
+justamente para quando a leitura está atrasada, e filtrar por ela devolveria o
+defeito para dentro da correção.
+
+O marco não é persistido. Ele é derivado do último lançamento de manutenção da
+categoria, em `expenses`. Uma coluna "última troca" criaria uma segunda verdade
+que divergiria da primeira na primeira correção de lançamento.
+
 ### Período é `sealed`, e o dia de referência é parâmetro
 
 `domain/model/DashboardPeriod.kt`. "Personalizado" carrega um intervalo e os
