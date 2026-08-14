@@ -2,7 +2,7 @@
 
 Room sobre SQLite, local ao aparelho. Nome do arquivo: `driver_profit.db`.
 
-**Versão atual do schema: 5**
+**Versão atual do schema: 6**
 
 O JSON do schema é exportado em `app/schemas/` e **é versionado no Git**. Ele é
 o que torna possível escrever testes de migração de verdade. Os schemas
@@ -115,6 +115,37 @@ litro.
 para "onde isso aconteceu" e nunca coexistem na mesma linha; três colunas
 seriam duas sempre nulas.
 
+### `personal_usage` (v6)
+
+Quilômetros rodados fora do trabalho (PRD §22).
+
+| Coluna | Tipo SQL | Nulo | Descrição |
+| --- | --- | --- | --- |
+| `id` | INTEGER PK AUTOINCREMENT | não | Identificador |
+| `vehicle_id` | INTEGER | **sim** | FK para `vehicles`, `ON DELETE SET NULL` |
+| `start_date` | INTEGER | não | Epoch day do primeiro dia |
+| `end_date` | INTEGER | não | Epoch day do último dia, inclusive |
+| `distance_km` | INTEGER | não | Km do intervalo inteiro, não por dia |
+| `source` | TEXT | não | `DECLARED` \| `RECONCILED` |
+| `note` | TEXT | não | Observação; string vazia quando não informada |
+| `created_at` | INTEGER | não | Epoch millis (UTC) |
+
+**Índices:** `start_date`, `end_date` e `vehicle_id`.
+
+**Tabela própria, e não coluna em `work_sessions`:** uso pessoal não tem
+plataforma, corridas nem faturamento, e não é uma jornada. Enfiá-lo lá
+obrigaria a deixar metade das colunas nulas e a filtrar toda consulta de
+ganhos.
+
+**Intervalo, e não um dia:** uma viagem de fim de semana cobre vários dias, e a
+sobra da conciliação cobre todo o período entre duas leituras de odômetro. O
+recorte proporcional por dias é do domínio (`PersonalUsage.kilometersWithin`),
+não do SQL.
+
+**`source` distingue declarado de estimado.** A sobra da conciliação não tem a
+mesma confiança de uma viagem que o motorista lançou, e a tela precisa dizer
+qual é qual antes de ele decidir corrigir.
+
 ## Convenções
 
 ### Nomes
@@ -184,6 +215,7 @@ Um PR que altera apenas a Entity está incompleto.
 | 3 | v0.3.0 | Adiciona `work_sessions` e o índice sobre `date` |
 | 4 | v0.4.0 | Adiciona `expenses`, com FK para `vehicles` e índices sobre `date` e `vehicle_id` |
 | 5 | v0.6.0 | Adiciona `odometer_km` em `expenses` (odômetro por lançamento) |
+| 6 | v0.7.0 | Adiciona `personal_usage` (quilometragem fora do trabalho) |
 
 #### Migração 1 → 2
 
@@ -231,6 +263,20 @@ verdade: "não sei".
 Consequência prática: o consumo estimado (v0.8.0) e os alertas de manutenção
 (v0.9.0) só passam a funcionar a partir do primeiro lançamento com leitura.
 Isso é correto — não há como reconstruir um dado que nunca foi coletado.
+
+#### Migração 5 → 6
+
+Aditiva: cria `personal_usage` com a chave estrangeira para `vehicles` e três
+índices. Nenhuma tabela existente é tocada.
+
+Índices em `start_date` **e** `end_date` porque a consulta do dashboard é de
+**sobreposição** de intervalos, não de contenção: uma viagem de 28/07 a 03/08
+precisa aparecer em julho e em agosto, cada mês com a fatia de quilômetros que
+lhe cabe. Filtrar por "começa dentro do período" perderia a segunda metade
+dela, e o custo/km de agosto voltaria a ficar inflado — que é o defeito que
+esta versão existe para corrigir.
+
+`vehicle_id` é indexado porque o Room o exige para a chave estrangeira.
 
 ## Desvios registrados em relação ao PRD
 

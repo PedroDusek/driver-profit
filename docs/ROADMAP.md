@@ -118,19 +118,19 @@ entrando como zero produz indicador errado e invisível. Acoplar o km ao
 lançamento do dinheiro é o que garante leitura frequente sem exigir ritual do
 motorista.
 
-### v0.7.0 — Uso pessoal
+### v0.7.0 — Uso pessoal ✅ concluída
 
 Corrige a limitação registrada na v0.5.0.
 
-- [ ] Lançamento de uso pessoal: data ou intervalo + km
-- [ ] Conciliação por odômetro — resíduo = leitura − km de trabalho − km
+- [x] Lançamento de uso pessoal: data ou intervalo + km
+- [x] Conciliação por odômetro — resíduo = leitura − km de trabalho − km
       pessoais já declarados
-- [ ] Pergunta explícita sobre o resíduo: uso pessoal ou jornada não lançada?
-- [ ] Resíduo distribuído proporcionalmente aos dias do intervalo
-- [ ] Custo real por km calculado sobre o km **total**
-- [ ] Repartição em reais entre trabalho e pessoal
-- [ ] Lucro descontando apenas a parcela profissional
-- [ ] Migração 5→6 + testes instrumentados
+- [x] Pergunta explícita sobre o resíduo: uso pessoal ou jornada não lançada?
+- [x] Resíduo distribuído proporcionalmente aos dias do intervalo
+- [x] Custo real por km calculado sobre o km **total**
+- [x] Repartição em reais entre trabalho e pessoal
+- [x] Lucro descontando apenas a parcela profissional
+- [x] Migração 5→6 + testes instrumentados
 
 **Critério de saída:** o motorista que usa o carro no fim de semana vê um
 custo/km que não pune o trabalho por isso, e os dois valores da repartição
