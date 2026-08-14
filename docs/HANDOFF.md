@@ -4,7 +4,7 @@ Documento de continuidade. Leia isto **antes** de qualquer coisa ao retomar o
 projeto em uma sessão nova, junto com `PRD.md`, `ARCHITECTURE.md` e
 `DEVELOPMENT.md`.
 
-**Última atualização:** v0.7.0
+**Última atualização:** v0.8.0
 
 ---
 
@@ -15,7 +15,7 @@ projeto em uma sessão nova, junto com `PRD.md`, `ARCHITECTURE.md` e
 | Código | `C:\Users\pedro\Desktop\driver-profit` |
 | Repositório | https://github.com/PedroDusek/driver-profit (público) |
 | Branch estável | `main`, protegida |
-| Última tag | `v0.6.0` (v0.7.0 pendente de teste em aparelho) |
+| Última tag | `v0.6.0`. v0.7.0 e v0.8.0 prontas, **sem teste em aparelho** |
 | Versão do banco | **6** |
 
 ⚠️ **O caminho não pode conter acento.** O projeto nasceu em
@@ -112,9 +112,8 @@ estimado em si chega na v0.8.0.
 | v0.3.0 / v0.3.1 Earnings | ✅ |
 | v0.4.0 / v0.4.1 Expenses | ✅ |
 | v0.5.0 Dashboard | ✅ |
-| v0.6.0 Odômetro · v0.7.0 Uso pessoal | ✅ |
-| **v0.8.0 Consumo estimado** | ⬅️ **próxima** |
-| v0.9.0 Manutenção preventiva | |
+| v0.6.0 Odômetro · v0.7.0 Uso pessoal · v0.8.0 Consumo | ✅ |
+| **v0.9.0 Manutenção preventiva** | ⬅️ **próxima** |
 | v0.10.0 Custos fixos · v0.11.0 Analytics | |
 | v0.12.0 UX polish · v0.13.0 Hardening · v0.14.0 RC · v1.0.0 MVP | |
 
@@ -124,20 +123,33 @@ detalhamento com critério de saída e impacto no banco está em
 [`ROADMAP.md`](ROADMAP.md); as regras de produto que sustentam tudo isso estão
 no PRD §22 e §23.
 
-### O que a v0.8.0 precisa fazer
+### ⚠️ Duas versões esperando aparelho
 
-**Consumo estimado** (PRD §23) — km/L, km/m³ e km/kWh a partir do odômetro e
-da quantidade.
+`feature/personal-usage` (v0.7.0) e `feature/fuel-consumption` (v0.8.0) estão
+empurradas e **não mergeadas**. A v0.8.0 foi empilhada sobre a v0.7.0.
 
-- Sempre rotulado **estimado**: o cálculo por odômetro só é exato se o tanque
-  for abastecido em condições comparáveis
-- Depende da quantidade em litros, que é **opcional** desde a v0.4.1. O
-  formulário precisa explicar o que se ganha ao preencher — e o argumento mais
-  forte é que ela protege o alerta de manutenção da v0.9.0
-- Comparação com o consumo que o painel do carro indica, que costuma ser
-  otimista
+Elas ficaram fora da `main` de propósito: a v0.7.0 traz a **migração 5→6**, e o
+CI não roda teste de migração. Quando houver aparelho, rodar os instrumentados
+uma vez cobre as duas — a v0.8.0 não mexe no banco.
 
-**Não mexe no banco.** O odômetro (v0.6.0) e a quantidade (v0.4.0) já estão lá.
+### O que a v0.9.0 precisa fazer
+
+**Manutenção preventiva** — alertas por quilometragem: óleo, filtros, pneus,
+freios, revisão.
+
+- Intervalo configurável por item
+- **Distância mínima implícita por combustível comprado**, como piso
+  independente do odômetro: litros × consumo histórico dá um chão que uma
+  leitura desatualizada não esconde
+- O alerta silencia, ou se declara incompleto, quando o dado não sustenta a
+  afirmação
+
+Assimetria que rege esta versão: subestimar km deixa o custo/km pessimista,
+mas **atrasa** o alerta de troca de óleo — e isso desgasta motor. O alerta não
+herda a degradação graciosa das outras funcionalidades; na dúvida ele pede a
+leitura em vez de estimar.
+
+O consumo histórico que o piso exige já existe: `ConsumptionEstimator`, v0.8.0.
 
 ### O que já está pronto e não deve ser refeito
 
@@ -147,6 +159,9 @@ da quantidade.
 - **Financiamento, seguro e IPVA são 100% do trabalho** e ficam fora do rateio
 - **Uso pessoal tem dois caminhos de entrada que se abatem**: declaração
   explícita e sobra da conciliação. Nunca somar os dois sem descontar
+- **Consumo é tanque-a-tanque, e par com combustível diferente é descartado.**
+  Alternar gasolina e etanol muda o consumo em ~30%; a média dos dois não
+  descreve nenhum. E ele é **sempre** rotulado estimado (PRD §23)
 
 ## 7. Testes instrumentados
 

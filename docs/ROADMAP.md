@@ -142,11 +142,26 @@ Dois mecanismos de entrada porque um só não basta: a declaração explícita p
 a viagem no mês em que ela aconteceu, e a conciliação captura o que ele nunca
 registrou. Um abate o outro para não haver dupla contagem (PRD §22).
 
-### v0.8.0 — Consumo estimado
+### v0.8.0 — Consumo estimado ✅ concluída
 
-- [ ] km/L, km/m³ e km/kWh a partir de odômetro e quantidade
-- [ ] Sempre rotulado **estimado** (PRD §23)
-- [ ] Comparação com o consumo que o painel do carro indica
+- [x] km/L, km/m³ e km/kWh a partir de odômetro e quantidade
+- [x] Sempre rotulado **estimado** (PRD §23)
+- [x] Exibido no histórico de despesas, por abastecimento
+- [ ] ~~Comparação com o consumo que o painel do carro indica~~ — adiada
+
+**Critério de saída:** a partir do segundo abastecimento com quantidade
+informada, o motorista vê quanto o carro está fazendo por litro.
+
+**Banco:** sem alteração. Odômetro (v0.6.0) e quantidade (v0.4.0) já existiam.
+
+A comparação com o painel foi adiada porque exige guardar o consumo declarado
+pelo fabricante no veículo — ou seja, migração. Não valia acrescentar uma
+sétima versão de schema por um número informativo; entra junto de outra
+mudança de banco quando houver.
+
+Pares com combustível diferente são descartados: num flex, alternar gasolina e
+etanol muda o consumo em cerca de 30%, e uma média dos dois não descreveria
+nenhum deles. Comparar consumo por combustível é pós-MVP (PRD §9).
 
 Consumo é sempre rotulado como estimado: o cálculo por odômetro só é exato se
 o tanque for abastecido em condições comparáveis.
