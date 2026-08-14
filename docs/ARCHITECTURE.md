@@ -201,6 +201,18 @@ Duas regras saem daí:
   odômetro fica em `UNKNOWN`. Nunca "em dia": das duas mentiras possíveis, essa é
   a que custa motor.
 
+E uma terceira, que é de apresentação mas muda o desenho: **a tela exibe o
+alvo, não quanto falta.** `MaintenanceAlert.nextServiceKm` é a leitura da
+última troca mais o intervalo — dois fatos somados, exatos mesmo com o painel
+três tanques atrasado. Contagem regressiva carregaria para dentro do número
+toda a incerteza sobre a posição atual do carro.
+
+Isso reposiciona o problema inteiro: a incerteza sai do **número**, onde errar
+destrói a confiança no app, e vai para o **momento do lembrete**, onde errar
+algumas centenas de quilômetros custa um aviso um pouco adiantado. É também o
+que permite ao app ser conferível — ele afirma um fato e deixa a comparação com
+o painel para o motorista, em vez de disputar com ele quem sabe a quilometragem.
+
 O consumo usado no piso é a **mediana** por combustível, não a média nem o
 máximo: um par tanque-a-tanque estragado desloca a média e domina o máximo. E os
 abastecimentos são recortados por data, não por odômetro — o piso existe

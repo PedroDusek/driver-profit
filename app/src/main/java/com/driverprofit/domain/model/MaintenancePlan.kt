@@ -113,10 +113,30 @@ data class MaintenanceAlert(
     val monitored: Boolean = true,
 ) {
     /**
+     * Quilometragem em que o serviço vence — **o número que a tela exibe**.
+     *
+     * É a soma de dois fatos: a leitura da última troca, lançada com a nota, e
+     * o intervalo, que o motorista definiu. Não depende de onde o carro está
+     * agora, então é exato mesmo com o painel atrasado.
+     *
+     * Essa é a diferença entre dizer "faltam 600 km" e "a próxima é aos
+     * 110.000 km". A primeira é uma afirmação sobre o presente, que é
+     * justamente o que o app não sabe com certeza — e um motorista que lê 600
+     * quando faltam 550 para de confiar no aplicativo. A segunda ele confere
+     * contra o próprio painel, e ela nunca está errada.
+     *
+     * `null` quando não há marco, o mesmo caso de [MaintenanceStatus.UNKNOWN].
+     */
+    val nextServiceKm: Long?
+        get() = lastServiceKm?.plus(intervalKm)
+
+    /**
      * Quanto falta para o intervalo. Negativo significa atraso.
      *
-     * `null` quando não há marco — e aqui `null` não é zero nem "em dia": é a
-     * ausência que a tela precisa exibir como tal.
+     * **Não é exibido**, de propósito — ver [nextServiceKm]. Serve para
+     * ordenar por urgência e para decidir o estado, onde um erro de algumas
+     * centenas de quilômetros adianta ou atrasa um lembrete discreto, em vez
+     * de imprimir um número errado na tela.
      */
     val remainingKm: Long?
         get() = traveledKm?.let { intervalKm - it }

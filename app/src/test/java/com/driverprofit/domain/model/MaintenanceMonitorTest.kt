@@ -159,6 +159,65 @@ class MaintenanceMonitorTest {
         assertEquals(1_000L, alerta.traveledKm)
     }
 
+    // --- O alvo exibido ---
+
+    @Test
+    fun `o alvo e a leitura da troca mais o intervalo`() {
+        val alerta = oil(
+            listOf(
+                service(MaintenanceCategory.OIL, odometerKm = 100_000, date = DIA_1),
+                refuel(odometerKm = 103_000, quantity = null, date = DIA_2),
+            ),
+        )
+
+        assertEquals(110_000L, alerta.nextServiceKm)
+    }
+
+    @Test
+    fun `o alvo nao muda quando o odometro esta atrasado`() {
+        // Este e o motivo de exibir o alvo em vez de contagem regressiva: os
+        // dois cenarios abaixo tem quilometragem corrente diferente, e o numero
+        // que o motorista le e o mesmo nos dois. Ele confere contra o painel e
+        // bate sempre.
+        val comPainelEmDia = oil(
+            listOf(
+                service(MaintenanceCategory.OIL, odometerKm = 100_000, date = DIA_1),
+                refuel(odometerKm = 109_400, quantity = null, date = DIA_2),
+            ),
+        )
+        val comPainelAtrasado = oil(
+            listOf(
+                service(MaintenanceCategory.OIL, odometerKm = 100_000, date = DIA_1),
+                refuel(odometerKm = 100_400, quantity = null, date = DIA_2),
+            ),
+        )
+
+        assertEquals(110_000L, comPainelEmDia.nextServiceKm)
+        assertEquals(110_000L, comPainelAtrasado.nextServiceKm)
+        // A incerteza nao sumiu: ela migrou do numero exibido para o estado,
+        // onde errar custa um lembrete adiantado em vez de um numero falso.
+        assertEquals(MaintenanceStatus.DUE_SOON, comPainelEmDia.status)
+        assertEquals(MaintenanceStatus.OK, comPainelAtrasado.status)
+    }
+
+    @Test
+    fun `o alvo acompanha o intervalo que o motorista escolheu`() {
+        val alerta = oil(
+            listOf(service(MaintenanceCategory.OIL, odometerKm = 100_000, date = DIA_1)),
+            listOf(schedule(MaintenanceItem.OIL, intervalKm = 5_000)),
+        )
+
+        assertEquals(105_000L, alerta.nextServiceKm)
+    }
+
+    @Test
+    fun `sem marco nao ha alvo para exibir`() {
+        val alerta = oil(emptyList())
+
+        assertNull(alerta.nextServiceKm)
+        assertEquals(MaintenanceStatus.UNKNOWN, alerta.status)
+    }
+
     // --- O piso por combustivel comprado ---
 
     @Test

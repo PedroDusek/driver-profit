@@ -26,6 +26,16 @@ dado — e isso é deliberado.
 
 ### Decisões registradas
 
+- **A tela exibe o alvo, não a contagem regressiva.** "A próxima é aos 110.000
+  km" é a soma de dois fatos — a leitura da última troca e o intervalo
+  escolhido — e por isso é exata mesmo com o painel atrasado. "Faltam 600 km"
+  seria uma afirmação sobre o presente, que é justamente o que o app não sabe
+  com certeza; um motorista que lê 600 quando faltam 550 para de confiar no
+  aplicativo inteiro. A incerteza migra do número exibido para o **momento do
+  lembrete**, onde errar algumas centenas de quilômetros custa um aviso
+  adiantado em vez de um número falso.
+- **Os rótulos de estado são neutros em gênero** — "Em atraso", e não
+  "vencido", que não concorda com "revisão".
 - **A assimetria que rege a versão.** Subestimar quilometragem deixa o custo/km
   pessimista, o que é apenas chato; mas **atrasa** o alerta de troca de óleo, o
   que desgasta motor. As duas tolerâncias a erro são diferentes, e o tratamento
