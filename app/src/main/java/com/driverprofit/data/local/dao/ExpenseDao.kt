@@ -69,6 +69,39 @@ interface ExpenseDao {
     )
     fun observeOdometers(): Flow<List<VehicleOdometer>>
 
+    /**
+     * Última leitura **anterior** ao período — a linha de partida da
+     * conciliação.
+     *
+     * Sem ela, a distância percorrida no período começaria na primeira leitura
+     * de dentro dele, e tudo o que o motorista rodou entre a última leitura
+     * anterior e essa primeira ficaria de fora.
+     */
+    @Query(
+        """
+        SELECT MAX(odometer_km) FROM expenses
+        WHERE vehicle_id = :vehicleId AND date < :startEpochDay
+        """,
+    )
+    suspend fun odometerBefore(vehicleId: Long, startEpochDay: Long): Long?
+
+    /** Menor e maior leitura dentro do período. */
+    @Query(
+        """
+        SELECT MIN(odometer_km) FROM expenses
+        WHERE vehicle_id = :vehicleId AND date BETWEEN :startEpochDay AND :endEpochDay
+        """,
+    )
+    suspend fun minOdometerIn(vehicleId: Long, startEpochDay: Long, endEpochDay: Long): Long?
+
+    @Query(
+        """
+        SELECT MAX(odometer_km) FROM expenses
+        WHERE vehicle_id = :vehicleId AND date BETWEEN :startEpochDay AND :endEpochDay
+        """,
+    )
+    suspend fun maxOdometerIn(vehicleId: Long, startEpochDay: Long, endEpochDay: Long): Long?
+
     @Query("SELECT COUNT(*) FROM expenses")
     suspend fun count(): Int
 

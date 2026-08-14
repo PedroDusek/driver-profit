@@ -4,9 +4,11 @@ import androidx.room.Database
 import androidx.room.RoomDatabase
 import androidx.room.TypeConverters
 import com.driverprofit.data.local.dao.ExpenseDao
+import com.driverprofit.data.local.dao.PersonalUsageDao
 import com.driverprofit.data.local.dao.VehicleDao
 import com.driverprofit.data.local.dao.WorkSessionDao
 import com.driverprofit.data.local.entity.ExpenseEntity
+import com.driverprofit.data.local.entity.PersonalUsageEntity
 import com.driverprofit.data.local.entity.VehicleEntity
 import com.driverprofit.data.local.entity.WorkSessionEntity
 
@@ -22,7 +24,12 @@ import com.driverprofit.data.local.entity.WorkSessionEntity
  * testá-la e atualizar `docs/DATABASE.md`.
  */
 @Database(
-    entities = [VehicleEntity::class, WorkSessionEntity::class, ExpenseEntity::class],
+    entities = [
+        VehicleEntity::class,
+        WorkSessionEntity::class,
+        ExpenseEntity::class,
+        PersonalUsageEntity::class,
+    ],
     version = DriverProfitDatabase.VERSION,
     exportSchema = true,
 )
@@ -35,15 +42,18 @@ abstract class DriverProfitDatabase : RoomDatabase() {
 
     abstract fun expenseDao(): ExpenseDao
 
+    abstract fun personalUsageDao(): PersonalUsageDao
+
     companion object {
         /**
-         * Versão 5 — adiciona `odometer_km` em `expenses` (odômetro por lançamento).
+         * Versão 6 — adiciona `personal_usage` (quilometragem fora do trabalho).
+         * Versão 5 adicionou `odometer_km` em `expenses` (odômetro por lançamento).
          * Versão 4 adicionou `expenses` (registro de despesas).
          * Versão 3 adicionou `work_sessions` (registro de ganhos).
          * Versão 2 simplificou o veículo para nome + combustível.
          * Versão 1 tinha marca, modelo, ano, odômetro e três eixos de propulsão.
          */
-        const val VERSION = 5
+        const val VERSION = 6
 
         const val NAME = "driver_profit.db"
     }

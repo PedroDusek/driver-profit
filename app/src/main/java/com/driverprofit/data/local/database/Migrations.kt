@@ -161,11 +161,58 @@ object Migrations {
         }
     }
 
+    /**
+     * 5 → 6: quilometragem de uso pessoal.
+     *
+     * Cria `personal_usage`. Aditiva — nenhuma tabela existente é tocada.
+     *
+     * Tabela própria, e não coluna em `work_sessions`: uso pessoal não tem
+     * plataforma, corridas nem faturamento, e não é uma jornada.
+     *
+     * Três índices. `start_date` e `end_date` porque a consulta do dashboard é
+     * de **sobreposição** de intervalos — uma viagem de 28/07 a 03/08 precisa
+     * aparecer nos dois meses. `vehicle_id` porque o Room o exige para a chave
+     * estrangeira.
+     */
+    val MIGRATION_5_6 = object : Migration(5, 6) {
+        override fun migrate(db: SupportSQLiteDatabase) {
+            db.execSQL(
+                """
+                CREATE TABLE IF NOT EXISTS `personal_usage` (
+                    `id` INTEGER PRIMARY KEY AUTOINCREMENT NOT NULL,
+                    `vehicle_id` INTEGER,
+                    `start_date` INTEGER NOT NULL,
+                    `end_date` INTEGER NOT NULL,
+                    `distance_km` INTEGER NOT NULL,
+                    `source` TEXT NOT NULL,
+                    `note` TEXT NOT NULL,
+                    `created_at` INTEGER NOT NULL,
+                    FOREIGN KEY(`vehicle_id`) REFERENCES `vehicles`(`id`)
+                        ON UPDATE NO ACTION ON DELETE SET NULL
+                )
+                """.trimIndent(),
+            )
+            db.execSQL(
+                "CREATE INDEX IF NOT EXISTS `index_personal_usage_start_date` " +
+                    "ON `personal_usage` (`start_date`)",
+            )
+            db.execSQL(
+                "CREATE INDEX IF NOT EXISTS `index_personal_usage_end_date` " +
+                    "ON `personal_usage` (`end_date`)",
+            )
+            db.execSQL(
+                "CREATE INDEX IF NOT EXISTS `index_personal_usage_vehicle_id` " +
+                    "ON `personal_usage` (`vehicle_id`)",
+            )
+        }
+    }
+
     /** Todas as migrações conhecidas, na ordem. */
     val ALL: Array<Migration> = arrayOf(
         MIGRATION_1_2,
         MIGRATION_2_3,
         MIGRATION_3_4,
         MIGRATION_4_5,
+        MIGRATION_5_6,
     )
 }

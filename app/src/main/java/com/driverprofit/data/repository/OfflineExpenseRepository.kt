@@ -3,6 +3,7 @@ package com.driverprofit.data.repository
 import com.driverprofit.data.local.dao.ExpenseDao
 import com.driverprofit.data.local.entity.toDomain
 import com.driverprofit.data.local.entity.toEntity
+import com.driverprofit.domain.model.DateRange
 import com.driverprofit.domain.model.Expense
 import com.driverprofit.domain.repository.ExpenseRepository
 import kotlinx.coroutines.CoroutineDispatcher
@@ -36,6 +37,22 @@ class OfflineExpenseRepository(
         expenseDao.observeOdometers()
             .map { rows -> rows.associate { it.vehicleId to it.odometerKm } }
             .flowOn(ioDispatcher)
+
+    override suspend fun odometerDistanceIn(vehicleId: Long, period: DateRange): Long? =
+        withContext(ioDispatcher) {
+            val start = period.start.toEpochDay()
+            val end = period.end.toEpochDay()
+
+            val last = expenseDao.maxOdometerIn(vehicleId, start, end) ?: return@withContext null
+            // Sem leitura anterior ao período, a menor de dentro é o melhor
+            // ponto de partida disponível — e aí o trecho anterior a ela
+            // simplesmente não entra, o que é honesto.
+            val first = expenseDao.odometerBefore(vehicleId, start)
+                ?: expenseDao.minOdometerIn(vehicleId, start, end)
+                ?: return@withContext null
+
+            (last - first).takeIf { it >= 0L }
+        }
 
     override suspend fun getExpense(id: Long): Expense? =
         withContext(ioDispatcher) { expenseDao.findById(id)?.toDomain() }
