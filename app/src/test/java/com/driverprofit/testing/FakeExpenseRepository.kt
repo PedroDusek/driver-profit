@@ -1,5 +1,6 @@
 package com.driverprofit.testing
 
+import com.driverprofit.domain.model.DateRange
 import com.driverprofit.domain.model.Expense
 import com.driverprofit.domain.repository.ExpenseRepository
 import kotlinx.coroutines.flow.Flow
@@ -41,6 +42,26 @@ class FakeExpenseRepository(
         list.filter { it.vehicleId != null && it.odometerKm != null }
             .groupBy { it.vehicleId!! }
             .mapValues { (_, rows) -> rows.maxOf { it.odometerKm!! } }
+    }
+
+    /**
+     * Parte da última leitura anterior ao período, como o repositório real —
+     * senão o trecho entre ela e a primeira leitura de dentro sumiria.
+     */
+    override suspend fun odometerDistanceIn(vehicleId: Long, period: DateRange): Long? {
+        val doVeiculo = expenses.value.filter { it.vehicleId == vehicleId }
+        val dentro = doVeiculo
+            .filter { it.date in period }
+            .mapNotNull { it.odometerKm }
+        val ultima = dentro.maxOrNull() ?: return null
+
+        val antes = doVeiculo
+            .filter { it.date < period.start }
+            .mapNotNull { it.odometerKm }
+            .maxOrNull()
+
+        val primeira = antes ?: dentro.minOrNull() ?: return null
+        return (ultima - primeira).takeIf { it >= 0L }
     }
 
     override suspend fun getExpense(id: Long): Expense? =
