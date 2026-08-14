@@ -299,29 +299,25 @@ private fun statusLabelColor(alert: MaintenanceAlert): Color = when {
     else -> MaterialTheme.colorScheme.onSurfaceVariant
 }
 
-/** A frase que explica o estado, incluindo a que admite não saber. */
+/**
+ * A frase principal do item, ou a que admite não saber.
+ *
+ * Exibe a **quilometragem de vencimento**, não uma contagem regressiva. O alvo
+ * é a soma de dois fatos — a leitura da última troca e o intervalo escolhido —
+ * e por isso é exato mesmo com o painel atrasado. Contagem regressiva
+ * carregaria para dentro do número toda a incerteza sobre onde o carro está
+ * agora, e um motorista que lê "faltam 600" quando faltam 550 para de confiar
+ * no aplicativo inteiro.
+ */
 @Composable
 private fun detailText(alert: MaintenanceAlert): String {
-    val remaining = alert.remainingKm
-    val traveled = alert.traveledKm
+    val target = alert.nextServiceKm
+        ?: return stringResource(R.string.maintenance_unknown_message)
 
-    if (remaining == null || traveled == null) {
-        return stringResource(R.string.maintenance_unknown_message)
-    }
-
-    val progress = stringResource(
-        R.string.maintenance_since_service,
-        BrazilianFormatter.kilometers(traveled),
-        BrazilianFormatter.kilometers(alert.intervalKm),
+    return stringResource(
+        R.string.maintenance_next_service,
+        BrazilianFormatter.kilometers(target),
     )
-
-    val headline = if (remaining < 0L) {
-        stringResource(R.string.maintenance_overdue_by, BrazilianFormatter.kilometers(-remaining))
-    } else {
-        stringResource(R.string.maintenance_remaining, BrazilianFormatter.kilometers(remaining))
-    }
-
-    return "$headline · $progress"
 }
 
 /**
@@ -421,15 +417,23 @@ fun MaintenanceWarningCard(
             )
             warnings.forEach { vehicleMaintenance ->
                 vehicleMaintenance.needingAttention.forEach { alert ->
-                    Text(
-                        text = stringResource(
-                            R.string.maintenance_dashboard_line,
-                            stringResource(MaintenanceLabels.item(alert.item)),
-                            stringResource(MaintenanceLabels.status(alert.status)),
-                        ),
-                        style = MaterialTheme.typography.bodyMedium,
-                        color = MaterialTheme.colorScheme.onErrorContainer,
-                    )
+                    // Item que pede atenção sempre tem alvo — só se chega a
+                    // "em atraso" havendo marco. Ainda assim o `let` decide
+                    // pela omissão em vez de imprimir um zero, porque um aviso
+                    // dizendo "próxima aos 0 km" queimaria a confiança que o
+                    // alvo existe para construir.
+                    alert.nextServiceKm?.let { target ->
+                        Text(
+                            text = stringResource(
+                                R.string.maintenance_dashboard_line,
+                                stringResource(MaintenanceLabels.item(alert.item)),
+                                stringResource(MaintenanceLabels.status(alert.status)),
+                                BrazilianFormatter.kilometers(target),
+                            ),
+                            style = MaterialTheme.typography.bodyMedium,
+                            color = MaterialTheme.colorScheme.onErrorContainer,
+                        )
+                    }
                 }
             }
         }
