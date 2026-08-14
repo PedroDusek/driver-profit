@@ -5,9 +5,11 @@ import androidx.room.Room
 import com.driverprofit.data.local.database.DriverProfitDatabase
 import com.driverprofit.data.local.database.Migrations
 import com.driverprofit.data.repository.OfflineExpenseRepository
+import com.driverprofit.data.repository.OfflinePersonalUsageRepository
 import com.driverprofit.data.repository.OfflineVehicleRepository
 import com.driverprofit.data.repository.OfflineWorkSessionRepository
 import com.driverprofit.domain.repository.ExpenseRepository
+import com.driverprofit.domain.repository.PersonalUsageRepository
 import com.driverprofit.domain.repository.VehicleRepository
 import com.driverprofit.domain.repository.WorkSessionRepository
 import com.driverprofit.domain.usecase.DeleteExpenseUseCase
@@ -20,6 +22,14 @@ import com.driverprofit.domain.usecase.GetWorkSessionUseCase
 import com.driverprofit.domain.usecase.ObserveDashboardUseCase
 import com.driverprofit.domain.usecase.ObserveExpensesBetweenUseCase
 import com.driverprofit.domain.usecase.ObserveExpensesUseCase
+import com.driverprofit.domain.usecase.DeletePersonalUsageUseCase
+import com.driverprofit.domain.usecase.GetPersonalUsageUseCase
+import com.driverprofit.domain.usecase.ObservePersonalUsageInPeriodUseCase
+import com.driverprofit.domain.usecase.ObservePersonalUsageUseCase
+import com.driverprofit.domain.usecase.PersonalUsageValidator
+import com.driverprofit.domain.usecase.ReconcileOdometerUseCase
+import com.driverprofit.domain.usecase.SavePersonalUsageUseCase
+import com.driverprofit.domain.usecase.SaveReconciledPersonalUsageUseCase
 import com.driverprofit.domain.usecase.ObserveVehicleOdometerUseCase
 import com.driverprofit.domain.usecase.ObserveVehicleOdometersUseCase
 import com.driverprofit.domain.usecase.ObserveVehiclesUseCase
@@ -63,6 +73,13 @@ interface AppContainer {
 
     val observeVehicleOdometer: ObserveVehicleOdometerUseCase
     val observeVehicleOdometers: ObserveVehicleOdometersUseCase
+
+    val savePersonalUsage: SavePersonalUsageUseCase
+    val observePersonalUsage: ObservePersonalUsageUseCase
+    val getPersonalUsage: GetPersonalUsageUseCase
+    val deletePersonalUsage: DeletePersonalUsageUseCase
+    val reconcileOdometer: ReconcileOdometerUseCase
+    val saveReconciledPersonalUsage: SaveReconciledPersonalUsageUseCase
 }
 
 class DefaultAppContainer(private val context: Context) : AppContainer {
@@ -152,10 +169,46 @@ class DefaultAppContainer(private val context: Context) : AppContainer {
         ObserveVehicleOdometersUseCase(expenseRepository)
     }
 
+    private val personalUsageRepository: PersonalUsageRepository by lazy {
+        OfflinePersonalUsageRepository(database.personalUsageDao())
+    }
+
+    private val personalUsageValidator = PersonalUsageValidator()
+
+    override val savePersonalUsage: SavePersonalUsageUseCase by lazy {
+        SavePersonalUsageUseCase(personalUsageRepository, personalUsageValidator)
+    }
+
+    override val observePersonalUsage: ObservePersonalUsageUseCase by lazy {
+        ObservePersonalUsageUseCase(personalUsageRepository)
+    }
+
+    override val getPersonalUsage: GetPersonalUsageUseCase by lazy {
+        GetPersonalUsageUseCase(personalUsageRepository)
+    }
+
+    override val deletePersonalUsage: DeletePersonalUsageUseCase by lazy {
+        DeletePersonalUsageUseCase(personalUsageRepository)
+    }
+
+    override val reconcileOdometer: ReconcileOdometerUseCase by lazy {
+        ReconcileOdometerUseCase(
+            expenseRepository = expenseRepository,
+            workSessionRepository = workSessionRepository,
+            personalUsageRepository = personalUsageRepository,
+        )
+    }
+
+    override val saveReconciledPersonalUsage: SaveReconciledPersonalUsageUseCase by lazy {
+        SaveReconciledPersonalUsageUseCase(personalUsageRepository)
+    }
+
     override val observeDashboard: ObserveDashboardUseCase by lazy {
         ObserveDashboardUseCase(
             observeWorkSessionsBetween = ObserveWorkSessionsBetweenUseCase(workSessionRepository),
             observeExpensesBetween = ObserveExpensesBetweenUseCase(expenseRepository),
+            observePersonalUsageInPeriod =
+                ObservePersonalUsageInPeriodUseCase(personalUsageRepository),
         )
     }
 }

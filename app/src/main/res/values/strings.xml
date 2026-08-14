@@ -48,7 +48,41 @@
     <string name="dashboard_revenue_per_ride">Ganho por corrida</string>
 
     <string name="dashboard_section_cost">Custo e lucro</string>
-    <string name="dashboard_cost_per_km">Custo por km</string>
+    <string name="dashboard_cost_per_km">Custo real por km</string>
+    <string name="dashboard_split_work">Trabalho</string>
+    <string name="dashboard_split_personal">Pessoal</string>
+    <string name="dashboard_split_line">%1$s · %2$s</string>
+    <string name="dashboard_personal_note">O custo por km considera toda a distância rodada, inclusive a pessoal. Só a parte do trabalho entra no lucro.</string>
+
+    <!-- Uso pessoal -->
+    <string name="personal_usage_title">Uso pessoal</string>
+    <string name="personal_usage_add">Nova viagem pessoal</string>
+    <string name="personal_usage_empty_title">Nenhum uso pessoal registrado</string>
+    <string name="personal_usage_empty_message">Registre os quilômetros que você rodou fora do trabalho para o custo por km parar de cobrá-los da operação.</string>
+    <string name="personal_usage_form_add_title">Nova viagem pessoal</string>
+    <string name="personal_usage_form_edit_title">Editar viagem pessoal</string>
+    <string name="personal_usage_vehicle">Veículo</string>
+    <string name="personal_usage_start">Início</string>
+    <string name="personal_usage_end">Fim</string>
+    <string name="personal_usage_end_hint">Deixe em branco para uma viagem de um dia</string>
+    <string name="personal_usage_distance">Km rodados</string>
+    <string name="personal_usage_note">Observação</string>
+    <string name="personal_usage_delete_title">Excluir viagem pessoal?</string>
+    <string name="personal_usage_delete_message">Os %1$s serão removidos e voltarão a contar como quilometragem de trabalho.</string>
+    <string name="personal_usage_source_reconciled">Estimado pela conciliação do odômetro</string>
+    <string name="personal_usage_period">%1$s a %2$s</string>
+
+    <!-- Conciliação por odômetro -->
+    <string name="reconcile_title">Conferir odômetro</string>
+    <string name="reconcile_odometer">Distância pelo painel</string>
+    <string name="reconcile_work">Jornadas lançadas</string>
+    <string name="reconcile_declared">Uso pessoal já declarado</string>
+    <string name="reconcile_unexplained">Sem explicação</string>
+    <string name="reconcile_question">Esses quilômetros foram uso pessoal, ou jornada que você não lançou?</string>
+    <string name="reconcile_as_personal">Foi uso pessoal</string>
+    <string name="reconcile_as_work_message">Lance a jornada em Ganhos, com plataforma, corridas e valor. Registrar só a distância inflaria o seu R$/km.</string>
+    <string name="reconcile_all_explained">Tudo explicado: o painel bate com o que você lançou.</string>
+    <string name="reconcile_no_readings">Sem leituras de odômetro suficientes neste período para conferir.</string>
     <string name="dashboard_profit_per_km">Lucro por km</string>
     <string name="dashboard_profit_per_hour">Lucro por hora</string>
     <string name="dashboard_fixed_note">Seguro, IPVA e financiamento entram no lucro, mas ficam fora do custo por km: eles não variam com o quanto você roda.</string>
@@ -216,6 +250,8 @@
     <string name="error_vehicle_cannot_charge">Esse veículo não é recarregável</string>
     <string name="error_text_too_long">Texto muito longo</string>
     <string name="error_odometer_out_of_range">Quilometragem inválida</string>
+    <string name="error_end_before_start">O fim não pode ser antes do início</string>
+    <string name="error_distance_out_of_range">Distância inválida</string>
 
     <!-- Veículos: quilometragem -->
     <string name="vehicle_odometer">%1$s rodados</string>
