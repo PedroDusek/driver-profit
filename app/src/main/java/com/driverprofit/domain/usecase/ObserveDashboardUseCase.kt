@@ -16,12 +16,21 @@ import kotlinx.coroutines.flow.combine
 class ObserveDashboardUseCase(
     private val observeWorkSessionsBetween: ObserveWorkSessionsBetweenUseCase,
     private val observeExpensesBetween: ObserveExpensesBetweenUseCase,
+    private val observePersonalUsageInPeriod: ObservePersonalUsageInPeriodUseCase,
 ) {
 
     operator fun invoke(range: DateRange): Flow<DashboardMetrics> = combine(
         observeWorkSessionsBetween(range.start, range.end),
         observeExpensesBetween(range.start, range.end),
-    ) { sessions, expenses ->
-        DashboardMetrics.of(sessions, expenses)
+        observePersonalUsageInPeriod(range),
+    ) { sessions, expenses, personalUsage ->
+        DashboardMetrics.of(
+            sessions = sessions,
+            expenses = expenses,
+            // O recorte proporcional acontece aqui, e não no SQL: uma viagem
+            // que atravessa a virada do mês entra nos dois períodos, cada um
+            // com a fatia de dias que lhe cabe (PRD §22).
+            personalKilometers = personalUsage.sumOf { it.kilometersWithin(range) },
+        )
     }
 }

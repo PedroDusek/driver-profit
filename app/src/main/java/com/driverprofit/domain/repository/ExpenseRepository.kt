@@ -1,5 +1,6 @@
 package com.driverprofit.domain.repository
 
+import com.driverprofit.domain.model.DateRange
 import com.driverprofit.domain.model.Expense
 import kotlinx.coroutines.flow.Flow
 import java.time.LocalDate
@@ -32,6 +33,17 @@ interface ExpenseRepository {
 
     /** Última leitura de cada veículo, indexada por id. */
     fun observeOdometers(): Flow<Map<Long, Long>>
+
+    /**
+     * Quilômetros que o painel diz que o carro andou durante [period].
+     *
+     * Parte da última leitura **anterior** ao período, para não perder o
+     * trecho entre ela e a primeira leitura de dentro. Sem leitura anterior,
+     * usa a menor de dentro como linha de partida.
+     *
+     * `null` quando não há leituras suficientes para afirmar qualquer coisa.
+     */
+    suspend fun odometerDistanceIn(vehicleId: Long, period: DateRange): Long?
 
     suspend fun getExpense(id: Long): Expense?
 
