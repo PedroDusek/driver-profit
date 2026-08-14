@@ -5,6 +5,50 @@ Versionamento conforme [Semantic Versioning](https://semver.org/lang/pt-BR/).
 
 ## [Não publicado]
 
+## [0.9.0] — Manutenção preventiva
+
+Alertas por quilometragem para óleo, filtros, freios, pneus e revisão. É a
+primeira funcionalidade do app que **não** degrada com elegância quando falta
+dado — e isso é deliberado.
+
+### Adicionado
+
+- `MaintenanceItem` — cinco itens acompanhados, cada um com intervalo padrão
+  editável e ligação com a categoria de manutenção que estabelece o marco
+- `MaintenanceMonitor` — decide o estado de cada item: em dia, se aproximando,
+  vencido ou **sem dados**
+- **Piso de distância por combustível comprado** (PRD §23): litros multiplicados
+  pelo consumo histórico da v0.8.0 provam quilometragem independente do painel
+- Tela de manutenção, com um cartão por veículo, intervalo editável por item e
+  o marco de onde a contagem parte
+- Aviso no dashboard, só quando existe item vencido ou próximo
+- `maintenance_schedules` — **banco na versão 7**, migração aditiva
+
+### Decisões registradas
+
+- **A assimetria que rege a versão.** Subestimar quilometragem deixa o custo/km
+  pessimista, o que é apenas chato; mas **atrasa** o alerta de troca de óleo, o
+  que desgasta motor. As duas tolerâncias a erro são diferentes, e o tratamento
+  também: aqui, na dúvida, o alerta pede a leitura em vez de estimar.
+- **Sem marco, sem afirmação.** Item que nunca teve manutenção lançada com
+  odômetro fica em `UNKNOWN` e diz isso na tela. Nunca "em dia" — essa seria a
+  mentira cara das duas.
+- **Ausência de registro significa intervalo padrão.** Só vira linha no banco o
+  que o motorista alterou. Veículo novo já nasce acompanhado, a tabela fica com
+  meia dúzia de linhas, e continua sendo possível distinguir escolha de omissão.
+- **Voltar ao padrão apaga a preferência**, em vez de gravar o valor padrão:
+  assim o veículo acompanha uma eventual revisão do número.
+- **Consumo pela mediana**, não pela média nem pelo máximo. Um par tanque-a-tanque
+  estragado desloca a média e domina o máximo; a mediana o ignora.
+- **O piso recorta abastecimentos por data, não por odômetro.** Ele existe
+  justamente para o caso em que a leitura está atrasada — filtrar por ela
+  devolveria o defeito para dentro da correção.
+- **Item desligado continua na lista.** Sumir da tela ao ser desligado o tornaria
+  impossível de religar.
+- **`ON DELETE CASCADE`**, diferente de `expenses` e `personal_usage`: aquelas
+  guardam histórico financeiro e sobrevivem à troca de carro; esta guarda uma
+  preferência sobre um carro que deixou de existir.
+
 ## [0.8.0] — Consumo estimado
 
 O número que o PRD §23 pede desde o começo e que só ficou possível quando o

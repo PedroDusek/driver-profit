@@ -2,7 +2,7 @@
 
 Room sobre SQLite, local ao aparelho. Nome do arquivo: `driver_profit.db`.
 
-**Versão atual do schema: 6**
+**Versão atual do schema: 7**
 
 O JSON do schema é exportado em `app/schemas/` e **é versionado no Git**. Ele é
 o que torna possível escrever testes de migração de verdade. Os schemas
@@ -146,6 +146,51 @@ não do SQL.
 mesma confiança de uma viagem que o motorista lançou, e a tela precisa dizer
 qual é qual antes de ele decidir corrigir.
 
+### `maintenance_schedules` (v7)
+
+Intervalo de manutenção que o motorista definiu, sobrepondo o padrão do app.
+
+| Coluna | Tipo SQL | Nulo | Descrição |
+| --- | --- | --- | --- |
+| `id` | INTEGER PK AUTOINCREMENT | não | Identificador |
+| `vehicle_id` | INTEGER | não | FK para `vehicles`, `ON DELETE CASCADE` |
+| `item` | TEXT | não | `OIL` \| `FILTERS` \| `BRAKES` \| `TIRES` \| `INSPECTION` |
+| `interval_km` | INTEGER | não | A cada quantos quilômetros |
+| `monitored` | INTEGER | não | 0 quando o motorista desligou o acompanhamento |
+| `created_at` | INTEGER | não | Epoch millis (UTC) |
+
+**Índice:** `(vehicle_id, item)`, **único**.
+
+**A tabela guarda só o que ele mudou.** Linha ausente significa "intervalo
+padrão do app", que vive no enum `MaintenanceItem`. Três consequências, todas
+desejadas: um veículo recém-cadastrado já nasce acompanhado sem ritual de
+configuração; a tabela tem meia dúzia de linhas em vez de cinco por veículo; e
+continua sendo possível distinguir "ele escolheu 10.000" de "ele nunca mexeu" —
+o que permite revisar um padrão numa versão futura sem sobrescrever escolha de
+ninguém.
+
+**Por isso não existe "gravar o padrão".** Devolver um item ao padrão é apagar a
+linha, e é assim que `resetToDefault` funciona.
+
+**`vehicle_id` é NOT NULL e a exclusão é `CASCADE`**, ao contrário de `expenses`
+e `personal_usage`, que são anuláveis com `SET NULL`. Aquelas guardam histórico
+financeiro, que precisa sobreviver à troca de carro; esta guarda uma preferência
+sobre um carro específico, e sem o carro ela não significa nada.
+
+**`monitored` é coluna e não ausência de linha:** desligar um item precisa
+preservar o intervalo escolhido, para que religá-lo devolva o número dele e não
+o padrão. E o item continua aparecendo na tela — um item que some ao ser
+desligado não tem como ser religado.
+
+**Um índice só.** Ele é único, o que impede dois intervalos para o mesmo item, e
+como começa por `vehicle_id` também atende a exigência do Room para a chave
+estrangeira.
+
+**O marco não vive aqui.** De onde a contagem parte é o último lançamento de
+manutenção daquela categoria com odômetro, em `expenses` — dado que já existe
+desde a v0.4.0, com a leitura desde a v0.6.0. Duplicá-lo numa coluna criaria
+duas verdades que divergiriam na primeira correção de lançamento.
+
 ## Convenções
 
 ### Nomes
@@ -216,6 +261,7 @@ Um PR que altera apenas a Entity está incompleto.
 | 4 | v0.4.0 | Adiciona `expenses`, com FK para `vehicles` e índices sobre `date` e `vehicle_id` |
 | 5 | v0.6.0 | Adiciona `odometer_km` em `expenses` (odômetro por lançamento) |
 | 6 | v0.7.0 | Adiciona `personal_usage` (quilometragem fora do trabalho) |
+| 7 | v0.9.0 | Adiciona `maintenance_schedules` (intervalos de manutenção) |
 
 #### Migração 1 → 2
 
@@ -277,6 +323,21 @@ dela, e o custo/km de agosto voltaria a ficar inflado — que é o defeito que
 esta versão existe para corrigir.
 
 `vehicle_id` é indexado porque o Room o exige para a chave estrangeira.
+
+#### Migração 6 → 7
+
+Aditiva: cria `maintenance_schedules` com a chave estrangeira para `vehicles` e
+um índice único. Nenhuma tabela existente é tocada.
+
+**A tabela nasce vazia, e isso é o comportamento correto.** Como linha ausente
+significa "intervalo padrão", todo veículo já cadastrado passa a ser acompanhado
+sem que a migração precise inserir cinco linhas por carro — o que seria gravar
+no banco uma decisão que o motorista não tomou.
+
+Os alertas também não precisam de dado novo: o marco de cada item vem do
+histórico de manutenção que já está em `expenses`, com odômetro desde a v0.6.0.
+Consequência assumida: um item só passa a alertar depois do primeiro serviço
+lançado **com leitura**. Antes disso ele se declara sem dados, que é a verdade.
 
 ## Desvios registrados em relação ao PRD
 

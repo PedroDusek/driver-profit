@@ -4,52 +4,55 @@ Documento de continuidade. Leia isto **antes** de qualquer coisa ao retomar o
 projeto em uma sessão nova, junto com `PRD.md`, `ARCHITECTURE.md` e
 `DEVELOPMENT.md`.
 
-**Última atualização:** v0.8.0
+**Última atualização:** v0.9.0
 
 ---
 
 ## 0. Comece por aqui
 
-O estado não é "tudo na `main`". Duas versões estão prontas, empurradas e
-**fora da `main` de propósito**:
+O estado não é "tudo na `main`". Três versões estão prontas e **fora da `main`
+de propósito**, empilhadas uma sobre a outra:
 
 | Branch | Versão | Banco | Estado |
 | --- | --- | --- | --- |
 | `main` | v0.6.0 (última tag) | 5 | estável |
 | `feature/personal-usage` | v0.7.0 | **6** | gate verde, **migração 5→6 não testada** |
 | `feature/fuel-consumption` | v0.8.0 | 6 | empilhada sobre a v0.7.0, gate verde |
+| `feature/maintenance-alerts` | v0.9.0 | **7** | empilhada sobre a v0.8.0, gate verde, **migração 6→7 não testada** |
 
-**Por que não foram mergeadas:** a v0.7.0 traz a migração 5→6, e o CI **não
-roda testes de migração** (seção 7). A regra do projeto é exercitar toda
-migração num SQLite real antes do merge — foi assim que se descobriu, na
-v0.5.0, que nenhum teste de migração conseguia sequer começar por causa de um
-conflito de dependência.
+**Por que não foram mergeadas:** a v0.7.0 traz a migração 5→6 e a v0.9.0 traz a
+6→7, e o CI **não roda testes de migração** (seção 7). A regra do projeto é
+exercitar toda migração num SQLite real antes do merge — foi assim que se
+descobriu, na v0.5.0, que nenhum teste de migração conseguia sequer começar por
+causa de um conflito de dependência.
+
+A v0.9.0 empilhou sobre a v0.8.0 porque depende do `ConsumptionEstimator` para
+o piso de distância. Ramificar da `main` significaria reimplementá-lo.
 
 ### O que fazer primeiro
 
-1. Rodar os testes instrumentados em `feature/fuel-consumption` — ela contém
-   as duas versões, e a v0.8.0 não mexe no banco, então **uma rodada valida as
-   duas**
-2. Se passarem: PR da v0.7.0 → merge → tag `v0.7.0`; depois PR da v0.8.0 →
-   merge → tag `v0.8.0`
-3. Só então seguir para a v0.9.0
+1. Rodar os testes instrumentados em `feature/maintenance-alerts` — ela contém
+   as três versões, então **uma rodada valida tudo**, inclusive as migrações
+   5→6 e 6→7 e a cadeia completa 1→7
+2. Se passarem: PR da v0.7.0 → merge → tag `v0.7.0`; depois v0.8.0; depois
+   v0.9.0. Uma tag por versão, na ordem
+3. Só então seguir para a v0.10.0
 
 ### O impedimento
 
-Não há aparelho nem emulador disponível agora.
+Não há aparelho conectado agora. **O caminho decidido é o celular** — direto, e
+sem o custo de montar ambiente de emulação nesta máquina.
 
 - **Celular** (Redmi Note 8 Pro, Android 9): funciona, mas desconecta com
   frequência e a MIUI bloqueia a instalação. Contornos na seção 7
-- **Emulador:** `emulator.exe` existe, mas **não há imagem de sistema, nem AVD,
-  nem `cmdline-tools`**. A instalação foi interrompida antes de baixar
-  qualquer coisa. Máquina apertada: **7,7 GB de RAM e ~18 GB livres em C:** —
-  se for por esse caminho, usar imagem AOSP da API 28 (sem Google Play), perfil
-  de tela pequena e 1536 MB no AVD
-- **Robolectric — não investigado, e é a melhor pista.** Se o
+- **Emulador: descartado por decisão do Pedro.** Não perder tempo com isso —
+  faltavam imagem de sistema, AVD e `cmdline-tools`, e a máquina é apertada
+  (7,7 GB de RAM, ~18 GB livres em C:)
+- **Robolectric — não investigado, e continua sendo a melhor pista.** Se o
   `MigrationTestHelper` do Room 2.8.4 rodar sob ele, as migrações passam a
   rodar em `testDebugUnitTest`, ou seja **no CI, em todo PR, para sempre**.
-  Isso resolveria de vez o gargalo que trava toda versão com schema novo. Vale
-  verificar antes de investir em emulador
+  Isso resolveria de vez o gargalo que trava toda versão com schema novo — e
+  ele já travou duas
 
 ---
 
@@ -60,8 +63,8 @@ Não há aparelho nem emulador disponível agora.
 | Código | `C:\Users\pedro\Desktop\driver-profit` |
 | Repositório | https://github.com/PedroDusek/driver-profit (público) |
 | Branch estável | `main`, protegida |
-| Última tag | `v0.6.0`. v0.7.0 e v0.8.0 prontas, **sem teste em aparelho** |
-| Versão do banco | **6** |
+| Última tag | `v0.6.0`. v0.7.0, v0.8.0 e v0.9.0 prontas, **sem teste em aparelho** |
+| Versão do banco | **7** |
 
 ⚠️ **O caminho não pode conter acento.** O projeto nasceu em
 `Desktop\RodAí` e o AGP recusa build com caractere não-ASCII no caminho. Se
@@ -95,6 +98,8 @@ dashboard:
   veículo em jogo
 - **Uso pessoal** — quilômetros rodados fora do trabalho, por declaração ou
   por conciliação do odômetro
+- **Manutenção** — óleo, filtros, freios, pneus e revisão, com intervalo
+  editável por item. Diz "sem dados" quando não tem marco de onde contar
 - **Dashboard** — tela principal. Indicadores do período escolhido: lucro em
   destaque, faturamento e despesas, volume (km, horas, corridas), R$/km,
   R$/hora, R$/corrida, custo/km, lucro/km, lucro/hora e despesas por natureza
@@ -145,6 +150,11 @@ estimado em si chega na v0.8.0.
   lida do `Locale`
 - **`Clock` é injetado** onde a regra depende da data corrente
   (`DashboardViewModel`, `VehicleValidator`)
+- **Subestimar km e superestimar km não custam a mesma coisa.** No custo/km o
+  erro é só pessimismo; no alerta de manutenção ele atrasa a troca de óleo e
+  desgasta motor. Por isso o `MaintenanceMonitor` usa o **maior** entre a
+  diferença de odômetro e o piso por combustível comprado, e nunca afirma "em
+  dia" sobre item sem marco
 - **O lint não roda a checagem `Typos`**: ela usa dicionário inglês e acusava
   palavras portuguesas, quebrando o build com `warningsAsErrors`
 
@@ -158,8 +168,9 @@ estimado em si chega na v0.8.0.
 | v0.4.0 / v0.4.1 Expenses | ✅ |
 | v0.5.0 Dashboard | ✅ |
 | v0.6.0 Odômetro · v0.7.0 Uso pessoal · v0.8.0 Consumo | ✅ |
-| **v0.9.0 Manutenção preventiva** | ⬅️ **próxima** |
-| v0.10.0 Custos fixos · v0.11.0 Analytics | |
+| v0.9.0 Manutenção preventiva | ✅ |
+| **v0.10.0 Custos fixos por competência** | ⬅️ **próxima** |
+| v0.11.0 Analytics | |
 | v0.12.0 UX polish · v0.13.0 Hardening · v0.14.0 RC · v1.0.0 MVP | |
 
 O bloco v0.6.0–v0.10.0 foi desenhado em conjunto: cada versão é pequena,
@@ -168,33 +179,29 @@ detalhamento com critério de saída e impacto no banco está em
 [`ROADMAP.md`](ROADMAP.md); as regras de produto que sustentam tudo isso estão
 no PRD §22 e §23.
 
-### ⚠️ Duas versões esperando aparelho
+### ⚠️ Três versões esperando aparelho
 
-`feature/personal-usage` (v0.7.0) e `feature/fuel-consumption` (v0.8.0) estão
-empurradas e **não mergeadas**. A v0.8.0 foi empilhada sobre a v0.7.0.
+`feature/personal-usage` (v0.7.0), `feature/fuel-consumption` (v0.8.0) e
+`feature/maintenance-alerts` (v0.9.0) estão **não mergeadas**, cada uma
+empilhada sobre a anterior.
 
-Elas ficaram fora da `main` de propósito: a v0.7.0 traz a **migração 5→6**, e o
-CI não roda teste de migração. Quando houver aparelho, rodar os instrumentados
-uma vez cobre as duas — a v0.8.0 não mexe no banco.
+Elas ficaram fora da `main` de propósito: a v0.7.0 traz a **migração 5→6** e a
+v0.9.0 traz a **6→7**, e o CI não roda teste de migração. Quando houver
+aparelho, rodar os instrumentados na v0.9.0 uma vez cobre as três.
 
-### O que a v0.9.0 precisa fazer
+### O que a v0.10.0 precisa fazer
 
-**Manutenção preventiva** — alertas por quilometragem: óleo, filtros, pneus,
-freios, revisão.
+**Custos fixos por competência** — separar "quando paguei" de "a que período o
+valor se refere" (PRD §22).
 
-- Intervalo configurável por item
-- **Distância mínima implícita por combustível comprado**, como piso
-  independente do odômetro: litros × consumo histórico dá um chão que uma
-  leitura desatualizada não esconde
-- O alerta silencia, ou se declara incompleto, quando o dado não sustenta a
-  afirmação
+- Início e fim de competência na despesa, anuláveis
+- Valor diluído pelos dias do período
+- Financiamento, seguro e IPVA atribuídos **100% ao trabalho**
+- Custo fixo por km trabalhado
+- Migração **7→8** (a 6→7 foi consumida pela v0.9.0)
 
-Assimetria que rege esta versão: subestimar km deixa o custo/km pessimista,
-mas **atrasa** o alerta de troca de óleo — e isso desgasta motor. O alerta não
-herda a degradação graciosa das outras funcionalidades; na dúvida ele pede a
-leitura em vez de estimar.
-
-O consumo histórico que o piso exige já existe: `ConsumptionEstimator`, v0.8.0.
+Histórico e "Despesas" continuam exibindo **caixa**, para conferir com o
+extrato. Só os indicadores por km usam competência.
 
 ### O que já está pronto e não deve ser refeito
 
@@ -204,18 +211,24 @@ O consumo histórico que o piso exige já existe: `ConsumptionEstimator`, v0.8.0
 - **Financiamento, seguro e IPVA são 100% do trabalho** e ficam fora do rateio
 - **Uso pessoal tem dois caminhos de entrada que se abatem**: declaração
   explícita e sobra da conciliação. Nunca somar os dois sem descontar
+- **O alerta de manutenção não estima na dúvida** — é a única funcionalidade
+  que se recusa a trabalhar com o que tem. Item sem marco diz "sem dados", e
+  o piso por combustível comprado vence odômetro atrasado. Ver seção 5
+- **Intervalo de manutenção só vira linha no banco quando o motorista o
+  altera.** Ausência significa padrão do app; voltar ao padrão é apagar a linha
 - **Consumo é tanque-a-tanque, e par com combustível diferente é descartado.**
   Alternar gasolina e etanol muda o consumo em ~30%; a média dos dois não
   descreve nenhum. E ele é **sempre** rotulado estimado (PRD §23)
 
 ## 7. Testes instrumentados
 
-São a única verificação real das migrações. Cobrem os quatro DAOs e as seis
-migrações encadeadas (1→2→3→4→5→6).
+São a única verificação real das migrações. Cobrem os cinco DAOs e as sete
+migrações encadeadas (1→2→3→4→5→6→7).
 
-⚠️ **Os testes da migração 5→6 (v0.7.0) ainda não foram executados** — o
-aparelho desconectou antes. Na v0.6.0 foram 42 testes, todos passando. Rodar
-antes de mergear a v0.7.0.
+⚠️ **Os testes das migrações 5→6 (v0.7.0) e 6→7 (v0.9.0) ainda não foram
+executados** — o aparelho desconectou antes da primeira, e a segunda nasceu
+depois. Na v0.6.0 foram 42 testes, todos passando. Rodar antes de mergear
+qualquer uma das três versões pendentes.
 
 ```bash
 cd C:/Users/pedro/Desktop/driver-profit && ./gradlew connectedDebugAndroidTest
