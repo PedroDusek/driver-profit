@@ -5,10 +5,12 @@ import androidx.room.Room
 import com.driverprofit.data.local.database.DriverProfitDatabase
 import com.driverprofit.data.local.database.Migrations
 import com.driverprofit.data.repository.OfflineExpenseRepository
+import com.driverprofit.data.repository.OfflineMaintenanceScheduleRepository
 import com.driverprofit.data.repository.OfflinePersonalUsageRepository
 import com.driverprofit.data.repository.OfflineVehicleRepository
 import com.driverprofit.data.repository.OfflineWorkSessionRepository
 import com.driverprofit.domain.repository.ExpenseRepository
+import com.driverprofit.domain.repository.MaintenanceScheduleRepository
 import com.driverprofit.domain.repository.PersonalUsageRepository
 import com.driverprofit.domain.repository.VehicleRepository
 import com.driverprofit.domain.repository.WorkSessionRepository
@@ -20,6 +22,9 @@ import com.driverprofit.domain.usecase.GetExpenseUseCase
 import com.driverprofit.domain.usecase.GetVehicleUseCase
 import com.driverprofit.domain.usecase.GetWorkSessionUseCase
 import com.driverprofit.domain.usecase.ObserveDashboardUseCase
+import com.driverprofit.domain.usecase.ObserveMaintenanceUseCase
+import com.driverprofit.domain.usecase.ResetMaintenanceIntervalUseCase
+import com.driverprofit.domain.usecase.SaveMaintenanceIntervalUseCase
 import com.driverprofit.domain.usecase.ObserveExpensesBetweenUseCase
 import com.driverprofit.domain.usecase.ObserveExpensesUseCase
 import com.driverprofit.domain.usecase.DeletePersonalUsageUseCase
@@ -80,6 +85,10 @@ interface AppContainer {
     val deletePersonalUsage: DeletePersonalUsageUseCase
     val reconcileOdometer: ReconcileOdometerUseCase
     val saveReconciledPersonalUsage: SaveReconciledPersonalUsageUseCase
+
+    val observeMaintenance: ObserveMaintenanceUseCase
+    val saveMaintenanceInterval: SaveMaintenanceIntervalUseCase
+    val resetMaintenanceInterval: ResetMaintenanceIntervalUseCase
 }
 
 class DefaultAppContainer(private val context: Context) : AppContainer {
@@ -201,6 +210,26 @@ class DefaultAppContainer(private val context: Context) : AppContainer {
 
     override val saveReconciledPersonalUsage: SaveReconciledPersonalUsageUseCase by lazy {
         SaveReconciledPersonalUsageUseCase(personalUsageRepository)
+    }
+
+    private val maintenanceScheduleRepository: MaintenanceScheduleRepository by lazy {
+        OfflineMaintenanceScheduleRepository(database.maintenanceScheduleDao())
+    }
+
+    override val observeMaintenance: ObserveMaintenanceUseCase by lazy {
+        ObserveMaintenanceUseCase(
+            vehicleRepository = vehicleRepository,
+            expenseRepository = expenseRepository,
+            scheduleRepository = maintenanceScheduleRepository,
+        )
+    }
+
+    override val saveMaintenanceInterval: SaveMaintenanceIntervalUseCase by lazy {
+        SaveMaintenanceIntervalUseCase(maintenanceScheduleRepository)
+    }
+
+    override val resetMaintenanceInterval: ResetMaintenanceIntervalUseCase by lazy {
+        ResetMaintenanceIntervalUseCase(maintenanceScheduleRepository)
     }
 
     override val observeDashboard: ObserveDashboardUseCase by lazy {
