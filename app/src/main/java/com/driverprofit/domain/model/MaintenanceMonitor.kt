@@ -30,6 +30,26 @@ object MaintenanceMonitor {
     /** Fração final do intervalo em que o item passa a avisar. */
     private const val DUE_SOON_FRACTION = 10L
 
+    /**
+     * Piso da banda de aviso, em quilômetros.
+     *
+     * Existe porque a banda precisa ser maior que a defasagem que o painel
+     * consegue acumular. Como o odômetro é obrigatório em todo abastecimento, a
+     * defasagem máxima é um tanque — algo entre 300 e 500 km. Com 10% de um
+     * intervalo de 5.000 km, a banda seria 500 km e a margem real cairia para
+     * cem e poucos; num intervalo mais curto, o lembrete chegaria **depois** do
+     * vencimento, que é exatamente o que esta versão existe para evitar.
+     */
+    private const val MIN_DUE_SOON_KM = 1_000L
+
+    /**
+     * Teto da banda, como fração do intervalo.
+     *
+     * Sem ele, um intervalo curto ficaria permanentemente em aviso, e um alerta
+     * que está sempre ligado não é alerta.
+     */
+    private const val MAX_DUE_SOON_FRACTION = 2L
+
     private const val THOUSAND = 1_000L
 
     /**
@@ -110,10 +130,16 @@ object MaintenanceMonitor {
         val remaining = intervalKm - traveledKm
         return when {
             remaining <= 0L -> MaintenanceStatus.OVERDUE
-            remaining <= intervalKm / DUE_SOON_FRACTION -> MaintenanceStatus.DUE_SOON
+            remaining <= dueSoonBand(intervalKm) -> MaintenanceStatus.DUE_SOON
             else -> MaintenanceStatus.OK
         }
     }
+
+    /** Com quantos quilômetros de folga o lembrete começa a aparecer. */
+    private fun dueSoonBand(intervalKm: Long): Long = minOf(
+        maxOf(intervalKm / DUE_SOON_FRACTION, MIN_DUE_SOON_KM),
+        intervalKm / MAX_DUE_SOON_FRACTION,
+    )
 
     /**
      * Último serviço lançado na categoria do item.

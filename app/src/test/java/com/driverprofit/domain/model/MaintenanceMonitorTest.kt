@@ -131,6 +131,52 @@ class MaintenanceMonitorTest {
     }
 
     @Test
+    fun `a banda de aviso nunca fica menor que a defasagem possivel do painel`() {
+        // Intervalo curto: 10% seriam 500 km de banda, e o painel consegue
+        // ficar um tanque atrasado. O lembrete chegaria com margem de cem e
+        // poucos quilometros, ou depois do vencimento.
+        val alerta = oil(
+            listOf(
+                service(MaintenanceCategory.OIL, odometerKm = 100_000, date = DIA_1),
+                refuel(odometerKm = 104_100, quantity = null, date = DIA_2),
+            ),
+            listOf(schedule(MaintenanceItem.OIL, intervalKm = 5_000)),
+        )
+
+        // Faltam 900 km: dentro da banda minima de 1.000, fora dos 10%.
+        assertEquals(MaintenanceStatus.DUE_SOON, alerta.status)
+        assertEquals(105_000L, alerta.nextServiceKm)
+    }
+
+    @Test
+    fun `intervalo muito curto nao fica em aviso permanente`() {
+        // Com o piso de 1.000 km aplicado cegamente, um intervalo de 800 estaria
+        // em aviso desde o dia da troca. Alerta que nunca desliga nao e alerta.
+        val alerta = oil(
+            listOf(service(MaintenanceCategory.OIL, odometerKm = 100_000, date = DIA_1)),
+            listOf(schedule(MaintenanceItem.OIL, intervalKm = 800)),
+        )
+
+        assertEquals(MaintenanceStatus.OK, alerta.status)
+    }
+
+    @Test
+    fun `intervalo longo mantem a banda proporcional`() {
+        // Pneus a cada 40.000: a banda e 4.000 km, e nao os 1.000 do piso.
+        val alertas = MaintenanceMonitor.alerts(
+            listOf(
+                service(MaintenanceCategory.TIRES, odometerKm = 100_000, date = DIA_1),
+                refuel(odometerKm = 136_500, quantity = null, date = DIA_2),
+            ),
+            emptyList(),
+        )
+
+        val pneus = alertas.single { it.item == MaintenanceItem.TIRES }
+        // Faltam 3.500 km de 40.000 — dentro dos 10%.
+        assertEquals(MaintenanceStatus.DUE_SOON, pneus.status)
+    }
+
+    @Test
     fun `passou do intervalo fica vencido e o que falta fica negativo`() {
         val alerta = oil(
             listOf(
