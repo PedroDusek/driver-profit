@@ -34,9 +34,12 @@ o piso de distância. Ramificar da `main` significaria reimplementá-lo.
 1. Rodar os testes instrumentados em `feature/maintenance-alerts` — ela contém
    as três versões, então **uma rodada valida tudo**, inclusive as migrações
    5→6 e 6→7 e a cadeia completa 1→7
-2. Se passarem: PR da v0.7.0 → merge → tag `v0.7.0`; depois v0.8.0; depois
+2. **Conferir os números à mão no aparelho.** Nenhuma tela tem teste de
+   interface (seção 7), e o plano do Pedro é lançar dados reais e verificar se
+   os valores batem. É a única verificação que existe do que a tela mostra
+3. Se passarem: PR da v0.7.0 → merge → tag `v0.7.0`; depois v0.8.0; depois
    v0.9.0. Uma tag por versão, na ordem
-3. Só então seguir para a v0.10.0
+4. Só então a v0.9.1, que já está desenhada
 
 ### O impedimento
 
@@ -169,8 +172,8 @@ estimado em si chega na v0.8.0.
 | v0.5.0 Dashboard | ✅ |
 | v0.6.0 Odômetro · v0.7.0 Uso pessoal · v0.8.0 Consumo | ✅ |
 | v0.9.0 Manutenção preventiva | ✅ |
-| **v0.10.0 Custos fixos por competência** | ⬅️ **próxima** |
-| v0.11.0 Analytics | |
+| **v0.9.1 Fechar o ciclo do odômetro** | ⬅️ **próxima**, desenhada, sem código |
+| v0.10.0 Custos fixos · v0.11.0 Analytics | |
 | v0.12.0 UX polish · v0.13.0 Hardening · v0.14.0 RC · v1.0.0 MVP | |
 
 O bloco v0.6.0–v0.10.0 foi desenhado em conjunto: cada versão é pequena,
@@ -188,6 +191,29 @@ empilhada sobre a anterior.
 Elas ficaram fora da `main` de propósito: a v0.7.0 traz a **migração 5→6** e a
 v0.9.0 traz a **6→7**, e o CI não roda teste de migração. Quando houver
 aparelho, rodar os instrumentados na v0.9.0 uma vez cobre as três.
+
+### O que a v0.9.1 precisa fazer
+
+**Fechar o ciclo do odômetro.** Desenho completo na seção v0.9.1 do
+[`ROADMAP.md`](ROADMAP.md); decisões de produto no PRD §22 e §23. Escrito para
+revisão — **nenhuma linha de código foi escrita**.
+
+O problema: a conciliação da v0.7.0 existe mas **não gira sozinha**. É manual,
+mensal e só no primeiro veículo. Quem nunca aperta o botão fica com uso pessoal
+zerado, e o custo/km volta a ser o inflado da v0.5.0.
+
+Cinco itens, **em ordem de dependência**:
+
+1. **Discrepância negativa tratada** — pré-requisito. Hoje é `coerceAtLeast(0L)`,
+   o que quebra o cancelamento entre janelas e grava km pessoal inexistente
+2. **Conciliação por janela entre leituras**, por veículo, disparada pela
+   leitura nova — em vez de mês de calendário
+3. **"Não sei a leitura"** em lançamento retroativo, gravando `NULL`
+4. **Nota de limitação** quando falta dado de uso pessoal (PRD §22 manda, e não
+   está implementado)
+5. **Proporção na repartição** do custo/km
+
+**Sem alteração de banco** — não depende de nova rodada de teste de migração.
 
 ### O que a v0.10.0 precisa fazer
 

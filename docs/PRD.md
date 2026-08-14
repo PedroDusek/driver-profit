@@ -305,6 +305,68 @@ na tela**. O estado "sem correção" é ausência de dado, nunca uma chave que o
 motorista liga e desliga: um indicador que muda de definição conforme um botão
 deixa de ser conferível, e a versão desligada é sempre a errada.
 
+#### A janela da conciliação
+
+> **Decisão registrada.** Desenho fechado para a v0.9.1.
+
+A conciliação acontece **entre duas leituras de odômetro**, e não em recorte de
+calendário.
+
+O calendário não sabe nada sobre o carro. O único intervalo em que a diferença
+de odômetro é um fato é o que vai de uma leitura à seguinte; amarrá-la ao mês
+obrigaria a estimar o que aconteceu quando o mês termina no meio de dois
+abastecimentos — precisamente o que esta seção existe para evitar.
+
+Como o odômetro é obrigatório em abastecimento, recarga e manutenção, a leitura
+chega sozinha, no ritmo em que o motorista usa o carro. Isso torna a cadência de
+lançamento irrelevante: registrar diariamente, semanalmente ou depois de um mês
+sumido produz a mesma conta, sem caso especial.
+
+A conta da janela é:
+
+```
+sobra = (leitura nova − leitura anterior) − km de jornada − pessoal já declarado
+```
+
+**A sobra pode ser negativa, e isso é informação, não erro a esconder.** Uma
+jornada alocada na janela errada infla uma sobra e desinfla a seguinte, e as
+duas se cancelam — desde que a negativa seja preservada. Zerá-la quebra o
+cancelamento e transforma um erro passageiro em quilometragem pessoal gravada
+para sempre.
+
+Sobra negativa não é uso pessoal negativo: é sinal de que um número foi lançado
+errado — km de jornada inflado, ou leitura digitada baixa. É o único sinal de
+erro de digitação que o app consegue produzir sozinho, e por isso ele avisa em
+vez de engolir.
+
+#### Declaração de ignorância no odômetro
+
+> **Decisão registrada.** Desenho fechado para a v0.9.1.
+
+O odômetro é obrigatório em abastecimento, recarga e manutenção (§23). A
+obrigatoriedade vale para o lançamento do dia, quando o painel está à mão.
+
+Para **lançamento retroativo** — data anterior à última leitura conhecida
+daquele veículo — o formulário oferece declarar explicitamente que a leitura é
+desconhecida, gravando ausência de valor. É o caso de quem instala o app e lança
+o histórico do mês passado, ou de quem lança a semana toda no domingo: nota de
+posto não traz odômetro, e o número não existe para ser lembrado.
+
+Isso **não** afrouxa a regra do campo obrigatório, que proíbe branco tratado
+como zero em silêncio (§16, v0.3.1). Uma declaração explícita é o oposto de um
+branco: ausência já significa "não sei" em todo o cálculo — o consumo pula o
+par, o alerta de manutenção não usa como marco, a conciliação não conta a
+janela.
+
+A opção **não** aparece no lançamento do dia. Disponível sempre, viraria saída
+fácil rotineira, e a leitura por lançamento — fundação de três funcionalidades —
+deixaria de existir na prática.
+
+O que se perde é assumido: despesa antiga sem leitura conta no dinheiro e não
+conta na distância. É melhor que a alternativa, porque odômetro inventado
+envenena consumo, quilômetro pessoal e alerta de manutenção de uma vez — e neste
+último produz um alvo falso exibido com confiança.
+
 #### Atribuição por natureza de custo
 
 Nem todo custo se rateia da mesma forma, porque nem todo custo é causado pelo
@@ -383,8 +445,40 @@ condições comparáveis. No MVP, apresentar sempre como **consumo estimado**.
 > custo/km apenas o deixa pessimista. As duas tolerâncias a erro são
 > diferentes, e o tratamento também.
 
+> **Lançamento retroativo deixa o consumo otimista.** Tanque-a-tanque pressupõe
+> leitura tirada na bomba. Quem lança a semana inteira no domingo registra a
+> leitura de domingo num abastecimento de terça, e os dias a mais de rodagem
+> entram no trecho sem litro correspondente — o km/L sobe. O dinheiro e a
+> repartição trabalho/pessoal não sofrem com isso; só o consumo. Como ele é
+> secundário e já é sempre rotulado estimado, a distorção é aceitável — mas não
+> deve ser apresentada como precisão.
+
 Para elétricos: km/kWh ou kWh/100 km — a unidade pode ser definida na camada de
 apresentação.
+
+### Alerta de manutenção: alvo, não contagem regressiva
+
+> **Decisão registrada na v0.9.0.**
+
+O alerta exibe **a quilometragem em que o serviço vence** — "a próxima troca de
+óleo é aos 110.000 km" — e nunca quanto falta.
+
+O alvo é a soma de dois fatos: a leitura da última troca, lançada com a nota, e
+o intervalo, definido pelo motorista. Não depende de onde o carro está agora, e
+por isso é exato mesmo com o painel vários tanques atrasado.
+
+"Faltam 600 km" seria uma afirmação sobre o presente, que é a única coisa que o
+app não sabe com certeza. Um motorista que lê 600 quando faltam 550 confere no
+painel, encontra a divergência e para de confiar no aplicativo inteiro — não só
+naquele número.
+
+A incerteza não desaparece: ela migra do número exibido para o **momento do
+lembrete**, onde errar algumas centenas de quilômetros custa um aviso um pouco
+adiantado, e não um número falso. Por isso a banda de aviso nunca é menor que a
+defasagem que o painel consegue acumular entre dois abastecimentos.
+
+O app não disputa com o painel quem sabe a quilometragem. Ele afirma um fato
+conferível e deixa a comparação para o motorista — que é quem acompanha o carro.
 
 ## 24–25. Arquitetura
 
