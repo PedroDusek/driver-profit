@@ -110,6 +110,111 @@ class DashboardMetricsTest {
         assertEquals(Money.of(120, 0), metrics.expensesByCategory[ExpenseCategory.INSURANCE])
     }
 
+    // --- Uso pessoal (v0.7.0) ---
+
+    /**
+     * R$ 900 de custo operacional em 1.000 km totais — 800 de trabalho e 200
+     * pessoais. É o exemplo que está no PRD §22.
+     */
+    private val comUsoPessoal = DashboardMetrics.of(
+        sessions = listOf(session(Money.of(1_280, 0), rides = 62, minutes = 2_310, km = 800)),
+        expenses = listOf(
+            expense(ExpenseCategory.FUEL, Money.of(600, 0)),
+            expense(ExpenseCategory.MAINTENANCE, Money.of(200, 0)),
+            expense(ExpenseCategory.CAR_WASH, Money.of(100, 0)),
+        ),
+        personalKilometers = 200,
+    )
+
+    @Test
+    fun `custo por km usa a distancia total e nao so a de trabalho`() {
+        // Sem contar o km pessoal daria R$ 1,125/km - o indicador central do
+        // produto inflado em 25% para quem usa o carro no fim de semana.
+        assertEquals(1_000L, comUsoPessoal.totalKilometers)
+        assertEquals(Money.of(0, 90), comUsoPessoal.costPerKm)
+    }
+
+    @Test
+    fun `a reparticao soma exatamente a despesa operacional`() {
+        // As duas linhas da tela precisam fechar contra o extrato. Por isso a
+        // parte pessoal e calculada por diferenca, e nao por proporcao propria.
+        assertEquals(Money.of(720, 0), comUsoPessoal.workOperationalCost)
+        assertEquals(Money.of(180, 0), comUsoPessoal.personalOperationalCost)
+        assertEquals(
+            comUsoPessoal.operationalExpenses,
+            comUsoPessoal.workOperationalCost + comUsoPessoal.personalOperationalCost,
+        )
+    }
+
+    @Test
+    fun `o lucro nao paga o combustivel do fim de semana`() {
+        // Faturamento 1.280 menos os 720 que cabem ao trabalho.
+        assertEquals(Money.of(720, 0), comUsoPessoal.workExpenses)
+        assertEquals(Money.of(560, 0), comUsoPessoal.netProfit)
+    }
+
+    @Test
+    fun `sem uso pessoal o resultado e identico ao de antes`() {
+        // Garantia de nao regressao: quem nao declara nada nao pode ver
+        // numero nenhum mudar.
+        val semPessoal = DashboardMetrics.of(
+            sessions = listOf(session(Money.of(600, 0), rides = 30, minutes = 900, km = 300)),
+            expenses = listOf(expense(ExpenseCategory.FUEL, Money.of(180, 0))),
+        )
+
+        assertEquals(300L, semPessoal.totalKilometers)
+        assertEquals(Money.of(180, 0), semPessoal.workOperationalCost)
+        assertEquals(Money.ZERO, semPessoal.personalOperationalCost)
+        assertEquals(semPessoal.totalExpenses, semPessoal.workExpenses)
+        assertEquals(Money.of(420, 0), semPessoal.netProfit)
+        assertFalse(semPessoal.hasPersonalUsage)
+    }
+
+    @Test
+    fun `custo fixo nao entra no rateio com o uso pessoal`() {
+        // Passear no domingo nao gera parcela de financiamento (PRD 22).
+        val comFinanciamento = DashboardMetrics.of(
+            sessions = listOf(session(Money.of(2_000, 0), rides = 60, minutes = 2_400, km = 800)),
+            expenses = listOf(
+                expense(ExpenseCategory.FUEL, Money.of(600, 0)),
+                expense(ExpenseCategory.FINANCING, Money.of(1_200, 0)),
+            ),
+            personalKilometers = 200,
+        )
+
+        assertEquals(Money.of(1_200, 0), comFinanciamento.fixedExpenses)
+        // 600 x 800/1000 = 480 de operacional, mais os 1.200 inteiros.
+        assertEquals(Money.of(480, 0), comFinanciamento.workOperationalCost)
+        assertEquals(Money.of(1_680, 0), comFinanciamento.workExpenses)
+        // O custo/km continua olhando so o operacional sobre a distancia total.
+        assertEquals(Money.of(0, 60), comFinanciamento.costPerKm)
+    }
+
+    @Test
+    fun `sem quilometro nenhum o custo inteiro fica com o trabalho`() {
+        // Nao ha base para repartir; o comportamento conservador e o mesmo de
+        // antes da v0.7.0.
+        val semKm = DashboardMetrics.of(
+            sessions = listOf(session(Money.of(100, 0), rides = 5, minutes = 300, km = 0)),
+            expenses = listOf(expense(ExpenseCategory.FUEL, Money.of(40, 0))),
+        )
+
+        assertEquals(Money.of(40, 0), semKm.workOperationalCost)
+        assertEquals(Money.ZERO, semKm.personalOperationalCost)
+    }
+
+    @Test
+    fun `periodo so com uso pessoal nao e vazio`() {
+        val soPessoal = DashboardMetrics.of(
+            sessions = emptyList(),
+            expenses = emptyList(),
+            personalKilometers = 150,
+        )
+
+        assertFalse(soPessoal.isEmpty)
+        assertTrue(soPessoal.hasPersonalUsage)
+    }
+
     @Test
     fun `periodo sem quilometros nao tem indicador por km`() {
         // Nao e R$ 0,00/km: o indicador simplesmente nao existe (PRD 21).

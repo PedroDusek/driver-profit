@@ -10,8 +10,10 @@ import com.driverprofit.domain.model.Platform
 import com.driverprofit.domain.model.WorkSession
 import com.driverprofit.domain.usecase.ObserveDashboardUseCase
 import com.driverprofit.domain.usecase.ObserveExpensesBetweenUseCase
+import com.driverprofit.domain.usecase.ObservePersonalUsageInPeriodUseCase
 import com.driverprofit.domain.usecase.ObserveWorkSessionsBetweenUseCase
 import com.driverprofit.testing.FakeExpenseRepository
+import com.driverprofit.testing.FakePersonalUsageRepository
 import com.driverprofit.testing.FakeWorkSessionRepository
 import com.driverprofit.testing.MainDispatcherRule
 import kotlinx.coroutines.ExperimentalCoroutinesApi
@@ -89,10 +91,13 @@ class DashboardViewModelTest {
         ),
     )
 
+    private val personalUsage = FakePersonalUsageRepository()
+
     private fun viewModel() = DashboardViewModel(
         observeDashboard = ObserveDashboardUseCase(
             observeWorkSessionsBetween = ObserveWorkSessionsBetweenUseCase(sessions),
             observeExpensesBetween = ObserveExpensesBetweenUseCase(expenses),
+            observePersonalUsageInPeriod = ObservePersonalUsageInPeriodUseCase(personalUsage),
         ),
         clock = clock,
     )
