@@ -198,6 +198,133 @@ apenas pessimista; mas **atrasa** o alerta de manutenção, o que desgasta
 motor. Por isso o alerta não herda a degradação graciosa das outras
 funcionalidades — na dúvida ele pede a leitura, em vez de estimar.
 
+### v0.9.1 — Fechar o ciclo do odômetro
+
+O ciclo que a v0.7.0 construiu **não gira sozinho**. A conciliação existe, mas o
+gatilho é manual, roda sobre o mês corrente e só sobre o primeiro veículo da
+lista. Quem nunca apertar o botão fica com `km pessoal = 0`, e aí
+`km total = km de trabalho` — o custo/km volta a ser o da v0.5.0, inflado, que é
+exatamente o defeito que a v0.7.0 existe para corrigir.
+
+**Sem alteração de banco.** Os cinco itens são domínio e interface; a coluna
+anulável de odômetro e a tabela `personal_usage` já suportam tudo. Isso importa
+para o fluxo do projeto: esta versão não depende de mais uma rodada de teste de
+migração em aparelho.
+
+Os itens têm **dependência entre si**, e a ordem abaixo é de dependência, não de
+preferência.
+
+#### 1. Discrepância negativa tratada — pré-requisito
+
+Hoje a sobra da conciliação é `coerceAtLeast(0L)`. Isso precisa mudar antes de
+qualquer automação, porque quebra uma propriedade da qual o resto depende.
+
+Com janelas encadeadas, um lançamento alocado na janela errada **deveria se
+cancelar sozinho**:
+
+```
+Janela 1   leitura 100.000 → 101.000   delta 1.000   corridas 900   sobra +100
+Janela 2   leitura 101.000 → 101.700   delta   700   corridas 800   sobra −100
+                                                                    ────────
+                                                          pessoal real:  0
+```
+
+Com o piso em zero, a janela 2 vira 0 em vez de −100 e o motorista termina com
+100 km de uso pessoal que nunca existiram, gravados para sempre. Com
+conciliação manual e mensal isso quase nunca acontecia; com conciliação a cada
+leitura, acontece toda semana.
+
+Sobra negativa não é uso pessoal negativo: é **sinal de erro de lançamento** —
+km de jornada inflado, ou leitura digitada baixa. É o único sinal que o app tem
+de que um número foi digitado errado, e hoje ele é engolido em silêncio.
+
+**Critério de saída:** sobra negativa é exibida como divergência a resolver,
+nunca gravada como uso pessoal e nunca descartada calada.
+
+#### 2. Conciliação por janela entre leituras
+
+A janela deixa de ser o mês e passa a ser **de uma leitura de odômetro até a
+próxima**, por veículo, disparada pela chegada da leitura nova.
+
+O calendário não sabe nada sobre o carro. O único intervalo em que a diferença
+de odômetro é um fato é o que vai de uma leitura à seguinte — amarrar ao mês
+obriga a estimar o que aconteceu quando o mês termina entre dois
+abastecimentos, que é justamente o que o projeto evita.
+
+O ganho colateral é que a cadência do motorista deixa de importar. Lançar
+diariamente, semanalmente ou depois de um mês sumido produz a mesma conta, sem
+caso especial: a leitura é que define a fronteira.
+
+**Critério de saída:** o motorista que registra abastecimentos e jornadas, e
+nunca abre a tela de uso pessoal, vê o custo/km correto.
+
+#### 3. "Não sei a leitura" em lançamento retroativo
+
+O odômetro é obrigatório em abastecimento, recarga e manutenção, sem exceção por
+data. Quem baixa o app e lança o histórico do mês passado — ou lança a semana
+toda no domingo — encontra um campo obrigatório cuja resposta ele não tem: nota
+de posto não traz odômetro.
+
+As duas saídas de hoje são ruins. Desistir dos abastecimentos antigos deixa o
+custo/km sem numerador. Inventar um número envenena três coisas: o consumo
+estimado ordena por odômetro, o `MAX(odometer_km)` vira a quilometragem corrente
+do carro, e o marco de manutenção sai errado — este último produzindo um **alvo
+falso exibido com confiança**, que é pior que a contagem regressiva que a v0.9.0
+removeu.
+
+A saída é uma declaração explícita de ignorância, gravando `NULL`, **disponível
+apenas quando o lançamento é retroativo** — data anterior à última leitura
+conhecida daquele veículo. No lançamento de hoje ela não aparece, porque hoje o
+painel está à mão; disponível sempre, viraria escotilha de fuga diária e a
+fundação do odômetro desmoronaria.
+
+Isso não fura a regra da v0.6.0, preserva-a. O que ela proíbe é campo em branco
+que o cálculo trata como zero em silêncio (lição da v0.3.1). Uma declaração
+explícita é o oposto, e `NULL` já significa "não sei" em todo o domínio.
+
+**Critério de saída:** dá para lançar um mês de histórico sem inventar um único
+número.
+
+#### 4. Nota de limitação quando falta dado de uso pessoal
+
+O PRD §22 manda o app declarar a limitação na tela quando não há dado de uso
+pessoal. **Não está implementado.** A nota explicativa do custo/km só é
+desenhada quando já existe uso pessoal registrado — ou seja, ela aparece quando
+o número está certo e some quando está incompleto, que é o inverso do
+necessário.
+
+É a primeira coisa que deveria aparecer para quem acabou de instalar o app e
+lançou histórico sem odômetro.
+
+**Critério de saída:** custo/km sem dado de uso pessoal diz, na tela, que está
+calculado com o que existe.
+
+#### 5. Repartição do custo/km mostrando a proporção
+
+O foco principal da tela é o **custo/km total** — é o número que serve a quem
+roda só a trabalho, que é a maioria. A repartição entra abaixo, e é útil
+sobretudo para quem usa bastante o carro fora do trabalho: ela dá a ideia real
+de quanto a operação divide o veículo com a vida pessoal.
+
+A repartição ganha a proporção ao lado dos reais:
+
+```
+Custo real por km                  R$ 1,00
+  Trabalho     300 km   86%        R$ 300
+  Pessoal       50 km   14%        R$  50
+                                   ──────
+                                   R$ 350
+```
+
+**Percentual, e não centavos por km.** Escrever "R$ 0,86/km profissional"
+convidaria a multiplicar por 300 km de trabalho e chegar a R$ 258, que não é
+valor nenhum: os 86 centavos são por km **total**, não por km trabalhado. O
+custo por km é o mesmo nos dois usos — o que muda é quantos quilômetros cada um
+consumiu. Os reais continuam porque são o que fecha com o extrato.
+
+**Critério de saída:** as duas linhas somam a despesa operacional e a proporção
+responde "quanto do carro o trabalho divide com a vida pessoal".
+
 ### v0.10.0 — Custos fixos por competência
 
 - [ ] Período de competência na despesa (início e fim), separando "quando
