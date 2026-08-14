@@ -5,6 +5,76 @@ Versionamento conforme [Semantic Versioning](https://semver.org/lang/pt-BR/).
 
 ## [Não publicado]
 
+## [0.7.0] — Uso pessoal
+
+Corrige a distorção registrada como limitação conhecida na v0.5.0: o custo/km
+dividia despesa **total** por quilômetros **apenas profissionais**, então o
+combustível queimado no fim de semana inflava o indicador central do produto.
+
+### Corrigido
+
+**O custo por km agora usa a distância total.**
+
+A correção não classifica despesa nenhuma — combustível é fungível, um tanque
+não é "pessoal" nem "profissional". Basta o denominador ser o quilômetro
+total, porque o rateio proporcional se cancela algebricamente:
+
+```
+(E × Kp/K) ÷ Kp = E ÷ K
+```
+
+Sem estimar consumo, sem preço médio, e sem alterar nenhuma despesa gravada.
+
+Com R$ 900 de custo operacional em 1.000 km — 800 de trabalho, 200 pessoais —
+o custo/km sai de R$ 1,125 para R$ 0,90.
+
+### Adicionado
+
+**Domínio**
+- `PersonalUsage` — intervalo de dias mais quilômetros, com
+  `kilometersWithin` distribuindo proporcionalmente aos dias
+- `PersonalUsageValidator` e os use cases de escrita e leitura
+- `ReconcileOdometerUseCase` — confere o painel contra o lançado e **abate** o
+  que já foi declarado
+- `DashboardMetrics` ganha `personalKilometers`, `workOperationalCost`,
+  `personalOperationalCost` e `workExpenses`
+
+**Dados**
+- Banco vai para a **versão 6**, com `personal_usage`
+- Migração 5→6 aditiva
+- Consulta por **sobreposição** de intervalos, não por contenção
+
+**Interface**
+- Tela de uso pessoal com histórico, lançamento e exclusão
+- Conciliação por odômetro, mostrando a conta inteira antes de perguntar
+- Repartição trabalho/pessoal em reais no dashboard
+
+### Decisões registradas
+
+- **Dois mecanismos de entrada, e um abate o outro.** A declaração explícita
+  põe a viagem no mês em que aconteceu; a conciliação captura o que nunca foi
+  registrado. Sem o abatimento, o motorista descontaria duas vezes.
+- **A pergunta do resíduo não é presumida.** Uso pessoal e jornada esquecida
+  têm sinais opostos no custo/km.
+- **Jornada esquecida não é gravada aqui.** O lugar de corrigir é o formulário
+  de ganhos, com plataforma, corridas e valor — registrar só a distância
+  inflaria o R$/km, que é o defeito que a v0.3.1 corrigiu.
+- **A parte pessoal é calculada por diferença**, não por proporção própria:
+  dois arredondamentos independentes deixariam um centavo órfão e a tela
+  deixaria de fechar contra o extrato.
+- **Custo fixo não entra no rateio.** Passear no domingo não gera parcela de
+  financiamento (PRD §22).
+- **Sem quilômetro nenhum, o custo inteiro fica com o trabalho** — o
+  comportamento conservador, e o mesmo de antes desta versão.
+- **Consulta por sobreposição.** Uma viagem de 28/07 a 03/08 precisa aparecer
+  nos dois meses; filtrar por "começa dentro do período" perderia a segunda
+  metade e deixaria agosto inflado.
+
+### Não coberto
+
+O lançamento e a conciliação não têm teste de interface — o projeto ainda não
+tem nenhum. A lógica que sustenta os dois está coberta por teste de domínio.
+
 ## [0.6.0] — Odômetro
 
 Fundação das três versões seguintes: consumo estimado, uso pessoal e alertas
