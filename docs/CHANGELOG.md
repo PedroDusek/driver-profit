@@ -5,6 +5,46 @@ Versionamento conforme [Semantic Versioning](https://semver.org/lang/pt-BR/).
 
 ## [Não publicado]
 
+## [0.8.0] — Consumo estimado
+
+O número que o PRD §23 pede desde o começo e que só ficou possível quando o
+odômetro por lançamento chegou, na v0.6.0.
+
+### Adicionado
+
+- `Consumption` — quilômetros por unidade, em **milésimos**, pelo mesmo motivo
+  de `Quantity`: manter o número inteiro até a hora de exibir
+- `ConsumptionEstimator` — método tanque-a-tanque, com a distância vindo da
+  diferença de odômetro e o divisor sendo a quantidade do **segundo**
+  abastecimento, que é o que repõe o queimado no trecho
+- O consumo aparece no histórico de despesas, sempre rotulado **estimado**
+- `BrazilianFormatter.consumption` — `"8,75 km/L"`, com zero à direita cortado
+
+**Sem alteração de banco.** Odômetro e quantidade já existiam.
+
+### Decisões registradas
+
+- **Sempre rotulado estimado** (PRD §23). O número só seria exato se os dois
+  abastecimentos tivessem enchido o tanque nas mesmas condições, e ninguém
+  garante isso na vida real.
+- **Par com combustível diferente é descartado.** Num flex, alternar gasolina e
+  etanol muda o consumo em cerca de 30%; uma média dos dois não descreveria
+  nenhum deles. Comparar consumo por combustível é pós-MVP (PRD §9).
+- **A ordem é a do odômetro, não a da data.** Lançar hoje o abastecimento da
+  semana passada é comum, e a ordem física do carro é a do painel.
+- **Ausência de dado descarta o par em silêncio.** Sem odômetro nos dois, sem
+  quantidade no segundo, ou com odômetro repetido, não há estimativa — e não
+  há número inventado no lugar dela.
+- **Calculado sobre o histórico inteiro**, não sobre o que o filtro mostra: o
+  trecho nasce da diferença para o abastecimento anterior, que pode estar fora
+  do filtro.
+
+### Não implementado nesta versão
+
+**Comparação com o consumo declarado pelo painel do carro.** Exige guardar esse
+valor no veículo, ou seja, migração. Não valia uma sétima versão de schema por
+um número informativo — entra junto de outra mudança de banco quando houver.
+
 ## [0.7.0] — Uso pessoal
 
 Corrige a distorção registrada como limitação conhecida na v0.5.0: o custo/km
