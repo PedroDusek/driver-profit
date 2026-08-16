@@ -5,6 +5,49 @@ Versionamento conforme [Semantic Versioning](https://semver.org/lang/pt-BR/).
 
 ## [Não publicado]
 
+## [0.9.1] — Fechar o ciclo do odômetro
+
+O ciclo que a v0.7.0 construiu existia mas **não girava sozinho**: a conciliação
+era manual, mensal e só do primeiro veículo. Quem nunca apertasse o botão ficava
+com uso pessoal zerado e custo/km inflado — o defeito que a v0.7.0 existia para
+corrigir. Encontrado no primeiro teste com dados reais em aparelho.
+
+**Sem alteração de banco.**
+
+### Corrigido
+
+- **Sobra negativa não é mais zerada em silêncio.** O `coerceAtLeast(0L)` saiu.
+  Lançamento acima do painel vira divergência declarada, com a instrução de
+  conferir os dois números
+- **A conciliação acontece sozinha**, por janela entre leituras de odômetro, e
+  aparece no dashboard — ao lado do número que ela afeta
+- **O custo/km declara quando está incompleto** (PRD §22, exigido desde a
+  v0.7.0 e nunca implementado): sem dado de uso pessoal, a tela diz que toda a
+  distância está sendo cobrada do trabalho
+
+### Decisões registradas
+
+- **A janela vai de uma leitura à seguinte**, não de mês de calendário. O único
+  intervalo em que a diferença de odômetro é um fato é esse; e como a leitura é
+  obrigatória em todo abastecimento, ela chega sozinha. A cadência do motorista
+  deixa de importar — diária, semanal ou depois de um mês sumido dão a mesma
+  conta, sem caso especial.
+- **A janela começa no dia seguinte à leitura anterior**, para que janelas
+  consecutivas não contem a mesma jornada duas vezes.
+- **Preservar a negativa restaura o cancelamento entre janelas.** Uma jornada
+  alocada na janela errada infla uma sobra e desinfla a seguinte; com piso em
+  zero, o desequilíbrio passageiro virava quilometragem pessoal gravada para
+  sempre.
+- **Duas leituras no mesmo dia** caem numa janela de um dia só, e a jornada
+  daquele dia pode ser contada duas vezes — o que **encolhe** a sobra. Errar
+  para menos devolve o comportamento antigo em vez de inventar quilometragem
+  pessoal que ninguém rodou.
+
+### Ainda pendente da v0.9.1
+
+Itens 3 e 5 do desenho: "não sei a leitura" em lançamento retroativo, e a
+proporção na repartição do custo/km. Nenhum dos dois afeta o ciclo.
+
 ## [0.9.0] — Manutenção preventiva
 
 Alertas por quilometragem para óleo, filtros, freios, pneus e revisão. É a

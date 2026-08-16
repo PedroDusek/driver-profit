@@ -186,12 +186,30 @@ private fun ReconcileDialog(
 
     AlertDialog(
         onDismissRequest = onDismiss,
-        title = { Text(stringResource(R.string.reconcile_title)) },
+        title = {
+            Text(
+                text = if (reconciliation.hasDivergence) {
+                    stringResource(R.string.reconcile_divergence_title)
+                } else {
+                    stringResource(R.string.reconcile_title)
+                },
+            )
+        },
         text = {
             Column(verticalArrangement = Arrangement.spacedBy(8.dp)) {
                 when {
                     reconciliation.odometerKilometers == null ->
                         Text(stringResource(R.string.reconcile_no_readings))
+
+                    // Lançado a mais que o painel. Não é uso pessoal negativo:
+                    // é erro de digitação em algum dos dois números, e é o
+                    // único sinal que o app tem para apontá-lo.
+                    reconciliation.hasDivergence -> Text(
+                        stringResource(
+                            R.string.reconcile_divergence_message,
+                            BrazilianFormatter.kilometers(-(unexplained ?: 0L)),
+                        ),
+                    )
 
                     !reconciliation.hasUnexplained ->
                         Text(stringResource(R.string.reconcile_all_explained))
