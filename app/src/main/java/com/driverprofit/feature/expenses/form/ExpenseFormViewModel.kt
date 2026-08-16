@@ -185,7 +185,20 @@ class ExpenseFormViewModel(
         }
     }
 
-    fun onDateChange(value: LocalDate) = updateField(ExpenseField.DATE) { copy(date = value) }
+    /**
+     * Troca a data e, se ela deixar de ser retroativa, desfaz a declaração de
+     * leitura desconhecida.
+     *
+     * Sem isso a declaração ficaria pendurada num estado que não a permite: a
+     * caixa some da tela, o campo de odômetro continua escondido por causa dela,
+     * e o motorista recebe "campo obrigatório" sem ter onde preencher.
+     */
+    fun onDateChange(value: LocalDate) = updateField(ExpenseField.DATE) {
+        copy(
+            date = value,
+            odometerUnknown = odometerUnknown && value.isBefore(LocalDate.now(clock)),
+        )
+    }
 
     /**
      * Troca a categoria e limpa os campos de detalhe que deixaram de existir.
