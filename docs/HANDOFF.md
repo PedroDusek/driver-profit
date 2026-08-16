@@ -16,46 +16,50 @@ de propósito**, empilhadas uma sobre a outra:
 | Branch | Versão | Banco | Estado |
 | --- | --- | --- | --- |
 | `main` | v0.6.0 (última tag) | 5 | estável |
-| `feature/personal-usage` | v0.7.0 | **6** | gate verde, **migração 5→6 não testada** |
+| `feature/personal-usage` | v0.7.0 | **6** | gate verde, migração validada |
 | `feature/fuel-consumption` | v0.8.0 | 6 | empilhada sobre a v0.7.0, gate verde |
-| `feature/maintenance-alerts` | v0.9.0 | **7** | empilhada sobre a v0.8.0, gate verde, **migração 6→7 não testada** |
+| `feature/maintenance-alerts` | v0.9.0 | **7** | empilhada sobre a v0.8.0, gate verde, migração validada |
 
-**Por que não foram mergeadas:** a v0.7.0 traz a migração 5→6 e a v0.9.0 traz a
-6→7, e o CI **não roda testes de migração** (seção 7). A regra do projeto é
-exercitar toda migração num SQLite real antes do merge — foi assim que se
-descobriu, na v0.5.0, que nenhum teste de migração conseguia sequer começar por
-causa de um conflito de dependência.
+**O impedimento acabou.** Em 16/08/2026 o aparelho foi conectado e as três
+versões foram validadas de uma vez:
+
+- **62 testes instrumentados, todos passando** (eram 42 na v0.6.0), cobrindo os
+  cinco DAOs, as sete migrações encadeadas e a cadeia completa 1→7
+- **A atualização foi exercitada em dados reais**: um aparelho com a v0.6.0
+  instalada e banco na versão 5 recebeu a v0.9.0 por cima, migrou 5→6→7, abriu
+  sem exceção e manteve veículo, jornada e despesa intactos. O Room valida o
+  schema contra o hash esperado ao abrir, então isso prova que as migrações
+  escritas à mão produzem exatamente a estrutura esperada
+
+Nada disso está empurrado ainda. As três branches seguem locais.
 
 A v0.9.0 empilhou sobre a v0.8.0 porque depende do `ConsumptionEstimator` para
 o piso de distância. Ramificar da `main` significaria reimplementá-lo.
 
 ### O que fazer primeiro
 
-1. Rodar os testes instrumentados em `feature/maintenance-alerts` — ela contém
-   as três versões, então **uma rodada valida tudo**, inclusive as migrações
-   5→6 e 6→7 e a cadeia completa 1→7
-2. **Conferir os números à mão no aparelho.** Nenhuma tela tem teste de
-   interface (seção 7), e o plano do Pedro é lançar dados reais e verificar se
-   os valores batem. É a única verificação que existe do que a tela mostra
-3. Se passarem: PR da v0.7.0 → merge → tag `v0.7.0`; depois v0.8.0; depois
-   v0.9.0. Uma tag por versão, na ordem
+1. **Conferir os números à mão no aparelho.** Nenhuma tela tem teste de
+   interface (seção 7). É a única verificação que existe do que a tela mostra, e
+   é o que falta antes do merge
+2. `git push` das três branches
+3. PR da v0.7.0 → merge → tag `v0.7.0`; depois v0.8.0; depois v0.9.0. Uma tag
+   por versão, na ordem
 4. Só então a v0.9.1, que já está desenhada
 
-### O impedimento
+### O gargalo que continua de pé
 
-Não há aparelho conectado agora. **O caminho decidido é o celular** — direto, e
-sem o custo de montar ambiente de emulação nesta máquina.
+O CI **não roda testes de migração** — eles exigem aparelho. Toda versão com
+schema novo vai continuar esperando o cabo, como as três acima esperaram.
 
-- **Celular** (Redmi Note 8 Pro, Android 9): funciona, mas desconecta com
-  frequência e a MIUI bloqueia a instalação. Contornos na seção 7
-- **Emulador: descartado por decisão do Pedro.** Não perder tempo com isso —
-  faltavam imagem de sistema, AVD e `cmdline-tools`, e a máquina é apertada
-  (7,7 GB de RAM, ~18 GB livres em C:)
+- **Celular** (Redmi Note 8 Pro, Android 9): funciona. A MIUI às vezes recusa a
+  instalação e o `adb install` pode reportar erro vazio **tendo funcionado** —
+  conferir com `dumpsys package` antes de concluir que falhou. Contornos na
+  seção 7
+- **Emulador: descartado por decisão do Pedro.** Não perder tempo com isso
 - **Robolectric — não investigado, e continua sendo a melhor pista.** Se o
   `MigrationTestHelper` do Room 2.8.4 rodar sob ele, as migrações passam a
   rodar em `testDebugUnitTest`, ou seja **no CI, em todo PR, para sempre**.
-  Isso resolveria de vez o gargalo que trava toda versão com schema novo — e
-  ele já travou duas
+  Resolveria o gargalo de vez, em vez de resolvê-lo uma vez por versão
 
 ---
 
@@ -182,15 +186,15 @@ detalhamento com critério de saída e impacto no banco está em
 [`ROADMAP.md`](ROADMAP.md); as regras de produto que sustentam tudo isso estão
 no PRD §22 e §23.
 
-### ⚠️ Três versões esperando aparelho
+### Três versões prontas para merge
 
 `feature/personal-usage` (v0.7.0), `feature/fuel-consumption` (v0.8.0) e
-`feature/maintenance-alerts` (v0.9.0) estão **não mergeadas**, cada uma
-empilhada sobre a anterior.
+`feature/maintenance-alerts` (v0.9.0) estão **não mergeadas e não empurradas**,
+cada uma empilhada sobre a anterior.
 
-Elas ficaram fora da `main` de propósito: a v0.7.0 traz a **migração 5→6** e a
-v0.9.0 traz a **6→7**, e o CI não roda teste de migração. Quando houver
-aparelho, rodar os instrumentados na v0.9.0 uma vez cobre as três.
+O que as segurava — migração sem teste em aparelho — foi resolvido em
+16/08/2026 (seção 0). Falta a conferência manual dos números na tela, o push e
+a fila de PRs na ordem.
 
 ### O que a v0.9.1 precisa fazer
 
@@ -251,10 +255,10 @@ extrato. Só os indicadores por km usam competência.
 São a única verificação real das migrações. Cobrem os cinco DAOs e as sete
 migrações encadeadas (1→2→3→4→5→6→7).
 
-⚠️ **Os testes das migrações 5→6 (v0.7.0) e 6→7 (v0.9.0) ainda não foram
-executados** — o aparelho desconectou antes da primeira, e a segunda nasceu
-depois. Na v0.6.0 foram 42 testes, todos passando. Rodar antes de mergear
-qualquer uma das três versões pendentes.
+✅ **Última execução: 16/08/2026, 62 testes, todos passando**, em Redmi Note 8
+Pro com Android 9. Distribuição: `MigrationTest` 17, `ExpenseDaoTest` 14,
+`WorkSessionDaoTest` 10, `VehicleDaoTest` 8, `MaintenanceScheduleDaoTest` 8,
+`PersonalUsageDaoTest` 5.
 
 ```bash
 cd C:/Users/pedro/Desktop/driver-profit && ./gradlew connectedDebugAndroidTest
