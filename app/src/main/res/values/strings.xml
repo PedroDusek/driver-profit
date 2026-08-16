@@ -75,6 +75,7 @@
 
     <!-- Conciliação por odômetro -->
     <string name="reconcile_title">Conferir odômetro</string>
+    <string name="reconcile_period">Entre as leituras de %1$s e %2$s</string>
     <string name="reconcile_odometer">Distância pelo painel</string>
     <string name="reconcile_work">Jornadas lançadas</string>
     <string name="reconcile_declared">Uso pessoal já declarado</string>
@@ -86,7 +87,8 @@
     <string name="reconcile_divergence_title">Os lançamentos passam do painel</string>
     <string name="reconcile_divergence_message">Você lançou %1$s a mais do que o odômetro registra. Confira a quilometragem das jornadas e a leitura do último abastecimento — um dos dois números está errado.</string>
     <string name="dashboard_odometer_gap_title">Odômetro não confere</string>
-    <string name="dashboard_odometer_gap_line">%1$s · %2$s sem explicação</string>
+    <string name="dashboard_odometer_gap_line">%1$s sem explicação</string>
+    <string name="dashboard_odometer_gap_window">%1$s · %2$s a %3$s</string>
     <string name="dashboard_odometer_gap_action">Toque para resolver</string>
     <string name="dashboard_personal_missing_note">Calculado sem dado de uso pessoal: toda a distância está sendo cobrada do trabalho. Se você também usa o carro fora dele, o custo por km está mais alto que o real.</string>
     <string name="reconcile_no_readings">Sem leituras de odômetro suficientes neste período para conferir.</string>
@@ -290,6 +292,7 @@
     <string name="maintenance_action_resume">Voltar a acompanhar</string>
     <string name="maintenance_not_monitored">Não acompanhado</string>
     <string name="maintenance_dashboard_title">Manutenção pede atenção</string>
+    <string name="maintenance_dashboard_note">Conta a quilometragem do carro, não o período selecionado acima.</string>
     <string name="maintenance_dashboard_line">%1$s — %2$s · próxima aos %3$s</string>
     <string name="error_interval_out_of_range">Intervalo inválido</string>
 </resources>

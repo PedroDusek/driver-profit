@@ -415,6 +415,14 @@ fun MaintenanceWarningCard(
                 style = MaterialTheme.typography.titleSmall,
                 color = MaterialTheme.colorScheme.onErrorContainer,
             )
+            // Manutenção conta quilometragem acumulada do carro, e não o
+            // período do seletor logo abaixo. Sem dizê-lo, o alvo parece uma
+            // informação do mês escolhido.
+            Text(
+                text = stringResource(R.string.maintenance_dashboard_note),
+                style = MaterialTheme.typography.bodySmall,
+                color = MaterialTheme.colorScheme.onErrorContainer,
+            )
             warnings.forEach { vehicleMaintenance ->
                 vehicleMaintenance.needingAttention.forEach { alert ->
                     // Item que pede atenção sempre tem alvo — só se chega a
