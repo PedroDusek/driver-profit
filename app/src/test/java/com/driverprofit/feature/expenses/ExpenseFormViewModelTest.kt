@@ -415,4 +415,53 @@ class ExpenseFormViewModelTest {
         assertEquals(1, expenses.current.size)
         assertEquals(Money.of(15, 0), expenses.current.single().amount)
     }
+
+    // --- "Nao sei a leitura" em lancamento retroativo ---
+
+    @Test
+    fun `nao sei a leitura so e oferecida em data anterior a hoje`() = runTest {
+        val viewModel = viewModel()
+        advanceUntilIdle()
+        viewModel.onCategoryChange(ExpenseCategory.FUEL)
+
+        viewModel.onDateChange(hoje)
+        assertFalse(viewModel.uiState.value.allowsUnknownOdometer(hoje))
+
+        // No lancamento do dia o painel esta a mao; oferecer a saida ali a
+        // transformaria em rotina.
+        viewModel.onDateChange(hoje.minusDays(3))
+        assertTrue(viewModel.uiState.value.allowsUnknownOdometer(hoje))
+    }
+
+    @Test
+    fun `voltar a data para hoje desfaz a declaracao`() = runTest {
+        val viewModel = viewModel()
+        advanceUntilIdle()
+        viewModel.onCategoryChange(ExpenseCategory.FUEL)
+        viewModel.onDateChange(hoje.minusDays(3))
+        viewModel.onOdometerUnknownChange(true)
+        assertTrue(viewModel.uiState.value.odometerUnknown)
+
+        viewModel.onDateChange(hoje)
+
+        // Sem isso a declaracao ficaria pendurada num estado que nao a permite:
+        // a caixa some, o campo continua escondido por causa dela, e o
+        // motorista recebe "campo obrigatorio" sem ter onde preencher.
+        assertFalse(viewModel.uiState.value.odometerUnknown)
+    }
+
+    @Test
+    fun `digitar a leitura desmarca a declaracao`() = runTest {
+        val viewModel = viewModel()
+        advanceUntilIdle()
+        viewModel.onCategoryChange(ExpenseCategory.FUEL)
+        viewModel.onDateChange(hoje.minusDays(3))
+        viewModel.onOdometerUnknownChange(true)
+
+        viewModel.onOdometerChange("100000")
+
+        assertFalse(viewModel.uiState.value.odometerUnknown)
+        assertEquals("100000", viewModel.uiState.value.odometerInput)
+    }
+
 }
