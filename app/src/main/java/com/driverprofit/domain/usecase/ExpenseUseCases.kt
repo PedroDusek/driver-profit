@@ -6,6 +6,7 @@ import com.driverprofit.domain.model.ExpenseFieldError
 import com.driverprofit.domain.repository.ExpenseRepository
 import com.driverprofit.domain.repository.VehicleRepository
 import kotlinx.coroutines.flow.Flow
+import kotlinx.coroutines.flow.first
 import java.time.LocalDate
 
 /** Resultado de uma tentativa de salvar despesa. */
@@ -33,7 +34,9 @@ class SaveExpenseUseCase(
     suspend operator fun invoke(draft: ExpenseDraft): SaveExpenseResult {
         val vehicle = draft.vehicleId?.let { vehicleRepository.getVehicle(it) }
 
-        val errors = validator.validate(draft, vehicle)
+        val readings = draft.vehicleId?.let { readingsFor(it, exceptId = draft.id) }.orEmpty()
+
+        val errors = validator.validate(draft, vehicle, OdometerHistory(readings))
         if (errors.isNotEmpty()) return SaveExpenseResult.Invalid(errors)
 
         if (!draft.isEditing) {
@@ -52,6 +55,19 @@ class SaveExpenseUseCase(
         expenseRepository.updateExpense(validator.toExpense(draft, createdAt = existing.createdAt))
         return SaveExpenseResult.Success(draft.id)
     }
+
+    /**
+     * Leituras já registradas do veículo, exceto a do próprio lançamento.
+     *
+     * A exclusão importa na edição: sem ela, corrigir uma despesa a compararia
+     * consigo mesma e qualquer alteração de leitura seria recusada.
+     */
+    private suspend fun readingsFor(vehicleId: Long, exceptId: Long): List<OdometerReading> =
+        expenseRepository.observeExpenses().first()
+            .filter { it.vehicleId == vehicleId && it.id != exceptId }
+            .mapNotNull { expense ->
+                expense.odometerKm?.let { OdometerReading(expense.date, it) }
+            }
 }
 
 /** Observa o histórico completo de despesas (PRD §19). */

@@ -23,6 +23,22 @@ data class ExpenseDraft(
     /** Leitura do painel. Obrigatória para as categorias ligadas ao veículo. */
     val odometerKm: Long? = null,
 
+    /**
+     * Declaração explícita de que a leitura é desconhecida.
+     *
+     * Só vale em **lançamento retroativo** — data anterior à última leitura já
+     * registrada daquele veículo. É o caso de quem instala o app e preenche o
+     * histórico do mês passado: nota de posto não traz odômetro, e o número não
+     * existe para ser lembrado.
+     *
+     * Não afrouxa a regra do campo obrigatório, que proíbe branco tratado como
+     * zero em silêncio (PRD §23). Uma declaração explícita é o oposto de um
+     * branco: ausência já significa "não sei" em todo o cálculo — o consumo
+     * pula o par, o alerta de manutenção não usa como marco, a conciliação não
+     * fecha a janela.
+     */
+    val odometerUnknown: Boolean = false,
+
     // --- Abastecimento ---
     val fuelType: FuelType? = null,
     val quantity: Quantity? = null,

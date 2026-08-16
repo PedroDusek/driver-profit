@@ -127,6 +127,27 @@ data class DashboardMetrics(
     val hasPersonalUsage: Boolean get() = personalKilometers > 0L
 
     /**
+     * Percentual da distância total que foi trabalho.
+     *
+     * Responde "quanto do carro a operação divide com a vida pessoal", que é
+     * para o que a repartição serve. Exibido como percentual, e **não** como
+     * centavos por km: "R$ 0,86/km profissional" convidaria a multiplicar por
+     * quilômetro trabalhado e chegar a um valor que não existe — os 86 centavos
+     * são por quilômetro **total**. O custo por km é o mesmo nos dois usos; o
+     * que muda é quantos quilômetros cada um consumiu.
+     */
+    val workKilometerShare: Int?
+        get() = if (totalKilometers <= 0L) {
+            null
+        } else {
+            Math.round(workKilometers * PERCENT / totalKilometers.toDouble()).toInt()
+        }
+
+    /** Complemento de [workKilometerShare], para os dois sempre somarem 100. */
+    val personalKilometerShare: Int?
+        get() = workKilometerShare?.let { PERCENT.toInt() - it }
+
+    /**
      * `true` quando o período não tem nenhum lançamento.
      *
      * Distingue "você não trabalhou nesse período" de "você trabalhou e o
@@ -143,6 +164,8 @@ data class DashboardMetrics(
             totalOnlineTime.isZero
 
     companion object {
+
+        private const val PERCENT = 100.0
 
         /** Período sem nenhum lançamento. */
         val EMPTY: DashboardMetrics = DashboardMetrics(

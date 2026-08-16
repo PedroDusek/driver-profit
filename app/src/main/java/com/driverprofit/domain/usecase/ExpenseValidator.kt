@@ -25,7 +25,11 @@ class ExpenseValidator(
     private val clock: Clock = Clock.systemDefaultZone(),
 ) {
 
-    fun validate(draft: ExpenseDraft, vehicle: Vehicle?): List<ExpenseFieldError> = buildList {
+    fun validate(
+        draft: ExpenseDraft,
+        vehicle: Vehicle?,
+        history: OdometerHistory = OdometerHistory.EMPTY,
+    ): List<ExpenseFieldError> = buildList {
         addAll(validateDate(draft.date))
 
         val category = draft.category
@@ -48,7 +52,7 @@ class ExpenseValidator(
 
         if (category != null) {
             addAll(validateVehicle(category, draft, vehicle))
-            addAll(validateOdometer(category, draft))
+            addAll(validateOdometer(category, draft, history))
             addAll(validateDetail(category, draft, vehicle))
         }
     }
@@ -69,14 +73,36 @@ class ExpenseValidator(
     private fun validateOdometer(
         category: com.driverprofit.domain.model.ExpenseCategory,
         draft: ExpenseDraft,
+        history: OdometerHistory,
     ): List<ExpenseFieldError> {
         if (!category.requiresVehicle) return emptyList()
+
+        // "Não sei a leitura" só vale para trás. No lançamento do dia o painel
+        // está à mão, e oferecer a saída ali a transformaria em rotina — a
+        // leitura por lançamento deixaria de existir na prática, e com ela o
+        // consumo, o quilômetro pessoal e o alerta de manutenção.
+        if (draft.odometerUnknown) {
+            val isRetroactive = draft.date?.isBefore(LocalDate.now(clock)) == true
+            return if (isRetroactive) {
+                emptyList()
+            } else {
+                listOf(error(ExpenseField.ODOMETER, ExpenseValidationError.REQUIRED))
+            }
+        }
 
         val odometer = draft.odometerKm
             ?: return listOf(error(ExpenseField.ODOMETER, ExpenseValidationError.REQUIRED))
 
-        return if (odometer <= 0L || odometer > Expense.MAX_ODOMETER_KM) {
-            listOf(error(ExpenseField.ODOMETER, ExpenseValidationError.ODOMETER_OUT_OF_RANGE))
+        if (odometer <= 0L || odometer > Expense.MAX_ODOMETER_KM) {
+            return listOf(error(ExpenseField.ODOMETER, ExpenseValidationError.ODOMETER_OUT_OF_RANGE))
+        }
+
+        // Odômetro só cresce. Uma leitura que contradiz as vizinhas por data é
+        // dígito trocado, e aceitá-la calada envenena consumo, marco de
+        // manutenção e conciliação de uma vez — o marco produzindo um alvo
+        // falso exibido com confiança, que é o pior dos três.
+        return if (history.contradicts(draft.date, odometer)) {
+            listOf(error(ExpenseField.ODOMETER, ExpenseValidationError.ODOMETER_INCONSISTENT))
         } else {
             emptyList()
         }
@@ -97,7 +123,10 @@ class ExpenseValidator(
         detail = toDetail(draft),
         // Guardada só quando a categoria a exige: uma leitura digitada num
         // pedágio e depois abandonada não deve virar dado do veículo.
-        odometerKm = draft.odometerKm.takeIf { draft.category.requiresVehicle },
+        // "Não sei" grava ausência, e não zero: NULL diz a verdade, e todo o
+        // domínio já sabe lidar com ela.
+        odometerKm = draft.odometerKm
+            .takeIf { draft.category.requiresVehicle && !draft.odometerUnknown },
         createdAt = createdAt,
     )
 

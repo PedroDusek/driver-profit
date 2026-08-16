@@ -53,6 +53,15 @@ enum class ExpenseValidationError {
      */
     ODOMETER_OUT_OF_RANGE,
 
+    /**
+     * A leitura contradiz as vizinhas por data.
+     *
+     * Odômetro só cresce: um lançamento de 12/08 tem que ficar entre a leitura
+     * de 10/08 e a de 16/08. Fora disso é dígito trocado, e aceitá-lo calado
+     * envenena consumo, marco de manutenção e conciliação.
+     */
+    ODOMETER_INCONSISTENT,
+
     TEXT_TOO_LONG,
 }
 

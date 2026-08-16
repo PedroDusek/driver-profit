@@ -43,10 +43,35 @@ corrigir. Encontrado no primeiro teste com dados reais em aparelho.
   para menos devolve o comportamento antigo em vez de inventar quilometragem
   pessoal que ninguém rodou.
 
-### Ainda pendente da v0.9.1
+### Também nesta versão
 
-Itens 3 e 5 do desenho: "não sei a leitura" em lançamento retroativo, e a
-proporção na repartição do custo/km. Nenhum dos dois afeta o ciclo.
+- **Todas as janelas pendentes são conferidas**, não só a última. Dois
+  abastecimentos lançados antes de abrir o app fecham duas janelas, e conferir
+  só a mais nova abandonava a anterior para sempre — o que atinge em cheio quem
+  lança em lote, semanalmente.
+- **Coerência entre data e odômetro na validação.** Uma leitura que contradiz as
+  vizinhas por data é recusada com motivo: odômetro só cresce, e um lançamento
+  de 12/08 tem que caber entre a leitura de 10/08 e a de 16/08. Leituras do
+  mesmo dia ficam de fora da comparação, porque duas paradas no mesmo dia não
+  têm ordem conhecida.
+- **"Não sei a leitura"** em lançamento com data anterior a hoje, gravando
+  ausência. Nota de posto não traz odômetro, e exigir um número que não existe
+  empurra o motorista a inventar — o que envenena consumo, marco de manutenção e
+  conciliação de uma vez. A opção não aparece no lançamento do dia, quando o
+  painel está à mão; disponível sempre, viraria rotina e a leitura por
+  lançamento deixaria de existir na prática.
+- **Proporção na repartição do custo/km** — percentual, e não centavos por km.
+  "R$ 0,86/km profissional" convidaria a multiplicar por quilômetro trabalhado e
+  chegar a um valor que não existe: os 86 centavos são por quilômetro **total**.
+  O custo por km é o mesmo nos dois usos; o que muda é quantos quilômetros cada
+  um consumiu.
+
+### Decisão mantida
+
+A sobra **continua sendo uma pergunta**, não uma atribuição automática (PRD §22).
+Chegou-se a implementar a atribuição automática e ela foi revertida: passeio e
+jornada não lançada têm sinais opostos no custo/km, e presumir apagaria a
+diferença justamente no indicador central do produto.
 
 ## [0.9.0] — Manutenção preventiva
 

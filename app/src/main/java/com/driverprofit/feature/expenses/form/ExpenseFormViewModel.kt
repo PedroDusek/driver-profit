@@ -52,6 +52,8 @@ data class ExpenseFormUiState(
     val category: ExpenseCategory? = null,
     val amountDigits: String = "",
     val odometerInput: String = "",
+    /** O motorista declarou que não sabe a leitura deste lançamento antigo. */
+    val odometerUnknown: Boolean = false,
     /** Última leitura conhecida de cada veículo, para conferência na tela. */
     val odometers: Map<Long, Long> = emptyMap(),
     val description: String = "",
@@ -104,6 +106,18 @@ data class ExpenseFormUiState(
     /** O odômetro só é pedido onde há veículo em jogo (PRD §23). */
     val showOdometer: Boolean get() = showVehicle
 
+    /**
+     * A saída "não sei a leitura" só é oferecida em lançamento com data
+     * anterior a hoje.
+     *
+     * No lançamento do dia o painel está à mão. Oferecer a saída ali a
+     * transformaria em rotina, e a leitura por lançamento — fundação do
+     * consumo, do quilômetro pessoal e do alerta de manutenção — deixaria de
+     * existir na prática.
+     */
+    fun allowsUnknownOdometer(today: LocalDate): Boolean =
+        showOdometer && date?.isBefore(today) == true
+
     fun errorFor(field: ExpenseField): ExpenseValidationError? = errors[field]
 }
 
@@ -153,6 +167,11 @@ class ExpenseFormViewModel(
                     category = loaded?.category,
                     amountDigits = loaded?.amount?.cents?.toString().orEmpty(),
                     odometerInput = loaded?.odometerKm?.toString().orEmpty(),
+                    // Despesa antiga gravada sem leitura volta com a caixa
+                    // marcada, para editar não exigir um número que nunca houve.
+                    odometerUnknown = loaded != null &&
+                        loaded.category?.requiresVehicle == true &&
+                        loaded.odometerKm == null,
                     odometers = odometers,
                     description = loaded?.description.orEmpty(),
                     fuelType = loaded?.fuelType,
@@ -203,7 +222,12 @@ class ExpenseFormViewModel(
 
     /** Só dígitos: odômetro é quilômetro inteiro, sem separador nem fração. */
     fun onOdometerChange(value: String) = updateField(ExpenseField.ODOMETER) {
-        copy(odometerInput = value.filter(Char::isDigit).take(MAX_ODOMETER_DIGITS))
+        copy(
+            odometerInput = value.filter(Char::isDigit).take(MAX_ODOMETER_DIGITS),
+            // Digitar a leitura desmarca a declaração de ignorância: os dois
+            // juntos seriam contraditórios.
+            odometerUnknown = false,
+        )
     }
 
     fun onDescriptionChange(value: String) =
@@ -223,6 +247,20 @@ class ExpenseFormViewModel(
         updateField(ExpenseField.MAINTENANCE_CATEGORY) { copy(maintenanceCategory = value) }
 
     fun onPlaceChange(value: String) = updateField(ExpenseField.PLACE) { copy(place = value) }
+
+    /** Dia de referência, para decidir se o lançamento é retroativo. */
+    fun today(): LocalDate = LocalDate.now(clock)
+
+    /** Alterna a declaração de que a leitura é desconhecida. */
+    fun onOdometerUnknownChange(value: Boolean) {
+        _uiState.update {
+            it.copy(
+                odometerUnknown = value,
+                odometerInput = if (value) "" else it.odometerInput,
+                errors = it.errors - ExpenseField.ODOMETER,
+            )
+        }
+    }
 
     fun onSave() {
         if (_uiState.value.isSaving) return
@@ -274,7 +312,8 @@ internal fun ExpenseFormUiState.toDraft(expenseId: Long = Expense.UNSAVED_ID): E
         category = category,
         amount = amount,
         description = description,
-        odometerKm = odometerKm.takeIf { showOdometer },
+        odometerKm = odometerKm.takeIf { showOdometer && !odometerUnknown },
+        odometerUnknown = odometerUnknown && showOdometer,
         fuelType = fuelType,
         quantity = quantity,
         station = if (detailKind == ExpenseDetailKind.REFUEL) place else "",
