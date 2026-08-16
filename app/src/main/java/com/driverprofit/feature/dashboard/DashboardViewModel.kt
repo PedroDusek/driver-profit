@@ -8,6 +8,8 @@ import com.driverprofit.domain.model.DateRange
 import com.driverprofit.domain.model.VehicleMaintenance
 import com.driverprofit.domain.usecase.ObserveDashboardUseCase
 import com.driverprofit.domain.usecase.ObserveMaintenanceUseCase
+import com.driverprofit.domain.usecase.ObserveOdometerReconciliationUseCase
+import com.driverprofit.domain.usecase.VehicleReconciliation
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.SharingStarted
@@ -49,10 +51,27 @@ sealed interface DashboardUiState {
 class DashboardViewModel(
     observeDashboard: ObserveDashboardUseCase,
     observeMaintenance: ObserveMaintenanceUseCase,
+    observeReconciliation: ObserveOdometerReconciliationUseCase,
     private val clock: Clock = Clock.systemDefaultZone(),
 ) : ViewModel() {
 
     private val period = MutableStateFlow<DashboardPeriod>(DEFAULT_PERIOD)
+
+    /**
+     * Quilômetros que o painel registra e o lançado não explica.
+     *
+     * Fica no dashboard, e não escondido na tela de uso pessoal, porque é aqui
+     * que o número afetado aparece. Enquanto houver sobra sem resolver, o
+     * custo/km está dividindo por menos quilômetros do que o carro rodou — e o
+     * motorista precisa ver isso ao lado do número, não em outra tela que ele
+     * talvez nunca abra.
+     */
+    val odometerDivergences: StateFlow<List<VehicleReconciliation>> = observeReconciliation()
+        .stateIn(
+            scope = viewModelScope,
+            started = SharingStarted.WhileSubscribed(STOP_TIMEOUT_MILLIS),
+            initialValue = emptyList(),
+        )
 
     /**
      * Veículos com item de manutenção vencido ou próximo.

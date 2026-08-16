@@ -11,6 +11,7 @@ import com.driverprofit.domain.model.WorkSession
 import com.driverprofit.domain.usecase.ObserveDashboardUseCase
 import com.driverprofit.domain.usecase.ObserveExpensesBetweenUseCase
 import com.driverprofit.domain.usecase.ObserveMaintenanceUseCase
+import com.driverprofit.domain.usecase.ObserveOdometerReconciliationUseCase
 import com.driverprofit.domain.usecase.ObservePersonalUsageInPeriodUseCase
 import com.driverprofit.domain.usecase.ObserveWorkSessionsBetweenUseCase
 import com.driverprofit.testing.FakeExpenseRepository
@@ -109,6 +110,12 @@ class DashboardViewModelTest {
             observePersonalUsageInPeriod = ObservePersonalUsageInPeriodUseCase(personalUsage),
         ),
         observeMaintenance = ObserveMaintenanceUseCase(vehicles, expenses, schedules),
+        observeReconciliation = ObserveOdometerReconciliationUseCase(
+            vehicles,
+            expenses,
+            sessions,
+            personalUsage,
+        ),
         clock = clock,
     )
 

@@ -1,5 +1,6 @@
 package com.driverprofit.feature.dashboard
 
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.horizontalScroll
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
@@ -58,6 +59,7 @@ import com.driverprofit.domain.model.DashboardMetrics
 import com.driverprofit.domain.model.DashboardPeriod
 import com.driverprofit.domain.model.DateRange
 import com.driverprofit.domain.model.ExpenseCategory
+import com.driverprofit.domain.usecase.VehicleReconciliation
 import com.driverprofit.feature.maintenance.MaintenanceWarningCard
 import java.time.Instant
 import java.time.LocalDate
@@ -86,6 +88,7 @@ fun DashboardScreen(
 ) {
     val uiState by viewModel.uiState.collectAsStateWithLifecycle()
     val maintenanceWarnings by viewModel.maintenanceWarnings.collectAsStateWithLifecycle()
+    val divergences by viewModel.odometerDivergences.collectAsStateWithLifecycle()
     var showRangePicker by remember { mutableStateOf(false) }
 
     Scaffold(
@@ -138,6 +141,15 @@ fun DashboardScreen(
             ),
             verticalArrangement = Arrangement.spacedBy(12.dp),
         ) {
+            if (divergences.isNotEmpty()) {
+                item {
+                    OdometerGapCard(
+                        divergences = divergences,
+                        onResolve = onOpenPersonalUsage,
+                    )
+                }
+            }
+
             // Antes do seletor de período: o aviso não pertence a um período, e
             // um alerta abaixo dos cartões só seria visto por quem rolasse.
             if (maintenanceWarnings.isNotEmpty()) {
@@ -377,6 +389,18 @@ private fun CostRatiosCard(metrics: DashboardMetrics) {
             value = BrazilianFormatter.moneyOrUnavailable(metrics.costPerKm),
         )
 
+        // Sem dado de uso pessoal o app calcula com o que tem — e **diz isso**
+        // (PRD §22). Antes da v0.9.1 a tela ficava calada, e um número
+        // incompleto exibido como resposta final é indistinguível de um número
+        // errado para quem está lendo.
+        if (!metrics.hasPersonalUsage && metrics.totalKilometers > 0L) {
+            Text(
+                text = stringResource(R.string.dashboard_personal_missing_note),
+                style = MaterialTheme.typography.bodySmall,
+                color = MaterialTheme.colorScheme.onSurfaceVariant,
+            )
+        }
+
         // A repartição só aparece quando há uso pessoal: sem ele os dois
         // valores seriam "tudo" e "zero", o que não informa nada.
         if (metrics.hasPersonalUsage) {
@@ -433,6 +457,62 @@ private fun ExpensesByCategoryCard(metrics: DashboardMetrics) {
                     value = BrazilianFormatter.money(amount),
                 )
             }
+    }
+}
+
+/**
+ * Quilômetros que o painel registra e o lançado não explica.
+ *
+ * Fica no topo do dashboard porque é aqui que o número afetado aparece:
+ * enquanto a sobra não for resolvida, o custo/km divide por menos quilômetros
+ * do que o carro rodou. Até a v0.9.0 essa conferência dependia de o motorista
+ * abrir a tela de uso pessoal e apertar um botão que ele não tinha como saber
+ * que existia.
+ */
+@Composable
+private fun OdometerGapCard(
+    divergences: List<VehicleReconciliation>,
+    onResolve: () -> Unit,
+) {
+    Card(
+        modifier = Modifier
+            .fillMaxWidth()
+            .clickable(onClick = onResolve),
+        colors = CardDefaults.cardColors(
+            containerColor = MaterialTheme.colorScheme.tertiaryContainer,
+        ),
+    ) {
+        Column(
+            modifier = Modifier
+                .fillMaxWidth()
+                .padding(16.dp),
+            verticalArrangement = Arrangement.spacedBy(4.dp),
+        ) {
+            Text(
+                text = stringResource(R.string.dashboard_odometer_gap_title),
+                style = MaterialTheme.typography.titleSmall,
+                color = MaterialTheme.colorScheme.onTertiaryContainer,
+            )
+            divergences.forEach { item ->
+                val gap = item.reconciliation.unexplainedKilometers ?: 0L
+                Text(
+                    text = stringResource(
+                        R.string.dashboard_odometer_gap_line,
+                        item.vehicle.name,
+                        // Valor absoluto: a divergência negativa é lançamento a
+                        // mais, e o diálogo é que explica de que lado ela está.
+                        BrazilianFormatter.kilometers(kotlin.math.abs(gap)),
+                    ),
+                    style = MaterialTheme.typography.bodyMedium,
+                    color = MaterialTheme.colorScheme.onTertiaryContainer,
+                )
+            }
+            Text(
+                text = stringResource(R.string.dashboard_odometer_gap_action),
+                style = MaterialTheme.typography.labelMedium,
+                color = MaterialTheme.colorScheme.onTertiaryContainer,
+            )
+        }
     }
 }
 

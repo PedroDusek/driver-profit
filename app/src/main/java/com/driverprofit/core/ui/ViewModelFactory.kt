@@ -32,6 +32,7 @@ object DriverProfitViewModelFactory {
             DashboardViewModel(
                 observeDashboard = container().observeDashboard,
                 observeMaintenance = container().observeMaintenance,
+                observeReconciliation = container().observeOdometerReconciliation,
             )
         }
         initializer {
@@ -44,9 +45,8 @@ object DriverProfitViewModelFactory {
         initializer {
             PersonalUsageListViewModel(
                 observePersonalUsage = container().observePersonalUsage,
-                observeVehicles = container().observeVehicles,
+                observeReconciliation = container().observeOdometerReconciliation,
                 deletePersonalUsage = container().deletePersonalUsage,
-                reconcileOdometer = container().reconcileOdometer,
                 saveReconciled = container().saveReconciledPersonalUsage,
             )
         }

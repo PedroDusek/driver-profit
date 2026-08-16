@@ -32,7 +32,7 @@ import com.driverprofit.domain.usecase.GetPersonalUsageUseCase
 import com.driverprofit.domain.usecase.ObservePersonalUsageInPeriodUseCase
 import com.driverprofit.domain.usecase.ObservePersonalUsageUseCase
 import com.driverprofit.domain.usecase.PersonalUsageValidator
-import com.driverprofit.domain.usecase.ReconcileOdometerUseCase
+import com.driverprofit.domain.usecase.ObserveOdometerReconciliationUseCase
 import com.driverprofit.domain.usecase.SavePersonalUsageUseCase
 import com.driverprofit.domain.usecase.SaveReconciledPersonalUsageUseCase
 import com.driverprofit.domain.usecase.ObserveVehicleOdometerUseCase
@@ -83,7 +83,7 @@ interface AppContainer {
     val observePersonalUsage: ObservePersonalUsageUseCase
     val getPersonalUsage: GetPersonalUsageUseCase
     val deletePersonalUsage: DeletePersonalUsageUseCase
-    val reconcileOdometer: ReconcileOdometerUseCase
+    val observeOdometerReconciliation: ObserveOdometerReconciliationUseCase
     val saveReconciledPersonalUsage: SaveReconciledPersonalUsageUseCase
 
     val observeMaintenance: ObserveMaintenanceUseCase
@@ -200,8 +200,9 @@ class DefaultAppContainer(private val context: Context) : AppContainer {
         DeletePersonalUsageUseCase(personalUsageRepository)
     }
 
-    override val reconcileOdometer: ReconcileOdometerUseCase by lazy {
-        ReconcileOdometerUseCase(
+    override val observeOdometerReconciliation: ObserveOdometerReconciliationUseCase by lazy {
+        ObserveOdometerReconciliationUseCase(
+            vehicleRepository = vehicleRepository,
             expenseRepository = expenseRepository,
             workSessionRepository = workSessionRepository,
             personalUsageRepository = personalUsageRepository,
