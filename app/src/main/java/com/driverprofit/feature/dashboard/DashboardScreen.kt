@@ -500,13 +500,28 @@ private fun OdometerGapCard(
                 Text(
                     text = stringResource(
                         R.string.dashboard_odometer_gap_line,
-                        item.vehicle.name,
                         // Valor absoluto: a divergência negativa é lançamento a
                         // mais, e o diálogo é que explica de que lado ela está.
                         BrazilianFormatter.kilometers(kotlin.math.abs(gap)),
                     ),
                     style = MaterialTheme.typography.bodyMedium,
                     color = MaterialTheme.colorScheme.onTertiaryContainer,
+                )
+                // O intervalo é de outra natureza que o período selecionado
+                // acima: ele vai de uma leitura de odômetro à seguinte. Sem
+                // dizê-lo, o número parece pertencer ao filtro escolhido — e
+                // com duas janelas pendentes, as duas linhas ficariam
+                // indistinguíveis.
+                Text(
+                    text = stringResource(
+                        R.string.dashboard_odometer_gap_window,
+                        item.vehicle.name,
+                        BrazilianFormatter.date(item.reconciliation.period.start),
+                        BrazilianFormatter.date(item.reconciliation.period.end),
+                    ),
+                    style = MaterialTheme.typography.bodySmall,
+                    color = MaterialTheme.colorScheme.onTertiaryContainer,
+                    modifier = Modifier.padding(bottom = 4.dp),
                 )
             }
             Text(

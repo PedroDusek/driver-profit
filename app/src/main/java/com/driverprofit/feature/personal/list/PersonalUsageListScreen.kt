@@ -215,6 +215,18 @@ private fun ReconcileDialog(
                         Text(stringResource(R.string.reconcile_all_explained))
 
                     else -> {
+                        // Qual janela está sendo conferida. Com mais de uma
+                        // pendente, dois diálogos seguidos seriam idênticos
+                        // exceto pelos números.
+                        Text(
+                            text = stringResource(
+                                R.string.reconcile_period,
+                                BrazilianFormatter.date(reconciliation.period.start),
+                                BrazilianFormatter.date(reconciliation.period.end),
+                            ),
+                            style = MaterialTheme.typography.bodySmall,
+                            color = MaterialTheme.colorScheme.onSurfaceVariant,
+                        )
                         ReconcileRow(
                             stringResource(R.string.reconcile_odometer),
                             reconciliation.odometerKilometers,

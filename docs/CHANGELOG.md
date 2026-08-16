@@ -66,6 +66,15 @@ corrigir. Encontrado no primeiro teste com dados reais em aparelho.
   O custo por km é o mesmo nos dois usos; o que muda é quantos quilômetros cada
   um consumiu.
 
+- **Cada bloco diz a que intervalo se refere.** O dashboard empilha três
+  semânticas de tempo — o período selecionado, a janela entre duas leituras de
+  odômetro e a quilometragem acumulada do carro — e só a primeira era rotulada.
+  A divergência passa a mostrar as datas da janela, o aviso de manutenção diz
+  que não depende do seletor, e o diálogo de conciliação abre dizendo qual
+  intervalo está conferindo. Este último virou necessidade quando mais de uma
+  janela passou a ficar pendente: dois diálogos seguidos eram idênticos exceto
+  pelos números.
+
 ### Decisão mantida
 
 A sobra **continua sendo uma pergunta**, não uma atribuição automática (PRD §22).
