@@ -51,6 +51,7 @@
     <string name="dashboard_cost_per_km">Custo real por km</string>
     <string name="dashboard_split_work">Trabalho</string>
     <string name="dashboard_split_personal">Pessoal</string>
+    <string name="dashboard_split_share">%1$s · %2$s · %3$d%%</string>
     <string name="dashboard_split_line">%1$s · %2$s</string>
     <string name="dashboard_personal_note">O custo por km considera toda a distância rodada, inclusive a pessoal. Só a parte do trabalho entra no lucro.</string>
 
@@ -191,6 +192,8 @@
     <string name="expense_amount_hint">Zero é válido: recarga gratuita conta</string>
     <string name="expense_vehicle">Veículo</string>
     <string name="expense_vehicle_none">Cadastre um veículo antes de lançar esta despesa</string>
+    <string name="expense_odometer_unknown">Não sei a leitura deste dia</string>
+    <string name="expense_odometer_unknown_hint">Só para lançamento antigo. O valor e as despesas contam normalmente; a distância deste lançamento fica de fora.</string>
     <string name="expense_odometer">Odômetro (km)</string>
     <string name="expense_odometer_hint">Quilometragem do painel neste momento</string>
     <string name="expense_odometer_last">Última leitura: %1$s</string>
@@ -259,6 +262,7 @@
     <string name="error_vehicle_cannot_charge">Esse veículo não é recarregável</string>
     <string name="error_text_too_long">Texto muito longo</string>
     <string name="error_odometer_out_of_range">Quilometragem inválida</string>
+    <string name="error_odometer_inconsistent">Essa leitura não bate com as datas vizinhas: o odômetro só cresce</string>
     <string name="error_end_before_start">O fim não pode ser antes do início</string>
     <string name="error_distance_out_of_range">Distância inválida</string>
 

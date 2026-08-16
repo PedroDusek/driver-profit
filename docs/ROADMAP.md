@@ -198,7 +198,7 @@ apenas pessimista; mas **atrasa** o alerta de manutenção, o que desgasta
 motor. Por isso o alerta não herda a degradação graciosa das outras
 funcionalidades — na dúvida ele pede a leitura, em vez de estimar.
 
-### v0.9.1 — Fechar o ciclo do odômetro
+### v0.9.1 — Fechar o ciclo do odômetro ✅ concluída
 
 O ciclo que a v0.7.0 construiu **não gira sozinho**. A conciliação existe, mas o
 gatilho é manual, roda sobre o mês corrente e só sobre o primeiro veículo da

@@ -86,6 +86,7 @@ object ExpenseLabels {
             R.string.error_fuel_not_supported
         ExpenseValidationError.VEHICLE_CANNOT_CHARGE -> R.string.error_vehicle_cannot_charge
         ExpenseValidationError.ODOMETER_OUT_OF_RANGE -> R.string.error_odometer_out_of_range
+        ExpenseValidationError.ODOMETER_INCONSISTENT -> R.string.error_odometer_inconsistent
         ExpenseValidationError.TEXT_TOO_LONG -> R.string.error_text_too_long
     }
 }

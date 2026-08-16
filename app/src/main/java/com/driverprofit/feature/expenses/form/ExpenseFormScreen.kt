@@ -1,6 +1,7 @@
 package com.driverprofit.feature.expenses.form
 
 import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
@@ -36,6 +37,8 @@ import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
+import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.Checkbox
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.input.KeyboardType
@@ -192,7 +195,7 @@ fun ExpenseFormScreen(
                     ?: stringResource(R.string.expense_amount_hint),
             )
 
-            if (uiState.showOdometer) {
+            if (uiState.showOdometer && !uiState.odometerUnknown) {
                 CaretAtEndTextField(
                     value = uiState.odometerInput,
                     onValueChange = viewModel::onOdometerChange,
@@ -211,6 +214,32 @@ fun ExpenseFormScreen(
                         }
                         ?: stringResource(R.string.expense_odometer_hint),
                 )
+            }
+
+            // Só em lançamento retroativo: nota de posto não traz odômetro, e
+            // exigir um número que não existe empurra o motorista a inventar —
+            // o que envenena consumo, marco de manutenção e conciliação.
+            if (uiState.allowsUnknownOdometer(viewModel.today())) {
+                Row(
+                    modifier = Modifier.fillMaxWidth(),
+                    verticalAlignment = Alignment.CenterVertically,
+                ) {
+                    Checkbox(
+                        checked = uiState.odometerUnknown,
+                        onCheckedChange = viewModel::onOdometerUnknownChange,
+                    )
+                    Column {
+                        Text(
+                            text = stringResource(R.string.expense_odometer_unknown),
+                            style = MaterialTheme.typography.bodyMedium,
+                        )
+                        Text(
+                            text = stringResource(R.string.expense_odometer_unknown_hint),
+                            style = MaterialTheme.typography.bodySmall,
+                            color = MaterialTheme.colorScheme.onSurfaceVariant,
+                        )
+                    }
+                }
             }
 
             when (uiState.detailKind) {

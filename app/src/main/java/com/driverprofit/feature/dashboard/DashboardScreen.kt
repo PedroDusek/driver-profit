@@ -407,11 +407,13 @@ private fun CostRatiosCard(metrics: DashboardMetrics) {
             SplitRow(
                 label = stringResource(R.string.dashboard_split_work),
                 kilometers = metrics.workKilometers,
+                share = metrics.workKilometerShare,
                 amount = metrics.workOperationalCost,
             )
             SplitRow(
                 label = stringResource(R.string.dashboard_split_personal),
                 kilometers = metrics.personalKilometers,
+                share = metrics.personalKilometerShare,
                 amount = metrics.personalOperationalCost,
             )
             Text(
@@ -539,18 +541,29 @@ private fun MetricsCard(title: String, content: @Composable () -> Unit) {
  * operacional do período.
  */
 @Composable
-private fun SplitRow(label: String, kilometers: Long, amount: Money) {
+private fun SplitRow(label: String, kilometers: Long, share: Int?, amount: Money) {
     Row(
         modifier = Modifier.fillMaxWidth(),
         horizontalArrangement = Arrangement.SpaceBetween,
         verticalAlignment = Alignment.CenterVertically,
     ) {
         Text(
-            text = stringResource(
-                R.string.dashboard_split_line,
-                label,
-                BrazilianFormatter.kilometers(kilometers),
-            ),
+            // O percentual responde "quanto do carro o trabalho divide com a
+            // vida pessoal", sem sugerir uma multiplicação que daria errado.
+            text = if (share == null) {
+                stringResource(
+                    R.string.dashboard_split_line,
+                    label,
+                    BrazilianFormatter.kilometers(kilometers),
+                )
+            } else {
+                stringResource(
+                    R.string.dashboard_split_share,
+                    label,
+                    BrazilianFormatter.kilometers(kilometers),
+                    share,
+                )
+            },
             style = MaterialTheme.typography.bodyMedium,
             color = MaterialTheme.colorScheme.onSurfaceVariant,
         )

@@ -74,51 +74,59 @@ data class VehicleReconciliation(
 object OdometerWindow {
 
     /**
-     * Conciliação da última janela de um veículo, ou `null` quando não há duas
-     * leituras para comparar.
+     * Conciliação de **todas** as janelas de um veículo, da mais antiga para a
+     * mais recente.
+     *
+     * Todas, e não apenas a última: lançar dois abastecimentos antes de abrir o
+     * app fecha duas janelas, e conferir só a mais nova abandonaria a anterior
+     * para sempre. Isso vale para quem lança em lote — semanalmente, por
+     * exemplo — e para quem preenche histórico depois.
+     *
+     * As já resolvidas saem da lista sozinhas: o uso pessoal gravado por uma
+     * conciliação anterior é descontado como declarado, e a sobra da janela
+     * volta a zero.
      *
      * @param expenses despesas **do veículo**.
      * @param sessions jornadas de trabalho. Elas não têm veículo (PRD §15), o
      *   que é simplificação assumida do MVP: com um carro por motorista, toda
      *   jornada da janela é daquele carro.
      */
-    fun latest(
+    fun pending(
         expenses: List<Expense>,
         sessions: List<WorkSession>,
         personalUsage: List<PersonalUsage>,
         vehicleId: Long,
-    ): OdometerReconciliation? {
+    ): List<OdometerReconciliation> {
         // Ordenado por leitura, e não por data: odômetro só cresce, e lançar
         // hoje a nota da semana passada é rotina.
         val readings = expenses
             .filter { it.vehicleId == vehicleId && it.odometerKm != null }
             .sortedBy { it.odometerKm }
 
-        if (readings.size < 2) return null
+        if (readings.size < 2) return emptyList()
 
-        val previous = readings[readings.size - 2]
-        val current = readings.last()
+        return readings.zipWithNext { previous, current ->
+            val previousOdometer = previous.odometerKm ?: return@zipWithNext null
+            val currentOdometer = current.odometerKm ?: return@zipWithNext null
 
-        val previousOdometer = previous.odometerKm ?: return null
-        val currentOdometer = current.odometerKm ?: return null
+            val window = windowBetween(previous.date, current.date)
 
-        val window = windowBetween(previous.date, current.date)
+            val work = sessions
+                .filter { it.date >= window.start && it.date <= window.end }
+                .sumOf { it.distanceKm }
 
-        val work = sessions
-            .filter { it.date >= window.start && it.date <= window.end }
-            .sumOf { it.distanceKm }
+            val declared = personalUsage
+                .filter { it.range.start <= window.end && it.range.end >= window.start }
+                .sumOf { it.kilometersWithin(window) }
 
-        val declared = personalUsage
-            .filter { it.range.start <= window.end && it.range.end >= window.start }
-            .sumOf { it.kilometersWithin(window) }
-
-        return OdometerReconciliation(
-            period = window,
-            vehicleId = vehicleId,
-            odometerKilometers = currentOdometer - previousOdometer,
-            workKilometers = work,
-            declaredPersonalKilometers = declared,
-        )
+            OdometerReconciliation(
+                period = window,
+                vehicleId = vehicleId,
+                odometerKilometers = currentOdometer - previousOdometer,
+                workKilometers = work,
+                declaredPersonalKilometers = declared,
+            )
+        }.filterNotNull().filter { it.hasUnexplained || it.hasDivergence }
     }
 
     /**
@@ -163,10 +171,9 @@ class ObserveOdometerReconciliationUseCase(
         workSessionRepository.observeSessions(),
         personalUsageRepository.observeAll(),
     ) { vehicles, expenses, sessions, personalUsage ->
-        vehicles.mapNotNull { vehicle ->
-            OdometerWindow.latest(expenses, sessions, personalUsage, vehicle.id)
-                ?.takeIf { it.hasUnexplained || it.hasDivergence }
-                ?.let { VehicleReconciliation(vehicle, it) }
+        vehicles.flatMap { vehicle ->
+            OdometerWindow.pending(expenses, sessions, personalUsage, vehicle.id)
+                .map { VehicleReconciliation(vehicle, it) }
         }
     }
 }

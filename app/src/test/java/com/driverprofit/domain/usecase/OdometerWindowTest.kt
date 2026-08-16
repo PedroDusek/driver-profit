@@ -11,7 +11,6 @@ import com.driverprofit.domain.model.Platform
 import com.driverprofit.domain.model.WorkSession
 import org.junit.Assert.assertEquals
 import org.junit.Assert.assertFalse
-import org.junit.Assert.assertNull
 import org.junit.Assert.assertTrue
 import org.junit.Test
 import java.time.Instant
@@ -51,16 +50,60 @@ class OdometerWindowTest {
         createdAt = Instant.EPOCH,
     )
 
+    private fun pending(
+        expenses: List<Expense>,
+        sessions: List<WorkSession> = emptyList(),
+        personalUsage: List<PersonalUsage> = emptyList(),
+    ) = OdometerWindow.pending(expenses, sessions, personalUsage, vehicleId = 1)
+
+    /** Ultima janela pendente, que e a que a tela mostra primeiro. */
     private fun latest(
         expenses: List<Expense>,
         sessions: List<WorkSession> = emptyList(),
         personalUsage: List<PersonalUsage> = emptyList(),
-    ) = OdometerWindow.latest(expenses, sessions, personalUsage, vehicleId = 1)
+    ) = pending(expenses, sessions, personalUsage).lastOrNull()
 
     @Test
     fun `sem duas leituras nao ha o que conferir`() {
-        assertNull(latest(emptyList()))
-        assertNull(latest(listOf(reading(100_000, DIA_1))))
+        assertTrue(pending(emptyList()).isEmpty())
+        assertTrue(pending(listOf(reading(100_000, DIA_1))).isEmpty())
+    }
+
+    @Test
+    fun `todas as janelas pendentes sao devolvidas e nao so a ultima`() {
+        // Dois abastecimentos lancados antes de abrir o app fecham duas
+        // janelas. Conferir so a mais nova abandonaria a anterior para sempre —
+        // e quem lanca em lote, semanalmente, cai nisso toda semana.
+        val janelas = pending(
+            expenses = listOf(
+                reading(100_000, DIA_1),
+                reading(101_000, DIA_4),
+                reading(101_800, DIA_6),
+            ),
+            sessions = listOf(session(DIA_2, 600), session(DIA_5, 500)),
+        )
+
+        assertEquals(2, janelas.size)
+        assertEquals(400L, janelas[0].unexplainedKilometers)
+        assertEquals(300L, janelas[1].unexplainedKilometers)
+    }
+
+    @Test
+    fun `janela ja resolvida sai da lista`() {
+        // O uso pessoal gravado por uma conciliacao anterior e descontado como
+        // declarado, e a sobra daquela janela volta a zero.
+        val janelas = pending(
+            expenses = listOf(
+                reading(100_000, DIA_1),
+                reading(101_000, DIA_4),
+                reading(101_800, DIA_6),
+            ),
+            sessions = listOf(session(DIA_2, 600), session(DIA_5, 500)),
+            personalUsage = listOf(personal(DIA_2, DIA_4, 400)),
+        )
+
+        assertEquals(1, janelas.size)
+        assertEquals(300L, janelas.single().unexplainedKilometers)
     }
 
     @Test
@@ -82,16 +125,16 @@ class OdometerWindowTest {
     @Test
     fun `uso pessoal ja declarado abate a sobra`() {
         // Sem esse desconto a viagem lancada a mao apareceria de novo dentro da
-        // sobra, e seria contada duas vezes.
-        val r = latest(
+        // sobra, e seria contada duas vezes. Zerada a sobra, a janela deixa de
+        // ser pendente e some da lista — que e como uma conciliacao resolvida
+        // para de aparecer na tela.
+        val janelas = pending(
             expenses = listOf(reading(100_000, DIA_1), reading(101_000, DIA_4)),
             sessions = listOf(session(DIA_2, 600)),
             personalUsage = listOf(personal(DIA_3, DIA_3, 400)),
-        )!!
+        )
 
-        assertEquals(0L, r.unexplainedKilometers)
-        assertFalse(r.hasUnexplained)
-        assertFalse(r.hasDivergence)
+        assertTrue(janelas.isEmpty())
     }
 
     @Test
@@ -121,12 +164,13 @@ class OdometerWindowTest {
         )
         val sessions = listOf(session(DIA_2, 900), session(DIA_5, 800))
 
-        val segunda = OdometerWindow.latest(expenses, sessions, emptyList(), 1)!!
+        val segunda = OdometerWindow.pending(expenses, sessions, emptyList(), 1).last()
         assertEquals(700L, segunda.odometerKilometers)
         assertEquals(800L, segunda.workKilometers)
         assertEquals(-100L, segunda.unexplainedKilometers)
 
-        val primeira = OdometerWindow.latest(expenses.dropLast(1), sessions, emptyList(), 1)!!
+        val primeira = OdometerWindow.pending(expenses.dropLast(1), sessions, emptyList(), 1)
+            .single()
         assertEquals(100L, primeira.unexplainedKilometers)
 
         // Somadas, as duas janelas dizem a verdade: 1.700 km de painel para
