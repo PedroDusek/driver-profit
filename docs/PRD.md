@@ -324,7 +324,7 @@ precisam ter.
 > **Não é para sempre.** O caso que o silêncio esconde é o sistemático: alguém
 > que anota quilômetro a mais toda semana teria o custo/km permanentemente
 > otimista sem nada dizer. Isso não é um alerta, é uma observação sobre um
-> conjunto — pertence à v0.11.0, junto de "evolução entre períodos".
+> conjunto — pertence à v0.13.0, junto de "evolução entre períodos".
 
 Sem dado de uso pessoal, o app calcula com o que tem e **declara a limitação
 na tela**. O estado "sem correção" é ausência de dado, nunca uma chave que o
@@ -417,6 +417,16 @@ ao motorista caiba numa frase e o cálculo caiba num teste.
 > Marcá-los individualmente é refinamento pós-MVP; o erro é pequeno diante do
 > combustível.
 
+> **Decisão de produto registrada (v0.11.0).** IPVA sai do rateio por
+> competência descrito na próxima seção — continua **100% ao trabalho** e fora
+> do custo/km, mas o valor lançado passa a contar inteiro no mês do
+> lançamento, sem diluir pelos meses do ano. O motivo é que o dinheiro sai da
+> conta do motorista à vista ou em poucas parcelas, nunca em doze fatias
+> iguais — diluir por competência descrevia um fluxo de caixa que não existe.
+> Pagou em mais de uma vez? Cada parcela é uma despesa separada, cada uma
+> contando no seu próprio mês. Seguro e financiamento continuam usando
+> competência normalmente.
+
 #### Competência dos custos fixos
 
 Custo fixo é pago em bloco e serve a um período. Sem separar as duas coisas, o
@@ -429,13 +439,15 @@ diário é o valor dividido pelos dias desse intervalo:
 
 | Lançamento | Pago em | Competência | Custo diário |
 | --- | --- | --- | --- |
-| IPVA R$ 1.200 | 15/01 | 01/01 – 31/12 | R$ 3,29 |
-| Seguro R$ 300 | 05/03 | 01/03 – 31/03 | R$ 9,68 |
-| Parcela R$ 1.200 | 10/04 | 01/04 – 30/04 | R$ 40,00 |
+| Seguro R$ 1.200 | 05/03 | 01/03 – 28/02 | R$ 3,29 |
+| Parcela do financiamento R$ 1.200 | 10/04 | 01/04 – 30/04 | R$ 40,00 |
 | Combustível R$ 150 | 12/04 | — | conta no dia |
+| IPVA R$ 1.200 | 15/01 | — (v0.11.0) | conta em janeiro, inteiro |
 
 Sem competência declarada, a despesa conta no próprio dia — o comportamento
-que já existe.
+que já existe. **IPVA nunca tem competência** a partir da v0.11.0: o
+formulário não oferece o campo para essa categoria (ver decisão registrada
+acima).
 
 **Histórico e "Despesas" continuam exibindo caixa**, para conferir com o
 extrato; apenas os indicadores por quilômetro usam competência. Resultado por

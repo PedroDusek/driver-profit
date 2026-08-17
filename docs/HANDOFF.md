@@ -25,14 +25,6 @@ mergeadas e tagueadas; não há branch de feature em aberto nem PR pendente.
 O PRD §58 volta a valer: dá para fazer `git checkout v0.8.0` e reproduzir aquele
 estado.
 
-⚠️ **O `CHANGELOG.md` está com uma entrada mal colocada.** O fix do Auto Backup
-(commit `08b33aa`: o Android não incluía o arquivo `-wal`, e o Room mantém
-escritas recentes só ali até um checkpoint, então o backup podia levar um
-SQLite quase vazio sem erro nenhum) já **está** na v0.10.1 — é ancestral da
-tag — mas o changelog ainda o lista em "[Não publicado]" em vez de dentro da
-seção `[0.10.1]`. Só o texto do changelog ficou para trás; o código e o
-release estão corretos.
-
 ### O que fazer primeiro
 
 **A última funcionalidade essencial do MVP já entrou.** O que resta é qualidade,
@@ -218,8 +210,9 @@ estimado em si chega na v0.8.0.
 | v0.9.0 Manutenção preventiva · v0.9.1 Ciclo do odômetro | ✅ |
 | v0.10.0 Custos fixos por competência | ✅ |
 | v0.10.1 Resolver a sobra do odômetro | ✅ |
-| **v0.11.0 Analytics** | ⬅️ próxima em escopo novo |
-| v0.12.0 UX polish · v0.13.0 Hardening · v0.14.0 RC · v1.0.0 MVP | |
+| **v0.11.0 IPVA sem competência** | ⬅️ em andamento |
+| v0.12.0 Veículo atual | |
+| v0.13.0 Analytics · v0.14.0 UX polish · v0.15.0 Hardening · v0.16.0 RC · v1.0.0 MVP | |
 
 O bloco v0.6.0–v0.10.0 foi desenhado em conjunto: cada versão é pequena,
 testável e reversível, e a ordem é de dependência, não de preferência. O
@@ -232,8 +225,9 @@ no PRD §22 e §23.
 Menos funcionalidade do que a contagem de versões sugere, e mais consolidação do
 que o roadmap deixa transparecer.
 
-**Funcionalidade essencial: nenhuma.** A v0.10.0 fechou a última. A v0.11.0
-(analytics) é desejável e não bloqueia o MVP.
+**Funcionalidade essencial: nenhuma.** A v0.10.0 fechou a última. v0.11.0
+(IPVA sem competência) e v0.12.0 (veículo atual) são pedidos de produto do
+Pedro, e v0.13.0 (analytics) é desejável — nenhuma bloqueia o MVP.
 
 **O que separa "funciona" de "lançável"**, e é o grosso:
 

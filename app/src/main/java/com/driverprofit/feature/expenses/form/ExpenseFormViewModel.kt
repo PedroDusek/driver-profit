@@ -108,14 +108,14 @@ data class ExpenseFormUiState(
     val showVehicle: Boolean get() = category?.requiresVehicle == true
 
     /**
-     * A competência só é oferecida em custo fixo — seguro, IPVA e
-     * financiamento (PRD §22).
+     * A competência só é oferecida em seguro e financiamento (PRD §22).
      *
      * Custo variável se esgota no dia em que foi pago: combustível queimado na
      * terça não serve à quarta. Oferecer o campo ali só criaria uma pergunta
-     * sem resposta útil, e um lugar a mais para errar.
+     * sem resposta útil, e um lugar a mais para errar. IPVA também ficou de
+     * fora a partir da v0.11.0: o valor conta inteiro no mês do lançamento.
      */
-    val showAccrual: Boolean get() = category?.isOperationalCost == false
+    val showAccrual: Boolean get() = category?.allowsAccrual == true
 
     /** O odômetro só é pedido onde há veículo em jogo (PRD §23). */
     val showOdometer: Boolean get() = showVehicle

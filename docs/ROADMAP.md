@@ -343,18 +343,48 @@ que significa "competência é a própria data", o comportamento atual.
 Histórico e "Despesas" continuam exibindo **caixa**, para conferir com o
 extrato. Só os indicadores por km usam competência.
 
-### v0.11.0 — Analytics
+### v0.11.0 — IPVA sem competência
+
+- [ ] `ExpenseCategory.allowsAccrual`: só seguro e financiamento
+- [ ] Formulário para de oferecer competência para IPVA
+- [ ] Validação de domínio rejeita competência fora de `allowsAccrual`
+- [ ] Dashboard filtra custo fixo rateado por `allowsAccrual`, não por
+      `accrual` estar vazio — robusto a dado legado
+
+**Critério de saída:** IPVA lançado conta inteiro no mês do lançamento, sem
+diluir pelos outros onze meses. Seguro e financiamento continuam usando
+competência.
+
+**Banco:** sem migração — mudança só de regra de negócio e validação.
+
+### v0.12.0 — Veículo atual
+
+- [ ] `vehicles.is_current`: automático com 1 veículo, botão com 2+
+- [ ] `work_sessions.vehicle_id`: ganhos passam a gravar o veículo atual
+- [ ] Despesas pré-selecionam o veículo atual (qualquer quantidade de
+      veículos, não só quando há exatamente um)
+- [ ] Migração 9→10 + testes instrumentados
+
+**Critério de saída:** trocar de veículo não obriga escolher o carro toda vez
+em ganhos e despesas, e cada lançamento mantém o veículo que tinha quando foi
+criado — a base para comparar histórico entre carros depois.
+
+**Banco:** versão 10.
+
+### v0.13.0 — Analytics
 
 - [ ] Gráficos
 - [ ] Custo por km separado por natureza (PRD §22)
 - [ ] Evolução de faturamento, R$/hora e R$/km entre períodos
+- [ ] Filtro/comparação do dashboard por veículo (ficou de fora da v0.12.0 de
+      propósito, para já ter dado histórico correto acumulado)
 - [ ] **Verificar se sobras negativas de odômetro são frequentes.** A v0.10.1 as
       desconsidera em silêncio, porque uma isolada não tem ação possível. Mas um
       motorista que anota quilômetro a mais sistematicamente teria o custo/km
       permanentemente otimista sem nada dizer. É observação sobre um conjunto,
       não alerta — e só faz sentido com histórico acumulado
 
-### v0.12.0 — UX Polish
+### v0.14.0 — UX Polish
 
 - [ ] Estados vazios, loading e erro
 - [ ] Animações moderadas
@@ -362,7 +392,7 @@ extrato. Só os indicadores por km usam competência.
 - [ ] Acessibilidade
 - [ ] Formatação brasileira em toda a interface
 
-### v0.13.0 — Hardening
+### v0.15.0 — Hardening
 
 - [ ] Cobertura de testes ampliada
 - [ ] Performance
@@ -371,7 +401,7 @@ extrato. Só os indicadores por km usam competência.
 - [ ] Backup local
 - [ ] Crash handling
 
-### v0.14.0 — Release Candidate
+### v0.16.0 — Release Candidate
 
 Congelamento de funcionalidades. A partir daqui: apenas correções,
 performance, segurança, UX, testes e estabilidade.

@@ -51,7 +51,7 @@ class ExpenseValidator(
             add(error(ExpenseField.DESCRIPTION, ExpenseValidationError.TEXT_TOO_LONG))
         }
 
-        addAll(validateAccrual(draft))
+        addAll(validateAccrual(category, draft))
 
         if (category != null) {
             addAll(validateVehicle(category, draft, vehicle))
@@ -79,10 +79,22 @@ class ExpenseValidator(
      * Uma ponta só não define intervalo, e aceitar isso obrigaria o cálculo a
      * inventar a outra — que é exatamente o tipo de suposição silenciosa que o
      * projeto evita. O fim antes do início é barrado pelo próprio `DateRange`.
+     *
+     * IPVA não aceita competência (PRD §22, v0.11.0). A UI já não oferece o
+     * campo para essa categoria, mas o domínio confere de novo — mesmo padrão
+     * de [validateDetail] rejeitando combustível incompatível mesmo a UI já
+     * filtrando as opções.
      */
-    private fun validateAccrual(draft: ExpenseDraft): List<ExpenseFieldError> {
+    private fun validateAccrual(
+        category: com.driverprofit.domain.model.ExpenseCategory?,
+        draft: ExpenseDraft,
+    ): List<ExpenseFieldError> {
         val start = draft.accrualStart
         val end = draft.accrualEnd
+
+        if (category != null && !category.allowsAccrual && (start != null || end != null)) {
+            return listOf(error(ExpenseField.ACCRUAL, ExpenseValidationError.ACCRUAL_NOT_ALLOWED))
+        }
 
         return when {
             start == null && end == null -> emptyList()

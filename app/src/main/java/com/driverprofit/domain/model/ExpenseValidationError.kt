@@ -68,6 +68,14 @@ enum class ExpenseValidationError {
     /** Competência com só uma das pontas preenchida. */
     ACCRUAL_INCOMPLETE,
 
+    /**
+     * Competência preenchida numa categoria que não a aceita.
+     *
+     * IPVA é o caso hoje (v0.11.0): o valor conta inteiro no mês do
+     * lançamento, e não pela fatia de dias de um intervalo.
+     */
+    ACCRUAL_NOT_ALLOWED,
+
     TEXT_TOO_LONG,
 }
 

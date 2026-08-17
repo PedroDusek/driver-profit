@@ -145,6 +145,29 @@ class ExpenseFormViewModelTest {
     }
 
     @Test
+    fun `ipva nao mostra campo de competencia`() = runTest {
+        // A partir da v0.11.0 o valor entra inteiro no mes do lancamento.
+        val viewModel = viewModel()
+        advanceUntilIdle()
+
+        viewModel.onCategoryChange(ExpenseCategory.VEHICLE_TAX)
+
+        assertFalse(viewModel.uiState.value.showAccrual)
+    }
+
+    @Test
+    fun `seguro e financiamento continuam mostrando competencia`() = runTest {
+        val viewModel = viewModel()
+        advanceUntilIdle()
+
+        listOf(ExpenseCategory.INSURANCE, ExpenseCategory.FINANCING).forEach { categoria ->
+            viewModel.onCategoryChange(categoria)
+
+            assertTrue("competencia deveria aparecer: $categoria", viewModel.uiState.value.showAccrual)
+        }
+    }
+
+    @Test
     fun `unidade do campo acompanha o combustivel escolhido`() = runTest {
         val viewModel = viewModel(vehicles = listOf(cngCar))
         advanceUntilIdle()

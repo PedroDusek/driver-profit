@@ -89,6 +89,7 @@ object ExpenseLabels {
         ExpenseValidationError.ODOMETER_OUT_OF_RANGE -> R.string.error_odometer_out_of_range
         ExpenseValidationError.ODOMETER_INCONSISTENT -> R.string.error_odometer_inconsistent
         ExpenseValidationError.ACCRUAL_INCOMPLETE -> R.string.error_accrual_incomplete
+        ExpenseValidationError.ACCRUAL_NOT_ALLOWED -> R.string.error_accrual_not_allowed
         ExpenseValidationError.TEXT_TOO_LONG -> R.string.error_text_too_long
     }
 }

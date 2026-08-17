@@ -35,10 +35,14 @@ class ObserveDashboardUseCase(
             // com a fatia de dias que lhe cabe (PRD §22).
             personalKilometers = personalUsage.sumOf { it.kilometersWithin(range) },
             // Mesma ideia do recorte proporcional acima, aplicada a dinheiro:
-            // o IPVA anual entrega a cada mês a fatia de dias que lhe cabe.
-            // Só custo fixo entra — variável se esgota no dia em que foi pago.
+            // o seguro anual entrega a cada mês a fatia de dias que lhe cabe.
+            // Só custo fixo que aceita competência entra (v0.11.0: não é mais
+            // todo custo fixo — IPVA saiu). O filtro é por `allowsAccrual`, e
+            // não por `accrual` estar vazio, para não depender de nenhuma
+            // linha antiga de IPVA ainda ter competência gravada de antes
+            // desta versão.
             accruedFixedCost = Money.sum(
-                accrued.filterNot { it.category.isOperationalCost }
+                accrued.filter { it.category.allowsAccrual }
                     .map { it.amountWithin(range) },
             ),
         )

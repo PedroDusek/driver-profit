@@ -5,14 +5,15 @@ Versionamento conforme [Semantic Versioning](https://semver.org/lang/pt-BR/).
 
 ## [Não publicado]
 
-### Corrigido
+### Alterado
 
-- **O backup automático não incluía o arquivo `-wal`.** O Room usa write-ahead
-  logging, e as escritas recentes ficam no WAL até um checkpoint movê-las para o
-  `.db`. As regras copiavam só o `.db`, então o backup podia levar um SQLite
-  válido e quase vazio — e a restauração devolveria um histórico incompleto sem
-  erro nenhum. Medido em 16/08/2026: `.db` com 4 KB e `-wal` com 206 KB. O
-  `-shm` segue de fora, porque o SQLite o regenera a partir do WAL.
+- **IPVA sai do rateio por competência.** O valor lançado passa a contar
+  inteiro no mês do lançamento, em vez de diluído pelos dias de um intervalo —
+  o dinheiro sai à vista ou em poucas parcelas, nunca em doze fatias iguais.
+  Continua **100% ao trabalho** e fora do custo/km. Seguro e financiamento
+  continuam usando competência normalmente. Sem migração de banco:
+  `Expense.amountWithin` já tinha o comportamento certo para quando não há
+  competência
 
 ## [0.10.1] — Resolver a sobra do odômetro
 
@@ -21,6 +22,15 @@ jornada — e nenhuma servia para o caso mais comum: uma sobra pequena que o
 motorista não consegue explicar. Sem terceira opção, o aviso ficava para sempre.
 
 **Banco na versão 9.**
+
+### Corrigido
+
+- **O backup automático não incluía o arquivo `-wal`.** O Room usa write-ahead
+  logging, e as escritas recentes ficam no WAL até um checkpoint movê-las para o
+  `.db`. As regras copiavam só o `.db`, então o backup podia levar um SQLite
+  válido e quase vazio — e a restauração devolveria um histórico incompleto sem
+  erro nenhum. Medido em 16/08/2026: `.db` com 4 KB e `-wal` com 206 KB. O
+  `-shm` segue de fora, porque o SQLite o regenera a partir do WAL.
 
 ### Adicionado
 

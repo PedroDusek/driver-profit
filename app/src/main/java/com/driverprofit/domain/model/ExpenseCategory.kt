@@ -42,6 +42,19 @@ enum class ExpenseCategory(val detailKind: ExpenseDetailKind) {
      */
     val isOperationalCost: Boolean
         get() = this !in setOf(INSURANCE, VEHICLE_TAX, FINANCING)
+
+    /**
+     * Custos fixos que ainda usam competência (PRD §22).
+     *
+     * IPVA saiu na v0.11.0: o dinheiro sai à vista ou em poucas parcelas, nunca
+     * em doze fatias iguais, então diluí-lo pelo ano não descrevia a realidade
+     * do motorista. O valor lançado passa a contar inteiro no mês do
+     * lançamento — o comportamento que [Expense.amountWithin] já tem quando
+     * [Expense.accrual] é `null`. Seguro e financiamento continuam podendo
+     * usar competência exatamente como antes.
+     */
+    val allowsAccrual: Boolean
+        get() = this in setOf(INSURANCE, FINANCING)
 }
 
 /** Que conjunto de campos extras a categoria exige no formulário. */

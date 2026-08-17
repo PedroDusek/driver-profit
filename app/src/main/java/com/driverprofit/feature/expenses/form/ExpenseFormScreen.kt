@@ -283,6 +283,14 @@ fun ExpenseFormScreen(
                         Text(stringResource(R.string.expense_accrual_clear))
                     }
                 }
+            } else if (uiState.category == ExpenseCategory.VEHICLE_TAX) {
+                // IPVA saiu da competência na v0.11.0: o valor entra inteiro
+                // no mês do lançamento, sem campo de período pra preencher.
+                Text(
+                    text = stringResource(R.string.expense_vehicle_tax_hint),
+                    style = MaterialTheme.typography.bodySmall,
+                    color = MaterialTheme.colorScheme.onSurfaceVariant,
+                )
             }
 
             when (uiState.detailKind) {

@@ -394,6 +394,70 @@ class ExpenseValidatorTest {
         )
     }
 
+    // --- Competência (PRD §22, v0.11.0) ---
+
+    private val vehicleTaxDraft = ExpenseDraft(
+        date = hoje,
+        category = ExpenseCategory.VEHICLE_TAX,
+        amount = Money.of(1200, 0),
+    )
+
+    @Test
+    fun `ipva sem competencia e valido`() {
+        assertEquals(emptyList<ExpenseFieldError>(), validator.validate(vehicleTaxDraft, null))
+    }
+
+    @Test
+    fun `ipva com competencia e rejeitado`() {
+        // O valor entra inteiro no mes do lancamento a partir da v0.11.0 - nao
+        // ha mais intervalo pra diluir.
+        val draft = vehicleTaxDraft.copy(
+            accrualStart = LocalDate.of(2026, 1, 1),
+            accrualEnd = LocalDate.of(2026, 12, 31),
+        )
+
+        assertTrue(
+            validator.validate(draft, null).contains(
+                ExpenseFieldError(ExpenseField.ACCRUAL, ExpenseValidationError.ACCRUAL_NOT_ALLOWED),
+            ),
+        )
+    }
+
+    @Test
+    fun `seguro e financiamento continuam aceitando competencia`() {
+        listOf(ExpenseCategory.INSURANCE, ExpenseCategory.FINANCING).forEach { categoria ->
+            val draft = ExpenseDraft(
+                date = hoje,
+                category = categoria,
+                amount = Money.of(300, 0),
+                accrualStart = hoje.withDayOfMonth(1),
+                accrualEnd = hoje,
+            )
+
+            assertEquals(
+                "competencia deveria ser aceita: $categoria",
+                emptyList<ExpenseFieldError>(),
+                validator.validate(draft, null),
+            )
+        }
+    }
+
+    @Test
+    fun `competencia incompleta continua rejeitada`() {
+        val draft = ExpenseDraft(
+            date = hoje,
+            category = ExpenseCategory.INSURANCE,
+            amount = Money.of(300, 0),
+            accrualStart = hoje.withDayOfMonth(1),
+        )
+
+        assertTrue(
+            validator.validate(draft, null).contains(
+                ExpenseFieldError(ExpenseField.ACCRUAL, ExpenseValidationError.ACCRUAL_INCOMPLETE),
+            ),
+        )
+    }
+
     // --- Texto ---
 
     @Test
