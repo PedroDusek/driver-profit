@@ -122,4 +122,48 @@ class VehicleDaoTest {
     fun findByIdInexistenteRetornaNulo() = runTest {
         assertNull(dao.findById(999L))
     }
+
+    // --- Veículo atual (v0.12.0) ---
+
+    @Test
+    fun setCurrentTrocaAtomicamenteQuemEAtual() = runTest {
+        val onixId = dao.insert(flexCar)
+        val dolphinId = dao.insert(electricCar)
+        dao.setCurrent(onixId)
+
+        dao.setCurrent(dolphinId)
+
+        assertEquals(false, dao.findById(onixId)!!.isCurrent)
+        assertEquals(true, dao.findById(dolphinId)!!.isCurrent)
+    }
+
+    @Test
+    fun promoteOldestToCurrentIfNoneNaoFazNadaSeJaHaUmAtual() = runTest {
+        val onixId = dao.insert(flexCar)
+        val dolphinId = dao.insert(electricCar)
+        dao.setCurrent(dolphinId)
+
+        dao.promoteOldestToCurrentIfNone()
+
+        assertEquals(false, dao.findById(onixId)!!.isCurrent)
+        assertEquals(true, dao.findById(dolphinId)!!.isCurrent)
+    }
+
+    @Test
+    fun promoteOldestToCurrentIfNonePromoveOMaisAntigoQuandoNinguemEAtual() = runTest {
+        val onixId = dao.insert(flexCar) // created_at = 1_000_000, o mais antigo
+        val dolphinId = dao.insert(electricCar) // created_at = 2_000_000
+
+        dao.promoteOldestToCurrentIfNone()
+
+        assertEquals(true, dao.findById(onixId)!!.isCurrent)
+        assertEquals(false, dao.findById(dolphinId)!!.isCurrent)
+    }
+
+    @Test
+    fun promoteOldestToCurrentIfNoneNaoQuebraComBancoVazio() = runTest {
+        dao.promoteOldestToCurrentIfNone()
+
+        assertEquals(0, dao.count())
+    }
 }

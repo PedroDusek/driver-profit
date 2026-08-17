@@ -47,4 +47,10 @@ class OfflineVehicleRepository(
 
     override suspend fun deleteVehicle(id: Long) =
         withContext(ioDispatcher) { vehicleDao.deleteById(id) }
+
+    override suspend fun setCurrent(id: Long) =
+        withContext(ioDispatcher) { vehicleDao.setCurrent(id) }
+
+    override suspend fun promoteOldestToCurrentIfNone() =
+        withContext(ioDispatcher) { vehicleDao.promoteOldestToCurrentIfNone() }
 }

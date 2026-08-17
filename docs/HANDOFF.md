@@ -4,14 +4,15 @@ Documento de continuidade. Leia isto **antes** de qualquer coisa ao retomar o
 projeto em uma sessão nova, junto com `PRD.md`, `ARCHITECTURE.md` e
 `DEVELOPMENT.md`.
 
-**Última atualização:** v0.10.1
+**Última atualização:** v0.12.0
 
 ---
 
 ## 0. Comece por aqui
 
-**Está tudo na `main`.** Em 16/08/2026 cinco versões pendentes foram
-mergeadas e tagueadas; não há branch de feature em aberto nem PR pendente.
+**Está tudo na `main`.** Em 17/08/2026, v0.11.0 e v0.12.0 — pedidos de
+produto do Pedro, não itens do roadmap original — foram mergeadas por
+fast-forward e tagueadas; não há branch de feature em aberto nem PR pendente.
 
 | Versão | Tag | Banco | Release |
 | --- | --- | --- | --- |
@@ -21,9 +22,17 @@ mergeadas e tagueadas; não há branch de feature em aberto nem PR pendente.
 | v0.9.1 Ciclo do odômetro | ✅ | 7 | ✅ |
 | v0.10.0 Custos fixos por competência | ✅ | **8** | ✅ |
 | v0.10.1 Resolver a sobra do odômetro | ✅ | **9** | ✅ |
+| v0.11.0 IPVA sem competência | ✅ | 9 | — |
+| v0.12.0 Veículo atual | ✅ | **10** | — |
 
 O PRD §58 volta a valer: dá para fazer `git checkout v0.8.0` e reproduzir aquele
 estado.
+
+⚠️ **v0.11.0 e v0.12.0 não têm release do GitHub** — só a tag local. A v0.10.1
+foi a última com `git push` e release publicado; as duas seguintes ficaram
+commitadas e tagueadas em `main`, mas ninguém rodou `git push origin main
+--tags` nem disparou o workflow de release. Fazer isso é decisão do Pedro, não
+automática.
 
 ### O que fazer primeiro
 
@@ -50,9 +59,8 @@ tem um construtor que roda na JVM com SQLite empacotado, **sem Robolectric**.
 
 ### O que já foi verificado, e o que não foi
 
-- **65 testes instrumentados** confirmados em Redmi Note 8 Pro (Android 9), mas
-  essa execução é da v0.10.0 (banco 8) — ver seção 7 para o que mudou desde
-  então e ainda não foi reconfirmado em aparelho
+- **76 testes instrumentados** confirmados em Redmi Note 8 Pro (Android 9),
+  17/08/2026, banco na versão 10 — ver seção 7
 - **Migração validada em dados reais**: aparelho com banco na versão 5 recebeu a
   v0.9.0 por cima, migrou 5→6→7, abriu sem exceção e manteve os dados. Como o
   Room confere o schema contra o hash esperado ao abrir, isso prova que as
@@ -89,8 +97,8 @@ tem um construtor que roda na JVM com SQLite empacotado, **sem Robolectric**.
 | Código | `C:\Users\pedro\Desktop\driver-profit` |
 | Repositório | https://github.com/PedroDusek/driver-profit (público) |
 | Branch estável | `main`, protegida |
-| Última tag | `v0.10.1`, com release publicado |
-| Versão do banco | **9** |
+| Última tag | `v0.12.0`, sem release publicado (ver aviso na seção 0) |
+| Versão do banco | **10** |
 
 ⚠️ **O caminho não pode conter acento.** O projeto nasceu em
 `Desktop\RodAí` e o AGP recusa build com caractere não-ASCII no caminho. Se
@@ -210,9 +218,10 @@ estimado em si chega na v0.8.0.
 | v0.9.0 Manutenção preventiva · v0.9.1 Ciclo do odômetro | ✅ |
 | v0.10.0 Custos fixos por competência | ✅ |
 | v0.10.1 Resolver a sobra do odômetro | ✅ |
-| **v0.11.0 IPVA sem competência** | ⬅️ em andamento |
-| v0.12.0 Veículo atual | |
-| v0.13.0 Analytics · v0.14.0 UX polish · v0.15.0 Hardening · v0.16.0 RC · v1.0.0 MVP | |
+| v0.11.0 IPVA sem competência | ✅ |
+| v0.12.0 Veículo atual | ✅ |
+| **v0.13.0 Analytics** | ⬅️ próxima em escopo novo |
+| v0.14.0 UX polish · v0.15.0 Hardening · v0.16.0 RC · v1.0.0 MVP | |
 
 O bloco v0.6.0–v0.10.0 foi desenhado em conjunto: cada versão é pequena,
 testável e reversível, e a ordem é de dependência, não de preferência. O
@@ -226,8 +235,9 @@ Menos funcionalidade do que a contagem de versões sugere, e mais consolidação
 que o roadmap deixa transparecer.
 
 **Funcionalidade essencial: nenhuma.** A v0.10.0 fechou a última. v0.11.0
-(IPVA sem competência) e v0.12.0 (veículo atual) são pedidos de produto do
-Pedro, e v0.13.0 (analytics) é desejável — nenhuma bloqueia o MVP.
+(IPVA sem competência) e v0.12.0 (veículo atual) foram pedidos de produto do
+Pedro, já mergeados e tagueados. v0.13.0 (analytics) é desejável e não
+bloqueia o MVP.
 
 **O que separa "funciona" de "lançável"**, e é o grosso:
 
@@ -297,19 +307,20 @@ sempre.
 ## 7. Testes instrumentados
 
 São a única verificação real das migrações. Cobrem cinco dos seis DAOs e as
-nove migrações encadeadas (1→2→3→4→5→6→7→8→9).
+dez migrações encadeadas (1→2→3→4→5→6→7→8→9→10).
 
-✅ **Última execução confirmada em dispositivo: 16/08/2026, 65 testes, todos
-passando**, em Redmi Note 8 Pro com Android 9 — mas essa execução é da
-v0.10.0 (banco 8). O código-fonte já tem 68 testes (banco 9, migração 8→9
-incluída): `MigrationTest` 23, `ExpenseDaoTest` 14, `WorkSessionDaoTest` 10,
-`VehicleDaoTest` 8, `MaintenanceScheduleDaoTest` 8, `PersonalUsageDaoTest` 5.
+✅ **Última execução confirmada em dispositivo: 17/08/2026, 76 testes, todos
+passando**, em Redmi Note 8 Pro com Android 9, já em `main` pós-merge da
+v0.12.0 (banco 10): `MigrationTest` 27, `ExpenseDaoTest` 14,
+`WorkSessionDaoTest` 10, `VehicleDaoTest` 12, `MaintenanceScheduleDaoTest` 8,
+`PersonalUsageDaoTest` 5.
+
+A v0.11.0 (banco 9, sem migração) rodou os 68 testes anteriores à v0.12.0 —
+todos passando — antes do merge, na branch `feature/vehicle-tax-cash-basis`.
 
 ⚠️ **`ReconciliationDismissalDao` não tem teste instrumentado dedicado.** É
 o único DAO dos seis sem cobertura própria — a tabela nova da v0.10.1 é
-exercitada só via `MigrationTest`. E os 68 testes do código-fonte ainda não
-foram confirmados rodando num aparelho; a próxima sessão que tocar em banco
-precisa rodar `connectedDebugAndroidTest` antes de assumir que passam.
+exercitada só via `MigrationTest`.
 
 ⚠️ **Ele desinstala os dois pacotes ao terminar, e isso apaga os dados.** Se
 você quer exercitar uma migração em cima de dados reais, faça isso **antes** de

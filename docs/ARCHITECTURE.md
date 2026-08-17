@@ -151,6 +151,35 @@ tempo de compilação tratar GNV em litros ou energia em litros.
 > cadastro que o motorista preenche uma vez. `ELECTRIC` e `HYBRID` continuam
 > na lista, então os casos do PRD §11 e §12 seguem atendidos.
 
+### O veículo atual é um invariante, não um estado livre
+
+Desde a v0.12.0, `Vehicle.isCurrent` garante: **exatamente um veículo é atual
+quando há pelo menos um cadastrado.** Três pontos mantêm isso, e nenhum outro
+lugar do código escreve em `isCurrent`:
+
+- `SaveVehicleUseCase` marca o veículo recém-criado como atual quando ele é o
+  primeiro (`repository.countVehicles() == 0` antes do insert). Cadastros
+  seguintes não mexem em quem é o atual.
+- `DeleteVehicleUseCase` chama `promoteOldestToCurrentIfNone()` depois de toda
+  exclusão, incondicionalmente. É idempotente — só age se a exclusão deixou o
+  banco sem nenhum atual — e promove o mais antigo dos que sobraram.
+- `SetCurrentVehicleUseCase` faz a troca manual (tela de veículos, com dois ou
+  mais veículos). No DAO, `clearCurrent()` + `markCurrent(id)` andam dentro de
+  um `@Transaction`, para nunca existir um instante com dois atuais nem com
+  nenhum.
+
+`VehicleValidator.toVehicle` recebe `isCurrent` como parâmetro com default
+`false` — o mesmo padrão de `createdAt` — para que editar nome ou combustível
+não resete a marcação: `SaveVehicleUseCase` passa `existing.isCurrent` na
+edição.
+
+É o veículo atual que `ExpenseFormViewModel` e `EarningsFormViewModel`
+pré-selecionam automaticamente ao abrir um lançamento novo
+(`vehicles.firstOrNull { it.isCurrent }`), substituindo a heurística anterior
+de "só pré-seleciona com exatamente um veículo cadastrado". Ganhos gravam o
+vínculo em `WorkSession.vehicleId` (novo em v0.12.0, nulo e imutável depois de
+salvo) — o mesmo padrão que despesa já usava desde a v0.4.0.
+
 ### O cálculo do dashboard vive no domínio
 
 `domain/model/DashboardMetrics.kt`. Recebe as sessões e as despesas de um

@@ -6,6 +6,7 @@ import com.driverprofit.domain.model.Vehicle
 import com.driverprofit.domain.usecase.DeleteVehicleUseCase
 import com.driverprofit.domain.usecase.ObserveVehicleOdometersUseCase
 import com.driverprofit.domain.usecase.ObserveVehiclesUseCase
+import com.driverprofit.domain.usecase.SetCurrentVehicleUseCase
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.StateFlow
@@ -44,6 +45,7 @@ class VehicleListViewModel(
     observeVehicles: ObserveVehiclesUseCase,
     observeVehicleOdometers: ObserveVehicleOdometersUseCase,
     private val deleteVehicle: DeleteVehicleUseCase,
+    private val setCurrentVehicle: SetCurrentVehicleUseCase,
 ) : ViewModel() {
 
     /** Veículo aguardando confirmação de exclusão, ou `null`. */
@@ -63,6 +65,19 @@ class VehicleListViewModel(
             started = SharingStarted.WhileSubscribed(STOP_TIMEOUT_MILLIS),
             initialValue = VehicleListUiState.Loading,
         )
+
+    /**
+     * Marca [vehicle] como o veículo atual (v0.12.0).
+     *
+     * Só existe efeito com dois ou mais veículos — a tela nem mostra o botão
+     * quando há um só, porque ele já nasce atual sozinho.
+     */
+    fun onSetCurrent(vehicle: Vehicle) {
+        if (vehicle.isCurrent) return
+        viewModelScope.launch {
+            setCurrentVehicle(vehicle.id)
+        }
+    }
 
     fun onDeleteRequested(vehicle: Vehicle) {
         pendingDeletion.value = vehicle

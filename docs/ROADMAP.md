@@ -343,12 +343,12 @@ que significa "competência é a própria data", o comportamento atual.
 Histórico e "Despesas" continuam exibindo **caixa**, para conferir com o
 extrato. Só os indicadores por km usam competência.
 
-### v0.11.0 — IPVA sem competência
+### v0.11.0 — IPVA sem competência ✅ concluída
 
-- [ ] `ExpenseCategory.allowsAccrual`: só seguro e financiamento
-- [ ] Formulário para de oferecer competência para IPVA
-- [ ] Validação de domínio rejeita competência fora de `allowsAccrual`
-- [ ] Dashboard filtra custo fixo rateado por `allowsAccrual`, não por
+- [x] `ExpenseCategory.allowsAccrual`: só seguro e financiamento
+- [x] Formulário para de oferecer competência para IPVA
+- [x] Validação de domínio rejeita competência fora de `allowsAccrual`
+- [x] Dashboard filtra custo fixo rateado por `allowsAccrual`, não por
       `accrual` estar vazio — robusto a dado legado
 
 **Critério de saída:** IPVA lançado conta inteiro no mês do lançamento, sem
@@ -357,13 +357,14 @@ competência.
 
 **Banco:** sem migração — mudança só de regra de negócio e validação.
 
-### v0.12.0 — Veículo atual
+### v0.12.0 — Veículo atual ✅ concluída
 
-- [ ] `vehicles.is_current`: automático com 1 veículo, botão com 2+
-- [ ] `work_sessions.vehicle_id`: ganhos passam a gravar o veículo atual
-- [ ] Despesas pré-selecionam o veículo atual (qualquer quantidade de
+- [x] `vehicles.is_current`: automático com 1 veículo, botão com 2+
+- [x] `work_sessions.vehicle_id`: ganhos passam a gravar o veículo atual
+- [x] Despesas pré-selecionam o veículo atual (qualquer quantidade de
       veículos, não só quando há exatamente um)
-- [ ] Migração 9→10 + testes instrumentados
+- [x] Migração 9→10 + 76 testes instrumentados, confirmados em Redmi Note 8
+      Pro (Android 9)
 
 **Critério de saída:** trocar de veículo não obriga escolher o carro toda vez
 em ganhos e despesas, e cada lançamento mantém o veículo que tinha quando foi

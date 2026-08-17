@@ -5,6 +5,22 @@ Versionamento conforme [Semantic Versioning](https://semver.org/lang/pt-BR/).
 
 ## [Não publicado]
 
+### Adicionado
+
+- **Veículo atual.** Com um veículo cadastrado, ele é automaticamente o
+  atual; com dois ou mais, um botão na tela de veículos escolhe qual é.
+  Ganhos e despesas gravam o veículo atual automaticamente no momento do
+  lançamento, e o vínculo não muda depois — trocar o veículo atual não
+  reclassifica lançamentos antigos. `work_sessions` ganha `vehicle_id`
+  (nulo, imutável), o mesmo padrão que despesa já tinha desde a v0.4.0.
+  **Banco na versão 10**
+- Resolve de graça um efeito colateral: com dois ou mais veículos, nada era
+  pré-selecionado no formulário de despesa, e o motorista via as opções de
+  combustível antes de escolher o carro. Agora o veículo atual vem
+  pré-selecionado independente de quantos veículos existem
+
+## [0.11.0] — IPVA sem competência
+
 ### Alterado
 
 - **IPVA sai do rateio por competência.** O valor lançado passa a contar

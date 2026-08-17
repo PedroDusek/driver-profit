@@ -47,4 +47,14 @@ class FakeVehicleRepository(
     override suspend fun deleteVehicle(id: Long) {
         vehicles.value = vehicles.value.filterNot { it.id == id }
     }
+
+    override suspend fun setCurrent(id: Long) {
+        vehicles.value = vehicles.value.map { it.copy(isCurrent = it.id == id) }
+    }
+
+    override suspend fun promoteOldestToCurrentIfNone() {
+        if (vehicles.value.any { it.isCurrent }) return
+        val oldest = vehicles.value.minByOrNull { it.createdAt } ?: return
+        vehicles.value = vehicles.value.map { it.copy(isCurrent = it.id == oldest.id) }
+    }
 }

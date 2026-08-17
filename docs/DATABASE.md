@@ -2,7 +2,7 @@
 
 Room sobre SQLite, local ao aparelho. Nome do arquivo: `driver_profit.db`.
 
-**Versão atual do schema: 9**
+**Versão atual do schema: 10**
 
 O JSON do schema é exportado em `app/schemas/` e **é versionado no Git**. Ele é
 o que torna possível escrever testes de migração de verdade. Os schemas
@@ -10,7 +10,7 @@ antigos são mantidos: sem o `1.json`, não há como testar a migração 1→2.
 
 ## Entidades
 
-### `vehicles` (v2)
+### `vehicles` (v2, `is_current` desde v10)
 
 Veículo do motorista. Guarda apenas o mínimo necessário para identificar o
 carro e calcular custo de abastecimento.
@@ -21,6 +21,7 @@ carro e calcular custo de abastecimento.
 | `name` | TEXT | não | Como o motorista chama o carro: "Onix branco" |
 | `fuel` | TEXT | não | `GASOLINE` \| `ETHANOL` \| `FLEX` \| `CNG` \| `FLEX_CNG` \| `ELECTRIC` \| `HYBRID` |
 | `created_at` | INTEGER | não | Epoch millis (UTC) |
+| `is_current` | INTEGER | não | Booleano (0/1). Desde a v0.12.0 |
 
 **Por que só isso:** marca, modelo e ano não entram em nenhuma conta de
 rentabilidade. `fuel` é o único atributo do veículo que o cálculo consome —
@@ -30,7 +31,14 @@ ele determina a unidade de medida do abastecimento (litro, m³ ou kWh).
 a controles de manutenção (troca de óleo, pneus), e não como atributo do
 veículo.
 
-### `work_sessions` (v3)
+**`is_current` mantém um invariante, não um estado livre**: exatamente um
+veículo é atual quando há pelo menos um cadastrado. `SaveVehicleUseCase`
+marca o primeiro veículo como atual na criação; `DeleteVehicleUseCase` promove
+o mais antigo dos que sobraram se o excluído era o atual;
+`SetCurrentVehicleUseCase` faz a troca manual, atomicamente. É o veículo atual
+que novos ganhos e despesas gravam automaticamente.
+
+### `work_sessions` (v3, `vehicle_id` desde v10)
 
 Uma sessão de trabalho: o que o motorista fez em um dia, numa plataforma
 (PRD §15). Rodar na Uber e na 99 no mesmo dia são dois registros — é isso que
@@ -39,6 +47,7 @@ torna a comparação entre plataformas possível depois (PRD §16).
 | Coluna | Tipo SQL | Nulo | Descrição |
 | --- | --- | --- | --- |
 | `id` | INTEGER PK AUTOINCREMENT | não | Identificador |
+| `vehicle_id` | INTEGER | **sim** | FK para `vehicles`, `ON DELETE SET NULL`. Desde a v0.12.0 |
 | `date` | INTEGER | não | Epoch day do dia de trabalho |
 | `platform` | TEXT | não | `UBER` \| `NINETY_NINE` \| `INDRIVE` \| `OTHER` |
 | `rides` | INTEGER | não | Número de corridas |
@@ -48,9 +57,18 @@ torna a comparação entre plataformas possível depois (PRD §16).
 | `note` | TEXT | não | Observação; string vazia quando não informada |
 | `created_at` | INTEGER | não | Epoch millis (UTC) |
 
-**Índice:** `index_work_sessions_date` sobre `date`. Toda consulta do dashboard
-filtra por período (PRD §20), e como `date` é epoch day o `BETWEEN` é
-comparação numérica que usa o índice.
+**Índices:** `index_work_sessions_date` sobre `date` — toda consulta do
+dashboard filtra por período (PRD §20), e como `date` é epoch day o `BETWEEN`
+é comparação numérica que usa o índice — e `index_work_sessions_vehicle_id`
+sobre `vehicle_id`, exigido pelo Room para a chave estrangeira.
+
+**`vehicle_id` é o veículo atual no momento do lançamento, gravado
+automaticamente** — nenhum campo do formulário de ganhos o edita. Anulável
+porque sessões lançadas antes da v0.12.0 não têm como saber qual carro era, e
+porque não é obrigatório ter veículo cadastrado para lançar um ganho. Fica
+parado depois de gravado: trocar o veículo atual não reclassifica sessões
+antigas — é isso que torna possível comparar histórico entre carros quando o
+motorista troca de veículo.
 
 **Campos numéricos não são anuláveis.** Um dia sem quilometragem anotada grava
 `0`, não `NULL`: para somar no dashboard, "não anotei" e "zero" dão no mesmo, e
@@ -304,6 +322,7 @@ Um PR que altera apenas a Entity está incompleto.
 | 7 | v0.9.0 | Adiciona `maintenance_schedules` (intervalos de manutenção) |
 | 8 | v0.10.0 | Adiciona `accrual_start` e `accrual_end` em `expenses` (competência) |
 | 9 | v0.10.1 | Adiciona `reconciliation_dismissals` (sobras aceitas fora da conta) |
+| 10 | v0.12.0 | Adiciona `vehicles.is_current` e `work_sessions.vehicle_id` (veículo atual) |
 
 #### Migração 1 → 2
 
@@ -393,6 +412,27 @@ corretamente todo lançamento anterior a esta versão.
 Preencher as despesas existentes com a própria data produziria o mesmo número,
 mas apagaria a distinção entre "não tem competência" e "tem competência de um
 dia só" — e o app perderia a chance de oferecer o campo em edição depois.
+
+#### Migração 9 → 10
+
+Duas mudanças aditivas na mesma migração, porque pertencem à mesma
+funcionalidade — veículo atual.
+
+`ALTER TABLE vehicles ADD COLUMN is_current INTEGER NOT NULL DEFAULT 0`,
+seguido de um `UPDATE` que marca como atual o veículo de menor `created_at`.
+Cobre os dois casos que existem em bancos anteriores a esta versão: com um
+veículo só, ele vira atual (que é a regra: veículo único é automaticamente
+atual); com vários, o mais antigo vira — determinístico, sem deixar nenhum
+banco sem veículo atual depois da migração.
+
+`ALTER TABLE work_sessions ADD COLUMN vehicle_id INTEGER REFERENCES
+vehicles(id) ON DELETE SET NULL`, com o índice que o Room exige para a chave
+estrangeira. Diferente da migração 3→4 (que criou `expenses` já com a FK, por
+ser tabela nova), aqui a FK entra numa tabela existente via `ADD COLUMN` — o
+SQLite aceita `REFERENCES` nessa forma, então não foi preciso o padrão
+tabela-nova+cópia+troca da migração 1→2. Sessões gravadas antes desta versão
+ficam com `vehicle_id NULL`: não há como reconstruir qual carro era o atual
+antes de a coluna existir.
 
 ## Desvios registrados em relação ao PRD
 

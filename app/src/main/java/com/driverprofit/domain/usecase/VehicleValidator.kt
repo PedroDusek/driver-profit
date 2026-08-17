@@ -42,11 +42,21 @@ class VehicleValidator(
      * Só chame depois de [validate] retornar lista vazia — daí o `!!`, que
      * documenta a pré-condição em vez de escondê-la atrás de um default
      * silencioso.
+     *
+     * [isCurrent] tem o mesmo motivo de [createdAt] receber um valor pronto em
+     * vez de default: o formulário de nome/combustível não edita quem é o
+     * veículo atual, então editar um veículo não pode resetar essa marca —
+     * quem chama passa o valor já existente.
      */
-    fun toVehicle(draft: VehicleDraft, createdAt: Instant = clock.instant()): Vehicle = Vehicle(
+    fun toVehicle(
+        draft: VehicleDraft,
+        createdAt: Instant = clock.instant(),
+        isCurrent: Boolean = false,
+    ): Vehicle = Vehicle(
         id = draft.id,
         name = draft.name.trim(),
         fuel = draft.fuel!!,
         createdAt = createdAt,
+        isCurrent = isCurrent,
     )
 }

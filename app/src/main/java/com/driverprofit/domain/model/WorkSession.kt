@@ -18,12 +18,20 @@ import java.time.LocalDate
  *
  * @param date dia de trabalho. Não é timestamp: o que importa é o dia, e é
  *   por dia que o dashboard vai agrupar.
+ * @param vehicleId veículo atual no momento do lançamento (v0.12.0).
+ *   Gravado automaticamente, nunca escolhido no formulário. Anulável porque
+ *   sessões lançadas antes desta versão não têm como saber qual carro era —
+ *   e porque não é obrigatório ter veículo cadastrado para lançar um ganho.
+ *   Fica parado depois de gravado: trocar o veículo atual não reclassifica
+ *   sessões antigas, o que é o que torna possível comparar histórico entre
+ *   carros quando o motorista troca de veículo.
  * @param distanceKm quilômetros rodados, em unidades inteiras. Meio quilômetro
  *   a mais ou a menos muda R$/km na terceira casa decimal — não vale a
  *   complexidade de fracionar.
  */
 data class WorkSession(
     val id: Long = UNSAVED_ID,
+    val vehicleId: Long? = null,
     val date: LocalDate,
     val platform: Platform,
     val rides: Int,

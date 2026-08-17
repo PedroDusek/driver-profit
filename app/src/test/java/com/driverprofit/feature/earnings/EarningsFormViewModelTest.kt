@@ -5,13 +5,17 @@ import com.driverprofit.core.common.Money
 import com.driverprofit.core.common.WorkDuration
 import com.driverprofit.core.navigation.DriverProfitDestination
 import com.driverprofit.domain.model.Platform
+import com.driverprofit.domain.model.Vehicle
+import com.driverprofit.domain.model.VehicleFuel
 import com.driverprofit.domain.model.WorkSession
 import com.driverprofit.domain.model.WorkSessionField
 import com.driverprofit.domain.model.WorkSessionValidationError
 import com.driverprofit.domain.usecase.GetWorkSessionUseCase
+import com.driverprofit.domain.usecase.ObserveVehiclesUseCase
 import com.driverprofit.domain.usecase.SaveWorkSessionUseCase
 import com.driverprofit.domain.usecase.WorkSessionValidator
 import com.driverprofit.feature.earnings.form.EarningsFormViewModel
+import com.driverprofit.testing.FakeVehicleRepository
 import com.driverprofit.testing.FakeWorkSessionRepository
 import com.driverprofit.testing.MainDispatcherRule
 import kotlinx.coroutines.ExperimentalCoroutinesApi
@@ -53,6 +57,7 @@ class EarningsFormViewModelTest {
     private fun viewModel(
         repository: FakeWorkSessionRepository = FakeWorkSessionRepository(),
         sessionId: Long? = null,
+        vehicles: FakeVehicleRepository = FakeVehicleRepository(),
     ): EarningsFormViewModel {
         val handle = SavedStateHandle(
             sessionId?.let { mapOf(DriverProfitDestination.ARG_SESSION_ID to it) } ?: emptyMap(),
@@ -61,6 +66,7 @@ class EarningsFormViewModelTest {
             savedStateHandle = handle,
             getWorkSession = GetWorkSessionUseCase(repository),
             saveWorkSession = SaveWorkSessionUseCase(repository, WorkSessionValidator(clock)),
+            observeVehicles = ObserveVehiclesUseCase(vehicles),
             clock = clock,
         )
     }
@@ -91,6 +97,33 @@ class EarningsFormViewModelTest {
         assertEquals("20", state.minutesInput)
         assertEquals("210", state.distanceInput)
         assertEquals("dia bom", state.note)
+    }
+
+    @Test
+    fun `lancamento novo pega o veiculo atual`() = runTest {
+        val onix = Vehicle(1, "Onix", VehicleFuel.FLEX, Instant.EPOCH, isCurrent = false)
+        val civic = Vehicle(2, "Civic", VehicleFuel.FLEX, Instant.EPOCH, isCurrent = true)
+        val viewModel = viewModel(vehicles = FakeVehicleRepository(listOf(onix, civic)))
+        advanceUntilIdle()
+
+        assertEquals(2L, viewModel.uiState.value.vehicleId)
+    }
+
+    @Test
+    fun `edicao preserva o veiculo gravado mesmo que o atual tenha mudado`() = runTest {
+        val sessaoComVeiculo = existingSession.copy(vehicleId = 1)
+        val onix = Vehicle(1, "Onix", VehicleFuel.FLEX, Instant.EPOCH, isCurrent = false)
+        val civic = Vehicle(2, "Civic", VehicleFuel.FLEX, Instant.EPOCH, isCurrent = true)
+        val viewModel = viewModel(
+            FakeWorkSessionRepository(listOf(sessaoComVeiculo)),
+            sessionId = 1,
+            vehicles = FakeVehicleRepository(listOf(onix, civic)),
+        )
+        advanceUntilIdle()
+
+        // O veiculo atual agora e o Civic, mas a sessao continua com o Onix,
+        // que era o atual quando ela foi lancada.
+        assertEquals(1L, viewModel.uiState.value.vehicleId)
     }
 
     @Test

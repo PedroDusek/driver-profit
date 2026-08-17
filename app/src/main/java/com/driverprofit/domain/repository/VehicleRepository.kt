@@ -28,4 +28,22 @@ interface VehicleRepository {
     suspend fun updateVehicle(vehicle: Vehicle)
 
     suspend fun deleteVehicle(id: Long)
+
+    /**
+     * Marca [id] como o veículo atual, e nenhum outro (v0.12.0).
+     *
+     * Troca atômica: entre limpar o atual anterior e marcar o novo não existe
+     * um instante sem nenhum veículo atual visível a outra consulta.
+     */
+    suspend fun setCurrent(id: Long)
+
+    /**
+     * Garante que, havendo veículo cadastrado, exista um atual.
+     *
+     * Sem efeito se já existir um atual ou se não houver veículo nenhum.
+     * Chamado depois de excluir um veículo: se o excluído era o atual, o mais
+     * antigo dos que sobraram assume — o formulário de ganhos e despesas
+     * depende de sempre haver um veículo atual quando existe pelo menos um.
+     */
+    suspend fun promoteOldestToCurrentIfNone()
 }

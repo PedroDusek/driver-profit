@@ -518,6 +518,127 @@ class MigrationTest {
     }
 
     @Test
+    fun migracao9para10MarcaOUnicoVeiculoComoAtual() {
+        helper.createDatabase(TEST_DB, 9).use { db ->
+            db.execSQL(
+                "INSERT INTO vehicles (id, name, fuel, created_at) " +
+                    "VALUES (1, 'Onix branco', 'FLEX', 1000)",
+            )
+        }
+
+        val db = helper.runMigrationsAndValidate(TEST_DB, 10, true, Migrations.MIGRATION_9_10)
+
+        db.query("SELECT is_current FROM vehicles WHERE id = 1").use { cursor ->
+            assertTrue(cursor.moveToFirst())
+            assertEquals(1, cursor.getInt(0))
+        }
+    }
+
+    @Test
+    fun migracao9para10EscolheOMaisAntigoQuandoHaVariosVeiculos() {
+        helper.createDatabase(TEST_DB, 9).use { db ->
+            db.execSQL(
+                "INSERT INTO vehicles (id, name, fuel, created_at) " +
+                    "VALUES (1, 'Onix branco', 'FLEX', 2000)",
+            )
+            db.execSQL(
+                "INSERT INTO vehicles (id, name, fuel, created_at) " +
+                    "VALUES (2, 'Civic prata', 'FLEX', 1000)",
+            )
+        }
+
+        val db = helper.runMigrationsAndValidate(TEST_DB, 10, true, Migrations.MIGRATION_9_10)
+
+        // O id 2 tem created_at menor (1000 < 2000): é ele o mais antigo,
+        // mesmo tendo o maior id.
+        db.query("SELECT id FROM vehicles WHERE is_current = 1").use { cursor ->
+            assertTrue(cursor.moveToFirst())
+            assertEquals(2, cursor.getInt(0))
+            assertFalse("deveria haver só um atual", cursor.moveToNext())
+        }
+    }
+
+    @Test
+    fun migracao9para10PermiteVehicleIdEmWorkSessions() {
+        helper.createDatabase(TEST_DB, 9).use { db ->
+            db.execSQL(
+                "INSERT INTO vehicles (id, name, fuel, created_at) " +
+                    "VALUES (1, 'Onix branco', 'FLEX', 1000)",
+            )
+            db.execSQL(
+                """
+                INSERT INTO work_sessions
+                    (id, date, platform, rides, revenue_cents, online_minutes,
+                     distance_km, note, created_at)
+                VALUES (1, 20000, 'UBER', 18, 32050, 500, 210, '', 1000)
+                """.trimIndent(),
+            )
+        }
+
+        val db = helper.runMigrationsAndValidate(TEST_DB, 10, true, Migrations.MIGRATION_9_10)
+
+        // Sessão gravada antes desta versão: não dá para reconstruir qual
+        // carro era o atual, então fica NULL — ausência honesta, não um
+        // veículo inventado.
+        db.query("SELECT vehicle_id FROM work_sessions WHERE id = 1").use { cursor ->
+            assertTrue(cursor.moveToFirst())
+            assertTrue(cursor.isNull(0))
+        }
+
+        db.execSQL(
+            """
+            INSERT INTO work_sessions
+                (id, vehicle_id, date, platform, rides, revenue_cents, online_minutes,
+                 distance_km, note, created_at)
+            VALUES (2, 1, 20001, 'UBER', 10, 20000, 300, 120, '', 2000)
+            """.trimIndent(),
+        )
+
+        db.query("SELECT vehicle_id FROM work_sessions WHERE id = 2").use { cursor ->
+            assertTrue(cursor.moveToFirst())
+            assertEquals(1, cursor.getInt(0))
+        }
+    }
+
+    @Test
+    fun migracao1para10AtravessaTodasAsEtapas() {
+        helper.createDatabase(TEST_DB, 1).use { db ->
+            db.execSQL(
+                """
+                INSERT INTO vehicles
+                    (id, brand, model, year, initial_odometer_km, powertrain,
+                     combustion_fuel, charging_capability, created_at)
+                VALUES
+                    (1, 'Chevrolet', 'Onix', 2020, 50000, 'COMBUSTION', 'FLEX', NULL, 1000)
+                """.trimIndent(),
+            )
+        }
+
+        val db = helper.runMigrationsAndValidate(
+            TEST_DB,
+            10,
+            true,
+            Migrations.MIGRATION_1_2,
+            Migrations.MIGRATION_2_3,
+            Migrations.MIGRATION_3_4,
+            Migrations.MIGRATION_4_5,
+            Migrations.MIGRATION_5_6,
+            Migrations.MIGRATION_6_7,
+            Migrations.MIGRATION_7_8,
+            Migrations.MIGRATION_8_9,
+            Migrations.MIGRATION_9_10,
+        )
+
+        db.query("SELECT name, fuel, is_current FROM vehicles").use { cursor ->
+            assertTrue(cursor.moveToFirst())
+            assertEquals("Chevrolet Onix", cursor.getString(0))
+            assertEquals("FLEX", cursor.getString(1))
+            // Único veículo do banco: nasce atual.
+            assertEquals(1, cursor.getInt(2))
+        }
+    }
+
+    @Test
     fun migracao1para9AtravessaTodasAsEtapas() {
         helper.createDatabase(TEST_DB, 1).use { db ->
             db.execSQL(

@@ -16,12 +16,19 @@ import java.time.Instant
  * Quilometragem também não vive aqui: ela será registrada por lançamento,
  * servindo a controles de manutenção (troca de óleo, pneus), e não como
  * atributo do veículo.
+ *
+ * [isCurrent] existe desde a v0.12.0: exatamente um veículo é atual quando há
+ * pelo menos um cadastrado. Com um só, ele nasce atual; com dois ou mais, o
+ * motorista escolhe pela tela de veículos. É o veículo atual que novos ganhos
+ * e despesas gravam automaticamente — o que viabiliza comparar histórico
+ * entre carros quando o motorista troca de veículo.
  */
 data class Vehicle(
     val id: Long = UNSAVED_ID,
     val name: String,
     val fuel: VehicleFuel,
     val createdAt: Instant,
+    val isCurrent: Boolean = false,
 ) {
     /** Insumos que o formulário de abastecimento deve oferecer (PRD §7). */
     val refuelOptions: List<FuelType> get() = fuel.refuelOptions

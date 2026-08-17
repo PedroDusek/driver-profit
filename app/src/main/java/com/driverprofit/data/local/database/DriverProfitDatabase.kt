@@ -56,6 +56,7 @@ abstract class DriverProfitDatabase : RoomDatabase() {
 
     companion object {
         /**
+         * Versão 10 — adiciona `vehicles.is_current` e `work_sessions.vehicle_id` (veículo atual).
          * Versão 9 — adiciona `reconciliation_dismissals` (sobras aceitas fora da conta).
          * Versão 8 adicionou competência (`accrual_start`, `accrual_end`) em `expenses`.
          * Versão 7 adicionou `maintenance_schedules` (intervalos de manutenção).
@@ -66,7 +67,7 @@ abstract class DriverProfitDatabase : RoomDatabase() {
          * Versão 2 simplificou o veículo para nome + combustível.
          * Versão 1 tinha marca, modelo, ano, odômetro e três eixos de propulsão.
          */
-        const val VERSION = 9
+        const val VERSION = 10
 
         const val NAME = "driver_profit.db"
     }

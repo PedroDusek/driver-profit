@@ -47,6 +47,7 @@ import com.driverprofit.domain.usecase.ObserveWorkSessionsUseCase
 import com.driverprofit.domain.usecase.SaveExpenseUseCase
 import com.driverprofit.domain.usecase.SaveVehicleUseCase
 import com.driverprofit.domain.usecase.SaveWorkSessionUseCase
+import com.driverprofit.domain.usecase.SetCurrentVehicleUseCase
 import com.driverprofit.domain.usecase.VehicleValidator
 import com.driverprofit.domain.usecase.WorkSessionValidator
 
@@ -67,6 +68,7 @@ interface AppContainer {
     val observeVehicles: ObserveVehiclesUseCase
     val getVehicle: GetVehicleUseCase
     val deleteVehicle: DeleteVehicleUseCase
+    val setCurrentVehicle: SetCurrentVehicleUseCase
 
     val saveWorkSession: SaveWorkSessionUseCase
     val observeWorkSessions: ObserveWorkSessionsUseCase
@@ -129,6 +131,10 @@ class DefaultAppContainer(private val context: Context) : AppContainer {
 
     override val deleteVehicle: DeleteVehicleUseCase by lazy {
         DeleteVehicleUseCase(vehicleRepository)
+    }
+
+    override val setCurrentVehicle: SetCurrentVehicleUseCase by lazy {
+        SetCurrentVehicleUseCase(vehicleRepository)
     }
 
     override val workSessionRepository: WorkSessionRepository by lazy {

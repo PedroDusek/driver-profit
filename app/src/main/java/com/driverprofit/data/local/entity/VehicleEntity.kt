@@ -30,6 +30,10 @@ data class VehicleEntity(
     /** Epoch millis em UTC. */
     @ColumnInfo(name = "created_at")
     val createdAt: Instant,
+
+    /** Veículo atual — exatamente um `true` quando há ao menos um veículo (v0.12.0). */
+    @ColumnInfo(name = "is_current")
+    val isCurrent: Boolean = false,
 )
 
 fun VehicleEntity.toDomain(): Vehicle = Vehicle(
@@ -37,6 +41,7 @@ fun VehicleEntity.toDomain(): Vehicle = Vehicle(
     name = name,
     fuel = fuel,
     createdAt = createdAt,
+    isCurrent = isCurrent,
 )
 
 fun Vehicle.toEntity(): VehicleEntity = VehicleEntity(
@@ -44,4 +49,5 @@ fun Vehicle.toEntity(): VehicleEntity = VehicleEntity(
     name = name,
     fuel = fuel,
     createdAt = createdAt,
+    isCurrent = isCurrent,
 )

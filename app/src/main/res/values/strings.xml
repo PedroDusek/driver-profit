@@ -108,6 +108,8 @@
     <string name="vehicle_add">Novo veículo</string>
     <string name="vehicle_empty_title">Nenhum veículo cadastrado</string>
     <string name="vehicle_empty_message">Cadastre seu veículo para começar a registrar abastecimentos.</string>
+    <string name="vehicle_action_set_current">Usar como veículo atual</string>
+    <string name="vehicle_current_description">Veículo atual</string>
     <string name="vehicle_delete_title">Excluir veículo?</string>
     <string name="vehicle_delete_message">%1$s será removido. Esta ação não pode ser desfeita.</string>
 

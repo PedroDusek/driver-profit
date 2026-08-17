@@ -175,9 +175,10 @@ class ExpenseFormViewModel(
                     isEditing = loaded != null,
                     vehicles = vehicles,
                     date = loaded?.date ?: LocalDate.now(clock),
-                    // Com um veículo só, escolher por ele é o certo — pedir
-                    // que selecione o único carro que existe é burocracia.
-                    vehicleId = loaded?.vehicleId ?: vehicles.singleOrNull()?.id,
+                    // O veículo atual vem pré-selecionado (v0.12.0) — pedir
+                    // para escolher toda vez seria burocracia, e com um só
+                    // veículo ele já nasce atual sozinho.
+                    vehicleId = loaded?.vehicleId ?: vehicles.firstOrNull { it.isCurrent }?.id,
                     category = loaded?.category,
                     amountDigits = loaded?.amount?.cents?.toString().orEmpty(),
                     odometerInput = loaded?.odometerKm?.toString().orEmpty(),

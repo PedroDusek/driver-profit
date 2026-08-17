@@ -13,6 +13,8 @@ import java.time.LocalDate
  */
 data class WorkSessionDraft(
     val id: Long = WorkSession.UNSAVED_ID,
+    /** Veículo atual no momento do lançamento (v0.12.0). Nunca escolhido no formulário. */
+    val vehicleId: Long? = null,
     val date: LocalDate? = null,
     val platform: Platform? = null,
     val rides: Int? = null,
@@ -28,6 +30,7 @@ data class WorkSessionDraft(
 /** Constrói um rascunho a partir de uma sessão já persistida, para edição. */
 fun WorkSession.toDraft(): WorkSessionDraft = WorkSessionDraft(
     id = id,
+    vehicleId = vehicleId,
     date = date,
     platform = platform,
     rides = rides,

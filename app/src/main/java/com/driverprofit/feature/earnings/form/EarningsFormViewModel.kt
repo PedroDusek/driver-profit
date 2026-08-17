@@ -15,11 +15,13 @@ import com.driverprofit.domain.model.WorkSessionFieldError
 import com.driverprofit.domain.model.WorkSessionValidationError
 import com.driverprofit.domain.model.toDraft
 import com.driverprofit.domain.usecase.GetWorkSessionUseCase
+import com.driverprofit.domain.usecase.ObserveVehiclesUseCase
 import com.driverprofit.domain.usecase.SaveWorkSessionResult
 import com.driverprofit.domain.usecase.SaveWorkSessionUseCase
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
+import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 import java.time.Clock
@@ -49,6 +51,15 @@ data class EarningsFormUiState(
     val note: String = "",
     val errors: Map<WorkSessionField, WorkSessionValidationError> = emptyMap(),
     val savedSessionId: Long? = null,
+    /**
+     * Veículo atual no momento do lançamento (v0.12.0).
+     *
+     * Nenhum campo do formulário edita isto — é gravado automaticamente. Numa
+     * sessão nova é o veículo atual no momento em que a tela abriu; numa
+     * edição é o que já estava gravado, para não reclassificar histórico
+     * quando o motorista troca de veículo depois.
+     */
+    val vehicleId: Long? = null,
 ) {
     /**
      * `null` enquanto o campo estiver em branco.
@@ -85,6 +96,7 @@ class EarningsFormViewModel(
     savedStateHandle: SavedStateHandle,
     private val getWorkSession: GetWorkSessionUseCase,
     private val saveWorkSession: SaveWorkSessionUseCase,
+    private val observeVehicles: ObserveVehiclesUseCase,
     private val clock: Clock = Clock.systemDefaultZone(),
 ) : ViewModel() {
 
@@ -106,22 +118,35 @@ class EarningsFormViewModel(
     init {
         if (sessionId != WorkSession.UNSAVED_ID) {
             loadSession(sessionId)
+        } else {
+            viewModelScope.launch {
+                _uiState.update { it.copy(vehicleId = currentVehicleId()) }
+            }
         }
     }
+
+    /** Veículo atual no momento em que a tela abriu (v0.12.0). */
+    private suspend fun currentVehicleId(): Long? =
+        observeVehicles().first().firstOrNull { it.isCurrent }?.id
 
     private fun loadSession(id: Long) {
         viewModelScope.launch {
             val session = getWorkSession(id)
-            _uiState.update { state ->
-                if (session == null) {
-                    // Sessão excluída em outra tela enquanto esta abria.
+            if (session == null) {
+                // Sessão excluída em outra tela enquanto esta abria — trata
+                // como lançamento novo, então busca o veículo atual também.
+                val vehicleId = currentVehicleId()
+                _uiState.update { state ->
                     state.copy(
                         isLoading = false,
                         isEditing = false,
                         date = LocalDate.now(clock),
+                        vehicleId = vehicleId,
                     )
-                } else {
-                    val draft = session.toDraft()
+                }
+            } else {
+                val draft = session.toDraft()
+                _uiState.update { state ->
                     state.copy(
                         isLoading = false,
                         isEditing = true,
@@ -133,6 +158,10 @@ class EarningsFormViewModel(
                         minutesInput = draft.onlineTime?.remainingMinutes?.toString().orEmpty(),
                         distanceInput = draft.distanceKm?.toString().orEmpty(),
                         note = draft.note,
+                        // Preserva o veículo já gravado — não re-deriva do
+                        // atual, para o histórico não mudar de dono quando o
+                        // motorista troca de veículo depois.
+                        vehicleId = draft.vehicleId,
                     )
                 }
             }
@@ -235,6 +264,7 @@ internal fun EarningsFormUiState.toDraft(
     sessionId: Long = WorkSession.UNSAVED_ID,
 ): WorkSessionDraft = WorkSessionDraft(
     id = sessionId,
+    vehicleId = vehicleId,
     date = date,
     platform = platform,
     rides = ridesInput.toIntOrNull(),

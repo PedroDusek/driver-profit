@@ -31,6 +31,33 @@ class SaveVehicleUseCaseTest {
     }
 
     @Test
+    fun `primeiro veiculo cadastrado nasce atual`() = runTest {
+        saveVehicle(validDraft)
+
+        assertTrue(repository.current.single().isCurrent)
+    }
+
+    @Test
+    fun `segundo veiculo cadastrado nao mexe em quem e o atual`() = runTest {
+        saveVehicle(validDraft)
+        saveVehicle(validDraft.copy(name = "Civic prata"))
+
+        val atuais = repository.current.filter { it.isCurrent }
+        assertEquals(1, atuais.size)
+        assertEquals("Onix branco", atuais.single().name)
+    }
+
+    @Test
+    fun `editar nao mexe em isCurrent`() = runTest {
+        val id = (saveVehicle(validDraft) as SaveVehicleResult.Success).id
+        saveVehicle(validDraft.copy(name = "Segundo carro"))
+
+        saveVehicle(validDraft.copy(id = id, name = "Onix branco renomeado"))
+
+        assertTrue(repository.current.first { it.id == id }.isCurrent)
+    }
+
+    @Test
     fun `rascunho invalido nao grava nada`() = runTest {
         val result = saveVehicle(validDraft.copy(name = ""))
 

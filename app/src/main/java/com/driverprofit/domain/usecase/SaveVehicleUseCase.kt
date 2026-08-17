@@ -1,5 +1,6 @@
 package com.driverprofit.domain.usecase
 
+import com.driverprofit.domain.model.Vehicle
 import com.driverprofit.domain.model.VehicleDraft
 import com.driverprofit.domain.model.VehicleFieldError
 import com.driverprofit.domain.repository.VehicleRepository
@@ -34,15 +35,35 @@ class SaveVehicleUseCase(
         if (errors.isNotEmpty()) return SaveVehicleResult.Invalid(errors)
 
         return if (draft.isEditing) {
-            // Preserva o createdAt original: editar o modelo do carro não muda
-            // a data em que ele entrou no app.
+            // Preserva o createdAt original e o isCurrent: editar nome ou
+            // combustível não muda quando o carro entrou no app, nem se ele é
+            // o veículo atual.
             val existing = repository.getVehicle(draft.id)
-                ?: return SaveVehicleResult.Success(repository.addVehicle(validator.toVehicle(draft)))
+                ?: return SaveVehicleResult.Success(insertAsFirstIfNeeded(validator.toVehicle(draft)))
 
-            repository.updateVehicle(validator.toVehicle(draft, createdAt = existing.createdAt))
+            repository.updateVehicle(
+                validator.toVehicle(
+                    draft,
+                    createdAt = existing.createdAt,
+                    isCurrent = existing.isCurrent,
+                ),
+            )
             SaveVehicleResult.Success(draft.id)
         } else {
-            SaveVehicleResult.Success(repository.addVehicle(validator.toVehicle(draft)))
+            SaveVehicleResult.Success(insertAsFirstIfNeeded(validator.toVehicle(draft)))
         }
+    }
+
+    /**
+     * Insere o veículo e, se ele for o primeiro cadastrado, marca como atual
+     * (v0.12.0). Com um só veículo, ele é automaticamente o atual — pedir
+     * para escolher o único carro que existe seria burocracia. Cadastros
+     * seguintes não mexem em quem é o atual.
+     */
+    private suspend fun insertAsFirstIfNeeded(vehicle: Vehicle): Long {
+        val isFirst = repository.countVehicles() == 0
+        val id = repository.addVehicle(vehicle)
+        if (isFirst) repository.setCurrent(id)
+        return id
     }
 }

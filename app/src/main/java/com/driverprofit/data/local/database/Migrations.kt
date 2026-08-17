@@ -311,6 +311,43 @@ object Migrations {
         }
     }
 
+    /**
+     * 9 → 10: veículo atual.
+     *
+     * `vehicles.is_current` — exatamente um veículo é atual quando há pelo
+     * menos um cadastrado. Com um só, ele nasce atual; com histórico de
+     * vários (só acontece em banco de teste anterior a esta versão), o mais
+     * antigo vira atual, e o motorista troca pela tela se quiser outro.
+     *
+     * `work_sessions.vehicle_id` — ganhos passam a levar veículo, como
+     * despesa já leva desde a v0.4.0. Aditiva: `ALTER TABLE ADD COLUMN` com
+     * `REFERENCES`, sem precisar do padrão tabela-nova+cópia+troca da
+     * migração 1→2 — não há coluna sendo removida, só acrescentada.
+     * Lançamentos antigos ficam com `vehicle_id NULL`: não dá para
+     * reconstruir qual carro era o atual antes desta versão.
+     */
+    val MIGRATION_9_10 = object : Migration(9, 10) {
+        override fun migrate(db: SupportSQLiteDatabase) {
+            db.execSQL(
+                "ALTER TABLE `vehicles` ADD COLUMN `is_current` INTEGER NOT NULL DEFAULT 0",
+            )
+            db.execSQL(
+                """
+                UPDATE vehicles SET is_current = 1
+                WHERE id = (SELECT id FROM vehicles ORDER BY created_at ASC LIMIT 1)
+                """.trimIndent(),
+            )
+            db.execSQL(
+                "ALTER TABLE `work_sessions` ADD COLUMN `vehicle_id` INTEGER " +
+                    "REFERENCES `vehicles`(`id`) ON UPDATE NO ACTION ON DELETE SET NULL",
+            )
+            db.execSQL(
+                "CREATE INDEX IF NOT EXISTS `index_work_sessions_vehicle_id` " +
+                    "ON `work_sessions` (`vehicle_id`)",
+            )
+        }
+    }
+
     /** Todas as migrações conhecidas, na ordem. */
     val ALL: Array<Migration> = arrayOf(
         MIGRATION_1_2,
@@ -321,5 +358,6 @@ object Migrations {
         MIGRATION_6_7,
         MIGRATION_7_8,
         MIGRATION_8_9,
+        MIGRATION_9_10,
     )
 }

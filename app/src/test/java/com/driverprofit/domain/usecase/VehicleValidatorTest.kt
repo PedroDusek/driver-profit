@@ -97,4 +97,16 @@ class VehicleValidatorTest {
     fun `toVehicle usa o relogio injetado`() {
         assertEquals(Instant.parse("2026-08-11T12:00:00Z"), validator.toVehicle(validDraft).createdAt)
     }
+
+    @Test
+    fun `toVehicle nao marca como atual por padrao`() {
+        // Editar nome ou combustivel nao pode mexer em quem e o veiculo
+        // atual - quem chama precisa passar o valor explicitamente.
+        assertEquals(false, validator.toVehicle(validDraft).isCurrent)
+    }
+
+    @Test
+    fun `toVehicle preserva isCurrent quando informado`() {
+        assertEquals(true, validator.toVehicle(validDraft, isCurrent = true).isCurrent)
+    }
 }

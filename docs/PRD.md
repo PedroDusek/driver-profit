@@ -166,7 +166,8 @@ Vehicle
  ├── id
  ├── name
  ├── fuel
- └── createdAt
+ ├── createdAt
+ └── isCurrent  (v0.12.0)
 ```
 
 > Desvios registrados, ambos detalhados em `DATABASE.md`:
@@ -176,6 +177,22 @@ Vehicle
 >
 > A quilometragem volta na v0.6.0 como registro por lançamento, servindo a
 > controles de manutenção — não como atributo do veículo.
+
+> **Decisão de produto registrada (v0.12.0): veículo atual.** Com um veículo
+> cadastrado, ele é automaticamente o atual. Com dois ou mais, o motorista
+> escolhe qual é o atual pela tela de veículos — exatamente um é atual sempre
+> que há pelo menos um cadastrado.
+>
+> Ganhos e despesas gravam o veículo atual automaticamente no momento do
+> lançamento, e esse vínculo **não muda depois**: trocar o veículo atual não
+> reclassifica lançamentos antigos. É isso que viabiliza comparar histórico
+> entre carros quando o motorista troca de veículo — cada lançamento fica
+> preso ao carro que era atual quando ele aconteceu.
+>
+> Um filtro/visão de comparação por veículo no dashboard fica para uma versão
+> seguinte, de propósito: esta versão só garante que o dado esteja marcado
+> corretamente desde já, para a comparação ter histórico correto quando
+> chegar.
 
 ## 15–16. Registro de ganhos
 
@@ -188,6 +205,12 @@ adicionar plataformas sem alterar o banco.
 A plataforma é armazenada em cada registro para viabilizar, no futuro,
 R$/hora, R$/km e R$/corrida por plataforma e comparação entre elas. Essa
 análise não precisa existir no MVP, mas o banco precisa permitir.
+
+Desde a v0.12.0, cada sessão também grava o **veículo atual** no momento do
+lançamento (anulável — nem sempre há veículo cadastrado quando o motorista
+lança um ganho). Não é campo do formulário: é automático, e não é
+reclassificado quando o motorista troca de veículo depois. Ver a decisão
+registrada em §14.
 
 ## 17. Despesas
 

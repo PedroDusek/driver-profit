@@ -64,6 +64,7 @@ object DriverProfitViewModelFactory {
                 observeVehicles = container().observeVehicles,
                 observeVehicleOdometers = container().observeVehicleOdometers,
                 deleteVehicle = container().deleteVehicle,
+                setCurrentVehicle = container().setCurrentVehicle,
             )
         }
         initializer {
@@ -84,6 +85,7 @@ object DriverProfitViewModelFactory {
                 savedStateHandle = createSavedStateHandle(),
                 getWorkSession = container().getWorkSession,
                 saveWorkSession = container().saveWorkSession,
+                observeVehicles = container().observeVehicles,
             )
         }
         initializer {

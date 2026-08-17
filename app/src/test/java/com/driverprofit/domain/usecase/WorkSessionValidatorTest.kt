@@ -267,4 +267,12 @@ class WorkSessionValidatorTest {
             validator.toSession(validDraft).createdAt,
         )
     }
+
+    @Test
+    fun `toSession carrega o veiculo sem exigir nada dele`() {
+        // O vinculo e automatico (v0.12.0): nulo e uma resposta valida, ja
+        // que nem sempre ha um veiculo atual quando o ganho e lancado.
+        assertEquals(null, validator.toSession(validDraft).vehicleId)
+        assertEquals(5L, validator.toSession(validDraft.copy(vehicleId = 5)).vehicleId)
+    }
 }

@@ -53,7 +53,9 @@ class ExpenseFormViewModelTest {
     private val cngCar = Vehicle(3, "Kwid GNV", VehicleFuel.CNG, Instant.EPOCH)
 
     private fun viewModel(
-        vehicles: List<Vehicle> = listOf(flexCar),
+        // Atual por padrão: reflete o que o app garante na prática (v0.12.0)
+        // — com um veículo só, ele sempre é o atual.
+        vehicles: List<Vehicle> = listOf(flexCar.copy(isCurrent = true)),
         expenses: FakeExpenseRepository = FakeExpenseRepository(),
         expenseId: Long? = null,
     ): ExpenseFormViewModel {
@@ -96,16 +98,28 @@ class ExpenseFormViewModelTest {
     }
 
     @Test
-    fun `com um veiculo so ele ja vem selecionado`() = runTest {
+    fun `veiculo atual ja vem selecionado`() = runTest {
+        // Antes da v0.12.0 isso so acontecia com exatamente um veiculo
+        // cadastrado; agora vale para qualquer quantidade, contanto que um
+        // deles esteja marcado como atual.
         val viewModel = viewModel()
         advanceUntilIdle()
 
-        // Pedir que selecione o unico carro que existe e burocracia.
         assertEquals(1L, viewModel.uiState.value.vehicleId)
     }
 
     @Test
-    fun `com varios veiculos nenhum vem selecionado`() = runTest {
+    fun `com varios veiculos o atual vem selecionado, nao o primeiro da lista`() = runTest {
+        val viewModel = viewModel(
+            vehicles = listOf(flexCar, electricCar.copy(isCurrent = true)),
+        )
+        advanceUntilIdle()
+
+        assertEquals(electricCar.id, viewModel.uiState.value.vehicleId)
+    }
+
+    @Test
+    fun `sem nenhum veiculo marcado como atual nenhum vem selecionado`() = runTest {
         val viewModel = viewModel(vehicles = listOf(flexCar, electricCar))
         advanceUntilIdle()
 
@@ -125,7 +139,7 @@ class ExpenseFormViewModelTest {
 
     @Test
     fun `abastecimento oferece so os combustiveis do veiculo`() = runTest {
-        val viewModel = viewModel(vehicles = listOf(cngCar))
+        val viewModel = viewModel(vehicles = listOf(cngCar.copy(isCurrent = true)))
         advanceUntilIdle()
 
         viewModel.onCategoryChange(ExpenseCategory.FUEL)
@@ -136,7 +150,7 @@ class ExpenseFormViewModelTest {
     @Test
     fun `eletricidade nao aparece como combustivel de abastecimento`() = runTest {
         // Carregar nao e abastecer: sao categorias diferentes.
-        val viewModel = viewModel(vehicles = listOf(electricCar))
+        val viewModel = viewModel(vehicles = listOf(electricCar.copy(isCurrent = true)))
         advanceUntilIdle()
 
         viewModel.onCategoryChange(ExpenseCategory.FUEL)
@@ -169,7 +183,7 @@ class ExpenseFormViewModelTest {
 
     @Test
     fun `unidade do campo acompanha o combustivel escolhido`() = runTest {
-        val viewModel = viewModel(vehicles = listOf(cngCar))
+        val viewModel = viewModel(vehicles = listOf(cngCar.copy(isCurrent = true)))
         advanceUntilIdle()
 
         viewModel.onCategoryChange(ExpenseCategory.FUEL)
@@ -180,7 +194,7 @@ class ExpenseFormViewModelTest {
 
     @Test
     fun `carregamento usa kWh como unidade`() = runTest {
-        val viewModel = viewModel(vehicles = listOf(electricCar))
+        val viewModel = viewModel(vehicles = listOf(electricCar.copy(isCurrent = true)))
         advanceUntilIdle()
 
         viewModel.onCategoryChange(ExpenseCategory.CHARGING)
@@ -366,7 +380,7 @@ class ExpenseFormViewModelTest {
     @Test
     fun `recarga gratuita e salva com valor zero`() = runTest {
         val expenses = FakeExpenseRepository()
-        val viewModel = viewModel(vehicles = listOf(electricCar), expenses = expenses)
+        val viewModel = viewModel(vehicles = listOf(electricCar.copy(isCurrent = true)), expenses = expenses)
         advanceUntilIdle()
 
         viewModel.onCategoryChange(ExpenseCategory.CHARGING)

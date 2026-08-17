@@ -2,6 +2,7 @@ package com.driverprofit.data.local.entity
 
 import androidx.room.ColumnInfo
 import androidx.room.Entity
+import androidx.room.ForeignKey
 import androidx.room.Index
 import androidx.room.PrimaryKey
 import com.driverprofit.core.common.Money
@@ -17,6 +18,11 @@ import java.time.LocalDate
  *
  * O índice em `date` existe porque toda consulta do dashboard filtra por
  * período (PRD §20) — e `date` é epoch day, então a comparação é numérica.
+ * O índice em `vehicle_id` é exigido pelo Room para a chave estrangeira, como
+ * em `ExpenseEntity`.
+ *
+ * `ON DELETE SET NULL` no veículo — excluir um carro não pode apagar o
+ * histórico de ganhos; a sessão fica órfã e continua somando.
  *
  * As unidades estão nos nomes das colunas de propósito: `revenue_cents`,
  * `online_minutes`, `distance_km`. Ler o schema não pode deixar dúvida sobre
@@ -24,12 +30,24 @@ import java.time.LocalDate
  */
 @Entity(
     tableName = "work_sessions",
-    indices = [Index(value = ["date"])],
+    foreignKeys = [
+        ForeignKey(
+            entity = VehicleEntity::class,
+            parentColumns = ["id"],
+            childColumns = ["vehicle_id"],
+            onDelete = ForeignKey.SET_NULL,
+        ),
+    ],
+    indices = [Index(value = ["date"]), Index(value = ["vehicle_id"])],
 )
 data class WorkSessionEntity(
     @PrimaryKey(autoGenerate = true)
     @ColumnInfo(name = "id")
     val id: Long = 0L,
+
+    /** Veículo atual no momento do lançamento (v0.12.0). Gravado automaticamente. */
+    @ColumnInfo(name = "vehicle_id")
+    val vehicleId: Long? = null,
 
     /** Epoch day. */
     @ColumnInfo(name = "date")
@@ -61,6 +79,7 @@ data class WorkSessionEntity(
 
 fun WorkSessionEntity.toDomain(): WorkSession = WorkSession(
     id = id,
+    vehicleId = vehicleId,
     date = date,
     platform = platform,
     rides = rides,
@@ -73,6 +92,7 @@ fun WorkSessionEntity.toDomain(): WorkSession = WorkSession(
 
 fun WorkSession.toEntity(): WorkSessionEntity = WorkSessionEntity(
     id = id,
+    vehicleId = vehicleId,
     date = date,
     platform = platform,
     rides = rides,

@@ -96,6 +96,7 @@ class WorkSessionValidator(
         createdAt: Instant = clock.instant(),
     ): WorkSession = WorkSession(
         id = draft.id,
+        vehicleId = draft.vehicleId,
         date = draft.date!!,
         platform = draft.platform!!,
         rides = draft.rides!!,

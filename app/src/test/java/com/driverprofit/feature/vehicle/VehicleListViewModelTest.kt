@@ -5,6 +5,7 @@ import com.driverprofit.domain.model.VehicleFuel
 import com.driverprofit.domain.usecase.DeleteVehicleUseCase
 import com.driverprofit.domain.usecase.ObserveVehicleOdometersUseCase
 import com.driverprofit.domain.usecase.ObserveVehiclesUseCase
+import com.driverprofit.domain.usecase.SetCurrentVehicleUseCase
 import com.driverprofit.feature.vehicle.list.VehicleListUiState
 import com.driverprofit.feature.vehicle.list.VehicleListViewModel
 import com.driverprofit.testing.FakeExpenseRepository
@@ -29,11 +30,17 @@ class VehicleListViewModelTest {
     @get:Rule
     val mainDispatcherRule = MainDispatcherRule()
 
-    private fun vehicle(id: Long, name: String, createdAt: Instant) = Vehicle(
+    private fun vehicle(
+        id: Long,
+        name: String,
+        createdAt: Instant,
+        isCurrent: Boolean = false,
+    ) = Vehicle(
         id = id,
         name = name,
         fuel = VehicleFuel.FLEX,
         createdAt = createdAt,
+        isCurrent = isCurrent,
     )
 
     private fun viewModel(
@@ -43,6 +50,7 @@ class VehicleListViewModelTest {
         observeVehicles = ObserveVehiclesUseCase(repository),
         observeVehicleOdometers = ObserveVehicleOdometersUseCase(expenses),
         deleteVehicle = DeleteVehicleUseCase(repository),
+        setCurrentVehicle = SetCurrentVehicleUseCase(repository),
     )
 
     @Test
@@ -150,6 +158,32 @@ class VehicleListViewModelTest {
         advanceUntilIdle()
 
         assertEquals(1, repository.current.size)
+    }
+
+    @Test
+    fun `marcar outro veiculo como atual troca a marcacao`() = runTest {
+        val onix = vehicle(1, "Onix", Instant.ofEpochMilli(1_000), isCurrent = true)
+        val civic = vehicle(2, "Civic", Instant.ofEpochMilli(2_000))
+        val repository = FakeVehicleRepository(listOf(onix, civic))
+        val viewModel = viewModel(repository)
+
+        viewModel.onSetCurrent(civic)
+        advanceUntilIdle()
+
+        val atuais = repository.current.filter { it.isCurrent }
+        assertEquals(listOf("Civic"), atuais.map { it.name })
+    }
+
+    @Test
+    fun `marcar o veiculo que ja e atual nao faz nada`() = runTest {
+        val onix = vehicle(1, "Onix", Instant.ofEpochMilli(1_000), isCurrent = true)
+        val repository = FakeVehicleRepository(listOf(onix))
+        val viewModel = viewModel(repository)
+
+        viewModel.onSetCurrent(onix)
+        advanceUntilIdle()
+
+        assertTrue(repository.current.single().isCurrent)
     }
 
     /**

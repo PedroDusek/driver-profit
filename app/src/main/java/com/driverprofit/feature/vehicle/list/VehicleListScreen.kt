@@ -14,6 +14,8 @@ import androidx.compose.material.icons.automirrored.filled.ArrowBack
 import androidx.compose.material.icons.filled.Add
 import androidx.compose.material.icons.filled.Delete
 import androidx.compose.material.icons.filled.Edit
+import androidx.compose.material.icons.filled.Star
+import androidx.compose.material.icons.outlined.StarBorder
 import androidx.compose.material3.AlertDialog
 import androidx.compose.material3.Card
 import androidx.compose.material3.CircularProgressIndicator
@@ -101,8 +103,12 @@ fun VehicleListScreen(
                     VehicleCard(
                         odometerKm = state.odometers[vehicle.id],
                         vehicle = vehicle,
+                        // Com um só veículo ele já nasce atual — o botão só
+                        // faz sentido quando há entre quais escolher.
+                        showCurrentToggle = state.vehicles.size > 1,
                         onEdit = { onEditVehicle(vehicle.id) },
                         onDelete = { viewModel.onDeleteRequested(vehicle) },
+                        onSetCurrent = { viewModel.onSetCurrent(vehicle) },
                     )
                 }
             }
@@ -133,6 +139,8 @@ private fun VehicleCard(
     vehicle: Vehicle,
     onEdit: () -> Unit,
     onDelete: () -> Unit,
+    onSetCurrent: () -> Unit,
+    showCurrentToggle: Boolean,
     odometerKm: Long? = null,
 ) {
     Card(modifier = Modifier.fillMaxWidth()) {
@@ -166,6 +174,22 @@ private fun VehicleCard(
                     style = MaterialTheme.typography.labelMedium,
                     color = MaterialTheme.colorScheme.onSurfaceVariant,
                 )
+            }
+            if (showCurrentToggle) {
+                IconButton(onClick = onSetCurrent) {
+                    if (vehicle.isCurrent) {
+                        Icon(
+                            imageVector = Icons.Default.Star,
+                            contentDescription = stringResource(R.string.vehicle_current_description),
+                            tint = MaterialTheme.colorScheme.primary,
+                        )
+                    } else {
+                        Icon(
+                            imageVector = Icons.Outlined.StarBorder,
+                            contentDescription = stringResource(R.string.vehicle_action_set_current),
+                        )
+                    }
+                }
             }
             IconButton(onClick = onEdit) {
                 Icon(Icons.Default.Edit, contentDescription = stringResource(R.string.action_edit))
@@ -225,9 +249,12 @@ private fun VehicleCardPreview() {
                 name = "Onix branco",
                 fuel = VehicleFuel.FLEX,
                 createdAt = Instant.EPOCH,
+                isCurrent = true,
             ),
+            showCurrentToggle = true,
             onEdit = {},
             onDelete = {},
+            onSetCurrent = {},
         )
     }
 }
