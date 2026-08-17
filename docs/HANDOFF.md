@@ -4,13 +4,13 @@ Documento de continuidade. Leia isto **antes** de qualquer coisa ao retomar o
 projeto em uma sessão nova, junto com `PRD.md`, `ARCHITECTURE.md` e
 `DEVELOPMENT.md`.
 
-**Última atualização:** v0.9.1
+**Última atualização:** v0.10.1
 
 ---
 
 ## 0. Comece por aqui
 
-**Está tudo na `main`.** Em 16/08/2026 as quatro versões pendentes foram
+**Está tudo na `main`.** Em 16/08/2026 cinco versões pendentes foram
 mergeadas e tagueadas; não há branch de feature em aberto nem PR pendente.
 
 | Versão | Tag | Banco | Release |
@@ -20,9 +20,18 @@ mergeadas e tagueadas; não há branch de feature em aberto nem PR pendente.
 | v0.9.0 Manutenção preventiva | ✅ | **7** | ✅ |
 | v0.9.1 Ciclo do odômetro | ✅ | 7 | ✅ |
 | v0.10.0 Custos fixos por competência | ✅ | **8** | ✅ |
+| v0.10.1 Resolver a sobra do odômetro | ✅ | **9** | ✅ |
 
 O PRD §58 volta a valer: dá para fazer `git checkout v0.8.0` e reproduzir aquele
 estado.
+
+⚠️ **O `CHANGELOG.md` está com uma entrada mal colocada.** O fix do Auto Backup
+(commit `08b33aa`: o Android não incluía o arquivo `-wal`, e o Room mantém
+escritas recentes só ali até um checkpoint, então o backup podia levar um
+SQLite quase vazio sem erro nenhum) já **está** na v0.10.1 — é ancestral da
+tag — mas o changelog ainda o lista em "[Não publicado]" em vez de dentro da
+seção `[0.10.1]`. Só o texto do changelog ficou para trás; o código e o
+release estão corretos.
 
 ### O que fazer primeiro
 
@@ -49,8 +58,9 @@ tem um construtor que roda na JVM com SQLite empacotado, **sem Robolectric**.
 
 ### O que já foi verificado, e o que não foi
 
-- **62 testes instrumentados** passando em Redmi Note 8 Pro (Android 9),
-  cobrindo os cinco DAOs e as sete migrações encadeadas, inclusive 1→7
+- **65 testes instrumentados** confirmados em Redmi Note 8 Pro (Android 9), mas
+  essa execução é da v0.10.0 (banco 8) — ver seção 7 para o que mudou desde
+  então e ainda não foi reconfirmado em aparelho
 - **Migração validada em dados reais**: aparelho com banco na versão 5 recebeu a
   v0.9.0 por cima, migrou 5→6→7, abriu sem exceção e manteve os dados. Como o
   Room confere o schema contra o hash esperado ao abrir, isso prova que as
@@ -87,8 +97,8 @@ tem um construtor que roda na JVM com SQLite empacotado, **sem Robolectric**.
 | Código | `C:\Users\pedro\Desktop\driver-profit` |
 | Repositório | https://github.com/PedroDusek/driver-profit (público) |
 | Branch estável | `main`, protegida |
-| Última tag | `v0.10.0`, com release publicado |
-| Versão do banco | **8** |
+| Última tag | `v0.10.1`, com release publicado |
+| Versão do banco | **9** |
 
 ⚠️ **O caminho não pode conter acento.** O projeto nasceu em
 `Desktop\RodAí` e o AGP recusa build com caractere não-ASCII no caminho. Se
@@ -132,8 +142,13 @@ No topo do dashboard aparecem dois avisos, e **nenhum dos dois pertence ao
 período selecionado** — cada um declara na tela a que intervalo se refere:
 
 - **Odômetro não confere**, quando há janela entre leituras com quilometragem
-  sem explicação. Toca e cai no diálogo que pergunta se foi uso pessoal ou
-  jornada não lançada
+  sem explicação. Toca e cai no diálogo com três respostas: uso pessoal,
+  jornada não lançada, ou **"Deixar de fora"** — a sobra sai dos totais e o
+  app para de perguntar por aquela janela, com a consequência (custo/km um
+  pouco mais alto) informada antes. Sobra negativa não aparece mais aqui: é
+  inconsistência entre dois números do próprio motorista, não distância
+  faltando, e segue calculada por baixo dos panos para as janelas se
+  cancelarem
 - **Manutenção pede atenção**, quando há item vencido ou próximo
 
 ## 4. Decisões de produto que divergem do PRD original
@@ -202,6 +217,7 @@ estimado em si chega na v0.8.0.
 | v0.6.0 Odômetro · v0.7.0 Uso pessoal · v0.8.0 Consumo | ✅ |
 | v0.9.0 Manutenção preventiva · v0.9.1 Ciclo do odômetro | ✅ |
 | v0.10.0 Custos fixos por competência | ✅ |
+| v0.10.1 Resolver a sobra do odômetro | ✅ |
 | **v0.11.0 Analytics** | ⬅️ próxima em escopo novo |
 | v0.12.0 UX polish · v0.13.0 Hardening · v0.14.0 RC · v1.0.0 MVP | |
 
@@ -223,8 +239,10 @@ que o roadmap deixa transparecer.
 
 - **Zero testes de interface.** Nenhuma tela tem verificação automatizada. Para
   um app cujo produto é a exatidão de um número, é a maior lacuna aberta
-- **Sem backup.** Offline-first sem nuvem: se o celular morrer, o histórico morre
-  junto
+- **Sem exportação manual.** O Auto Backup do Android existe (e a v0.10.1
+  corrigiu um bug em que ele perdia o WAL), mas é invisível — o motorista não
+  tem como conferir se funcionou, e some se o backup do sistema estiver
+  desligado. Exportar/importar arquivo é o item 1 da seção 0
 - **Sem crash handling.** Erro não tratado fecha o app sem deixar rastro
 
 **Três decisões que congelam na primeira instalação de terceiro** (PRD §48):
@@ -235,19 +253,35 @@ que o roadmap deixa transparecer.
   assinatura de debug e de release não se atualizam entre si
 - **Sem LICENSE**, por escolha do Pedro — efeito é todos os direitos reservados
 
-### O que a v0.10.0 precisa fazer
+### O que a v0.10.0 fez
 
-**Custos fixos por competência** — separar "quando paguei" de "a que período o
+**Custos fixos por competência** — separou "quando paguei" de "a que período o
 valor se refere" (PRD §22).
 
 - Início e fim de competência na despesa, anuláveis
 - Valor diluído pelos dias do período
 - Financiamento, seguro e IPVA atribuídos **100% ao trabalho**
 - Custo fixo por km trabalhado
-- Migração **7→8** (a 6→7 foi consumida pela v0.9.0)
+- Migração **7→8**
 
 Histórico e "Despesas" continuam exibindo **caixa**, para conferir com o
 extrato. Só os indicadores por km usam competência.
+
+### O que a v0.10.1 fez
+
+**Resolver a sobra do odômetro** — a conciliação tinha duas saídas (uso
+pessoal ou jornada não lançada) e nenhuma servia para a sobra pequena e
+inexplicável, o caso mais comum. Sem terceira opção, o aviso ficava para
+sempre.
+
+- **"Deixar de fora"**, gravando a quantidade dispensada (não só o intervalo)
+  em `reconciliation_dismissals`. A dispensa caduca se a sobra crescer além
+  do aceito
+- **Sobra negativa deixa de ser exibida** — é inconsistência entre dois
+  números do próprio motorista, não distância faltando, e não há fonte
+  externa contra a qual conferir. Continua calculada por baixo dos panos,
+  para janelas encadeadas se cancelarem
+- Migração **8→9**
 
 ### O que já está pronto e não deve ser refeito
 
@@ -268,13 +302,20 @@ extrato. Só os indicadores por km usam competência.
 
 ## 7. Testes instrumentados
 
-São a única verificação real das migrações. Cobrem os cinco DAOs e as oito
-migrações encadeadas (1→2→3→4→5→6→7→8).
+São a única verificação real das migrações. Cobrem cinco dos seis DAOs e as
+nove migrações encadeadas (1→2→3→4→5→6→7→8→9).
 
-✅ **Última execução: 16/08/2026, 65 testes, todos passando**, em Redmi Note 8
-Pro com Android 9. Distribuição: `MigrationTest` 20, `ExpenseDaoTest` 14,
-`WorkSessionDaoTest` 10, `VehicleDaoTest` 8, `MaintenanceScheduleDaoTest` 8,
-`PersonalUsageDaoTest` 5.
+✅ **Última execução confirmada em dispositivo: 16/08/2026, 65 testes, todos
+passando**, em Redmi Note 8 Pro com Android 9 — mas essa execução é da
+v0.10.0 (banco 8). O código-fonte já tem 68 testes (banco 9, migração 8→9
+incluída): `MigrationTest` 23, `ExpenseDaoTest` 14, `WorkSessionDaoTest` 10,
+`VehicleDaoTest` 8, `MaintenanceScheduleDaoTest` 8, `PersonalUsageDaoTest` 5.
+
+⚠️ **`ReconciliationDismissalDao` não tem teste instrumentado dedicado.** É
+o único DAO dos seis sem cobertura própria — a tabela nova da v0.10.1 é
+exercitada só via `MigrationTest`. E os 68 testes do código-fonte ainda não
+foram confirmados rodando num aparelho; a próxima sessão que tocar em banco
+precisa rodar `connectedDebugAndroidTest` antes de assumir que passam.
 
 ⚠️ **Ele desinstala os dois pacotes ao terminar, e isso apaga os dados.** Se
 você quer exercitar uma migração em cima de dados reais, faça isso **antes** de
