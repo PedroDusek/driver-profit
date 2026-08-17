@@ -106,3 +106,24 @@ fun DriverProTheme(
         content = content,
     )
 }
+
+/**
+ * Par contêiner/on-contêiner de [ProfitColors] para o tema atual (claro ou
+ * escuro), usado no card de lucro do Dashboard — o único lugar da tela onde a
+ * cor de fundo em si é o sinal financeiro, não só o texto.
+ */
+@Composable
+fun ProfitColors.container(positive: Boolean): Color = when {
+    isSystemInDarkTheme() && positive -> positiveContainerDark
+    isSystemInDarkTheme() && !positive -> negativeContainerDark
+    positive -> positiveContainerLight
+    else -> negativeContainerLight
+}
+
+@Composable
+fun ProfitColors.onContainer(positive: Boolean): Color = when {
+    isSystemInDarkTheme() && positive -> onPositiveContainerDark
+    isSystemInDarkTheme() && !positive -> onNegativeContainerDark
+    positive -> onPositiveContainerLight
+    else -> onNegativeContainerLight
+}

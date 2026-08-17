@@ -6,6 +6,7 @@ import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
@@ -13,12 +14,11 @@ import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.ReceiptLong
-import androidx.compose.material.icons.filled.Build
+import androidx.compose.material.icons.filled.Dashboard
 import androidx.compose.material.icons.filled.DateRange
 import androidx.compose.material.icons.filled.DirectionsCar
+import androidx.compose.material.icons.filled.MoreHoriz
 import androidx.compose.material.icons.filled.Payments
-import androidx.compose.material.icons.filled.SettingsBackupRestore
-import androidx.compose.material.icons.filled.Weekend
 import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.CircularProgressIndicator
@@ -28,8 +28,10 @@ import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.FilterChip
 import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.Icon
-import androidx.compose.material3.IconButton
+import androidx.compose.material3.LocalContentColor
 import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.NavigationBar
+import androidx.compose.material3.NavigationBarItem
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextButton
@@ -52,10 +54,17 @@ import com.driverpro.R
 import com.driverpro.core.common.Money
 import com.driverpro.core.common.WorkDuration
 import com.driverpro.core.ui.DriverProViewModelFactory
+import com.driverpro.core.ui.component.CategoryBarRow
+import com.driverpro.core.ui.component.StatTile
+import com.driverpro.core.ui.component.visual
 import com.driverpro.core.ui.format.BrazilianFormatter
 import com.driverpro.core.ui.format.DashboardLabels
 import com.driverpro.core.ui.format.ExpenseLabels
 import com.driverpro.core.ui.theme.DriverProTheme
+import com.driverpro.core.ui.theme.ProfitColors
+import com.driverpro.core.ui.theme.TabularFigures
+import com.driverpro.core.ui.theme.container
+import com.driverpro.core.ui.theme.onContainer
 import com.driverpro.domain.model.DashboardMetrics
 import com.driverpro.domain.model.DashboardPeriod
 import com.driverpro.domain.model.DateRange
@@ -75,6 +84,11 @@ import java.time.ZoneOffset
  *
  * A tela só desenha. Todo indicador chega pronto de `DashboardMetrics`, que é
  * domínio puro (PRD §29) — conta financeira em Composable é proibida (PRD §54).
+ *
+ * Navegação secundária (v0.14.0): a barra inferior leva às três seções mais
+ * usadas direto; o resto (uso pessoal, manutenção, backup) mora em "Mais" —
+ * ver [com.driverpro.feature.more.MoreScreen]. Antes disso eram seis ícones
+ * na TopAppBar, sem rótulo.
  */
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -82,9 +96,7 @@ fun DashboardScreen(
     onOpenVehicles: () -> Unit,
     onOpenEarnings: () -> Unit,
     onOpenExpenses: () -> Unit,
-    onOpenPersonalUsage: () -> Unit,
-    onOpenMaintenance: () -> Unit,
-    onOpenBackup: () -> Unit,
+    onOpenMore: () -> Unit,
     modifier: Modifier = Modifier,
     viewModel: DashboardViewModel = viewModel(factory = DriverProViewModelFactory.Factory),
 ) {
@@ -96,46 +108,14 @@ fun DashboardScreen(
     Scaffold(
         modifier = modifier.fillMaxSize(),
         topBar = {
-            TopAppBar(
-                title = { Text(text = stringResource(R.string.app_name)) },
-                actions = {
-                    IconButton(onClick = onOpenEarnings) {
-                        Icon(
-                            imageVector = Icons.Default.Payments,
-                            contentDescription = stringResource(R.string.earnings_list_title),
-                        )
-                    }
-                    IconButton(onClick = onOpenExpenses) {
-                        Icon(
-                            imageVector = Icons.AutoMirrored.Filled.ReceiptLong,
-                            contentDescription = stringResource(R.string.expenses_list_title),
-                        )
-                    }
-                    IconButton(onClick = onOpenPersonalUsage) {
-                        Icon(
-                            imageVector = Icons.Default.Weekend,
-                            contentDescription = stringResource(R.string.personal_usage_title),
-                        )
-                    }
-                    IconButton(onClick = onOpenMaintenance) {
-                        Icon(
-                            imageVector = Icons.Default.Build,
-                            contentDescription = stringResource(R.string.maintenance_title),
-                        )
-                    }
-                    IconButton(onClick = onOpenVehicles) {
-                        Icon(
-                            imageVector = Icons.Default.DirectionsCar,
-                            contentDescription = stringResource(R.string.vehicle_list_title),
-                        )
-                    }
-                    IconButton(onClick = onOpenBackup) {
-                        Icon(
-                            imageVector = Icons.Default.SettingsBackupRestore,
-                            contentDescription = stringResource(R.string.backup_title),
-                        )
-                    }
-                },
+            TopAppBar(title = { Text(text = stringResource(R.string.app_name)) })
+        },
+        bottomBar = {
+            DashboardNavigationBar(
+                onOpenEarnings = onOpenEarnings,
+                onOpenExpenses = onOpenExpenses,
+                onOpenVehicles = onOpenVehicles,
+                onOpenMore = onOpenMore,
             )
         },
     ) { innerPadding ->
@@ -153,7 +133,7 @@ fun DashboardScreen(
                 item {
                     OdometerGapCard(
                         divergences = divergences,
-                        onResolve = onOpenPersonalUsage,
+                        onResolve = onOpenMore,
                     )
                 }
             }
@@ -164,7 +144,7 @@ fun DashboardScreen(
                 item {
                     MaintenanceWarningCard(
                         warnings = maintenanceWarnings,
-                        onOpen = onOpenMaintenance,
+                        onOpen = onOpenMore,
                     )
                 }
             }
@@ -216,6 +196,53 @@ fun DashboardScreen(
                 viewModel.onCustomRangeChange(start, end)
                 showRangePicker = false
             },
+        )
+    }
+}
+
+/**
+ * Barra inferior com as três seções mais usadas + "Mais" (v0.14.0).
+ *
+ * Substitui a fileira de seis ícones sem rótulo que ocupava a TopAppBar.
+ * "Dashboard" fica sempre selecionado e sem ação: é a própria tela.
+ */
+@Composable
+private fun DashboardNavigationBar(
+    onOpenEarnings: () -> Unit,
+    onOpenExpenses: () -> Unit,
+    onOpenVehicles: () -> Unit,
+    onOpenMore: () -> Unit,
+) {
+    NavigationBar {
+        NavigationBarItem(
+            selected = true,
+            onClick = {},
+            icon = { Icon(Icons.Default.Dashboard, contentDescription = null) },
+            label = { Text(stringResource(R.string.nav_dashboard)) },
+        )
+        NavigationBarItem(
+            selected = false,
+            onClick = onOpenEarnings,
+            icon = { Icon(Icons.Default.Payments, contentDescription = null) },
+            label = { Text(stringResource(R.string.earnings_list_title)) },
+        )
+        NavigationBarItem(
+            selected = false,
+            onClick = onOpenExpenses,
+            icon = { Icon(Icons.AutoMirrored.Filled.ReceiptLong, contentDescription = null) },
+            label = { Text(stringResource(R.string.expenses_list_title)) },
+        )
+        NavigationBarItem(
+            selected = false,
+            onClick = onOpenVehicles,
+            icon = { Icon(Icons.Default.DirectionsCar, contentDescription = null) },
+            label = { Text(stringResource(R.string.vehicle_list_title)) },
+        )
+        NavigationBarItem(
+            selected = false,
+            onClick = onOpenMore,
+            icon = { Icon(Icons.Default.MoreHoriz, contentDescription = null) },
+            label = { Text(stringResource(R.string.nav_more)) },
         )
     }
 }
@@ -298,23 +325,27 @@ private fun EmptyPeriod() {
  * Faturamento, despesas e lucro — a conta que o motorista não consegue fazer
  * olhando só o extrato da plataforma.
  *
- * O lucro fica em destaque e muda de cor quando é negativo: prejuízo escrito
- * com a mesma tinta do lucro passa despercebido justamente no dia em que mais
- * importa.
+ * Hero card da tela (v0.14.0): o fundo em si carrega o sinal — verde quando dá
+ * lucro, vermelho quando dá prejuízo ([ProfitColors]) — e não mais a cor de
+ * marca genérica, que passou a ser só índigo (`Theme.kt`). Algarismo tabular
+ * no valor grande para os dígitos não "pularem" de largura ao trocar de
+ * período.
  */
 @Composable
 private fun ResultCard(metrics: DashboardMetrics) {
     val profit = metrics.netProfit
+    val positive = !profit.isNegative
     Card(
         modifier = Modifier.fillMaxWidth(),
         colors = CardDefaults.cardColors(
-            containerColor = MaterialTheme.colorScheme.primaryContainer,
+            containerColor = ProfitColors.container(positive),
+            contentColor = ProfitColors.onContainer(positive),
         ),
     ) {
         Column(
             modifier = Modifier
                 .fillMaxWidth()
-                .padding(16.dp),
+                .padding(20.dp),
             verticalArrangement = Arrangement.spacedBy(8.dp),
         ) {
             Text(
@@ -323,14 +354,9 @@ private fun ResultCard(metrics: DashboardMetrics) {
             )
             Text(
                 text = BrazilianFormatter.money(profit),
-                style = MaterialTheme.typography.displaySmall,
-                color = if (profit.isNegative) {
-                    MaterialTheme.colorScheme.error
-                } else {
-                    MaterialTheme.colorScheme.onPrimaryContainer
-                },
+                style = MaterialTheme.typography.displaySmall.copy(fontFeatureSettings = TabularFigures),
             )
-            HorizontalDivider()
+            HorizontalDivider(color = LocalContentColor.current.copy(alpha = 0.24f))
             MetricRow(
                 label = stringResource(R.string.dashboard_revenue),
                 value = BrazilianFormatter.money(metrics.totalRevenue),
@@ -349,17 +375,14 @@ private fun ResultCard(metrics: DashboardMetrics) {
 @Composable
 private fun VolumeCard(metrics: DashboardMetrics) {
     MetricsCard(title = stringResource(R.string.dashboard_section_volume)) {
-        MetricRow(
-            label = stringResource(R.string.dashboard_distance),
-            value = BrazilianFormatter.kilometers(metrics.workKilometers),
-        )
-        MetricRow(
-            label = stringResource(R.string.dashboard_online_time),
-            value = BrazilianFormatter.duration(metrics.totalOnlineTime),
-        )
-        MetricRow(
-            label = stringResource(R.string.dashboard_rides),
-            value = metrics.totalRides.toString(),
+        StatGrid(
+            listOf(
+                stringResource(R.string.dashboard_distance) to
+                    BrazilianFormatter.kilometers(metrics.workKilometers),
+                stringResource(R.string.dashboard_online_time) to
+                    BrazilianFormatter.duration(metrics.totalOnlineTime),
+                stringResource(R.string.dashboard_rides) to metrics.totalRides.toString(),
+            ),
         )
     }
 }
@@ -367,18 +390,35 @@ private fun VolumeCard(metrics: DashboardMetrics) {
 @Composable
 private fun RevenueRatiosCard(metrics: DashboardMetrics) {
     MetricsCard(title = stringResource(R.string.dashboard_section_revenue)) {
-        MetricRow(
-            label = stringResource(R.string.dashboard_revenue_per_km),
-            value = BrazilianFormatter.moneyOrUnavailable(metrics.revenuePerKm),
+        StatGrid(
+            listOf(
+                stringResource(R.string.dashboard_revenue_per_km) to
+                    BrazilianFormatter.moneyOrUnavailable(metrics.revenuePerKm),
+                stringResource(R.string.dashboard_revenue_per_hour) to
+                    BrazilianFormatter.moneyOrUnavailable(metrics.revenuePerHour),
+                stringResource(R.string.dashboard_revenue_per_ride) to
+                    BrazilianFormatter.moneyOrUnavailable(metrics.revenuePerRide),
+            ),
         )
-        MetricRow(
-            label = stringResource(R.string.dashboard_revenue_per_hour),
-            value = BrazilianFormatter.moneyOrUnavailable(metrics.revenuePerHour),
-        )
-        MetricRow(
-            label = stringResource(R.string.dashboard_revenue_per_ride),
-            value = BrazilianFormatter.moneyOrUnavailable(metrics.revenuePerRide),
-        )
+    }
+}
+
+/** Grade de 2 colunas para indicadores compactos — ver [StatTile]. */
+@Composable
+private fun StatGrid(items: List<Pair<String, String>>) {
+    Column(verticalArrangement = Arrangement.spacedBy(8.dp)) {
+        items.chunked(2).forEach { row ->
+            Row(
+                horizontalArrangement = Arrangement.spacedBy(8.dp),
+            ) {
+                row.forEach { (label, value) ->
+                    StatTile(label = label, value = value, modifier = Modifier.weight(1f))
+                }
+                if (row.size == 1) {
+                    Spacer(modifier = Modifier.weight(1f))
+                }
+            }
+        }
     }
 }
 
@@ -477,15 +517,24 @@ private fun CostRatiosCard(metrics: DashboardMetrics) {
     }
 }
 
+/**
+ * Breakdown de despesas por categoria com barra proporcional (v0.14.0) — a
+ * primeira visualização de dado do app além de texto. Cor e ícone vêm de
+ * [ExpenseCategory.visual], a mesma paleta usada nas linhas de
+ * `ExpensesListScreen`.
+ */
 @Composable
 private fun ExpensesByCategoryCard(metrics: DashboardMetrics) {
+    val total = metrics.expensesByCategory.values.sumOf { it.cents }.coerceAtLeast(1)
     MetricsCard(title = stringResource(R.string.dashboard_section_expenses)) {
         metrics.expensesByCategory.entries
             .sortedByDescending { it.value.cents }
             .forEach { (category, amount) ->
-                MetricRow(
+                CategoryBarRow(
                     label = stringResource(ExpenseLabels.category(category)),
                     value = BrazilianFormatter.money(amount),
+                    fraction = amount.cents.toFloat() / total.toFloat(),
+                    color = category.visual().color,
                 )
             }
     }
@@ -564,7 +613,12 @@ private fun OdometerGapCard(
 
 @Composable
 private fun MetricsCard(title: String, content: @Composable () -> Unit) {
-    Card(modifier = Modifier.fillMaxWidth()) {
+    Card(
+        modifier = Modifier.fillMaxWidth(),
+        colors = CardDefaults.cardColors(
+            containerColor = MaterialTheme.colorScheme.surfaceContainerLow,
+        ),
+    ) {
         Column(
             modifier = Modifier
                 .fillMaxWidth()
@@ -696,7 +750,7 @@ private fun Long.toLocalDate(): LocalDate =
 @Preview(showBackground = true)
 @Composable
 private fun DashboardCardsPreview() {
-    DriverProTheme(dynamicColor = false) {
+    DriverProTheme {
         Column(
             modifier = Modifier.padding(16.dp),
             verticalArrangement = Arrangement.spacedBy(12.dp),
@@ -718,6 +772,7 @@ private fun DashboardCardsPreview() {
             VolumeCard(metrics)
             RevenueRatiosCard(metrics)
             CostRatiosCard(metrics)
+            ExpensesByCategoryCard(metrics)
         }
     }
 }

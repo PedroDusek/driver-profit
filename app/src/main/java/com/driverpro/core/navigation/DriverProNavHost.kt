@@ -19,6 +19,7 @@ import com.driverpro.feature.earnings.list.EarningsListScreen
 import com.driverpro.feature.expenses.form.ExpenseFormScreen
 import com.driverpro.feature.expenses.list.ExpensesListScreen
 import com.driverpro.feature.maintenance.MaintenanceScreen
+import com.driverpro.feature.more.MoreScreen
 import com.driverpro.feature.personal.form.PersonalUsageFormScreen
 import com.driverpro.feature.personal.list.PersonalUsageListScreen
 import com.driverpro.feature.vehicle.form.VehicleFormScreen
@@ -43,6 +44,13 @@ fun DriverProNavHost(
                 onOpenVehicles = { navController.navigate(DriverProDestination.VEHICLE_LIST) },
                 onOpenEarnings = { navController.navigate(DriverProDestination.EARNINGS_LIST) },
                 onOpenExpenses = { navController.navigate(DriverProDestination.EXPENSES_LIST) },
+                onOpenMore = { navController.navigate(DriverProDestination.MORE) },
+            )
+        }
+
+        composable(route = DriverProDestination.MORE) {
+            MoreScreen(
+                onBack = navController::popBackStack,
                 onOpenPersonalUsage = {
                     navController.navigate(DriverProDestination.PERSONAL_USAGE_LIST)
                 },

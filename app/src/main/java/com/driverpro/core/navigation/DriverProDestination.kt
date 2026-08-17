@@ -77,6 +77,11 @@ object DriverProDestination {
     /** Exportar e importar arquivo (v0.13.0). */
     const val BACKUP = "backup"
 
+    // --- Mais ---
+
+    /** Hub para as seções secundárias, aberto pela barra inferior (v0.14.0). */
+    const val MORE = "more"
+
     /** Destino inicial do grafo de navegação. */
     const val START = DASHBOARD
 }

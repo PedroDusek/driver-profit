@@ -18,6 +18,10 @@
     <string name="action_cancel">Cancelar</string>
     <string name="action_confirm">Confirmar</string>
 
+    <!-- Navegação inferior (v0.14.0) -->
+    <string name="nav_dashboard">Dashboard</string>
+    <string name="nav_more">Mais</string>
+
     <!-- Dashboard -->
     <string name="dashboard_empty_title">Nada neste período</string>
     <string name="dashboard_empty_message">Nenhum ganho ou despesa registrado entre essas datas. Escolha outro período ou lance uma jornada.</string>
