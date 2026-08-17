@@ -273,6 +273,44 @@ object Migrations {
         }
     }
 
+    /**
+     * 8 → 9: sobras de odômetro aceitas fora da conta.
+     *
+     * Cria `reconciliation_dismissals`. Aditiva — nenhuma tabela existente é
+     * tocada, e a ausência de linha significa "nada foi dispensado", que
+     * descreve corretamente todo o histórico anterior.
+     *
+     * `ON DELETE CASCADE`, como `maintenance_schedules`: isto é uma decisão
+     * sobre um intervalo de um carro, não histórico financeiro.
+     *
+     * O índice é único sobre `(vehicle_id, start_date, end_date)` — uma janela
+     * tem uma decisão — e é ele que sustenta o `REPLACE` do DAO. Por começar em
+     * `vehicle_id`, também atende a exigência do Room para a chave estrangeira.
+     */
+    val MIGRATION_8_9 = object : Migration(8, 9) {
+        override fun migrate(db: SupportSQLiteDatabase) {
+            db.execSQL(
+                """
+                CREATE TABLE IF NOT EXISTS `reconciliation_dismissals` (
+                    `id` INTEGER PRIMARY KEY AUTOINCREMENT NOT NULL,
+                    `vehicle_id` INTEGER NOT NULL,
+                    `start_date` INTEGER NOT NULL,
+                    `end_date` INTEGER NOT NULL,
+                    `dismissed_km` INTEGER NOT NULL,
+                    `created_at` INTEGER NOT NULL,
+                    FOREIGN KEY(`vehicle_id`) REFERENCES `vehicles`(`id`)
+                        ON UPDATE NO ACTION ON DELETE CASCADE
+                )
+                """.trimIndent(),
+            )
+            db.execSQL(
+                "CREATE UNIQUE INDEX IF NOT EXISTS " +
+                    "`index_reconciliation_dismissals_vehicle_id_start_date_end_date` " +
+                    "ON `reconciliation_dismissals` (`vehicle_id`, `start_date`, `end_date`)",
+            )
+        }
+    }
+
     /** Todas as migrações conhecidas, na ordem. */
     val ALL: Array<Migration> = arrayOf(
         MIGRATION_1_2,
@@ -282,5 +320,6 @@ object Migrations {
         MIGRATION_5_6,
         MIGRATION_6_7,
         MIGRATION_7_8,
+        MIGRATION_8_9,
     )
 }

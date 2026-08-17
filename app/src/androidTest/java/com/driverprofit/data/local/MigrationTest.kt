@@ -446,6 +446,113 @@ class MigrationTest {
     }
 
     @Test
+    fun migracao8para9CriaDispensasSemTocarNoQueJaExiste() {
+        helper.createDatabase(TEST_DB, 8).use { db ->
+            db.execSQL(
+                "INSERT INTO vehicles (id, name, fuel, created_at) " +
+                    "VALUES (1, 'Onix branco', 'FLEX', 1000)",
+            )
+            db.execSQL(
+                """
+                INSERT INTO expenses
+                    (id, vehicle_id, date, category, amount_cents, description, created_at)
+                VALUES (1, 1, 20000, 'FUEL', 21000, '', 1000)
+                """.trimIndent(),
+            )
+        }
+
+        val db = helper.runMigrationsAndValidate(TEST_DB, 9, true, Migrations.MIGRATION_8_9)
+
+        db.query("SELECT COUNT(*) FROM expenses").use { cursor ->
+            assertTrue(cursor.moveToFirst())
+            assertEquals(1, cursor.getInt(0))
+        }
+        // Nasce vazia: ausência de linha significa "nada foi dispensado", que
+        // descreve corretamente todo o histórico anterior.
+        db.query("SELECT COUNT(*) FROM reconciliation_dismissals").use { cursor ->
+            assertTrue(cursor.moveToFirst())
+            assertEquals(0, cursor.getInt(0))
+        }
+    }
+
+    @Test
+    fun migracao8para9GuardaAQuantidadeDispensada() {
+        helper.createDatabase(TEST_DB, 8).use { db ->
+            db.execSQL(
+                "INSERT INTO vehicles (id, name, fuel, created_at) " +
+                    "VALUES (1, 'Onix branco', 'FLEX', 1000)",
+            )
+        }
+
+        val db = helper.runMigrationsAndValidate(TEST_DB, 9, true, Migrations.MIGRATION_8_9)
+
+        db.execSQL(
+            """
+            INSERT INTO reconciliation_dismissals
+                (id, vehicle_id, start_date, end_date, dismissed_km, created_at)
+            VALUES (1, 1, 20454, 20460, 15, 1000)
+            """.trimIndent(),
+        )
+
+        // A quantidade é o que torna a dispensa válida sobre um fato, e não
+        // sobre um pedaço do calendário.
+        db.query("SELECT dismissed_km FROM reconciliation_dismissals WHERE id = 1")
+            .use { cursor ->
+                assertTrue(cursor.moveToFirst())
+                assertEquals(15, cursor.getInt(0))
+            }
+
+        var recusou = false
+        try {
+            db.execSQL(
+                """
+                INSERT INTO reconciliation_dismissals
+                    (id, vehicle_id, start_date, end_date, dismissed_km, created_at)
+                VALUES (2, 1, 20454, 20460, 20, 2000)
+                """.trimIndent(),
+            )
+        } catch (expected: SQLiteConstraintException) {
+            recusou = true
+        }
+        assertTrue(recusou)
+    }
+
+    @Test
+    fun migracao1para9AtravessaTodasAsEtapas() {
+        helper.createDatabase(TEST_DB, 1).use { db ->
+            db.execSQL(
+                """
+                INSERT INTO vehicles
+                    (id, brand, model, year, initial_odometer_km, powertrain,
+                     combustion_fuel, charging_capability, created_at)
+                VALUES
+                    (1, 'Chevrolet', 'Onix', 2020, 50000, 'COMBUSTION', 'FLEX', NULL, 1000)
+                """.trimIndent(),
+            )
+        }
+
+        val db = helper.runMigrationsAndValidate(
+            TEST_DB,
+            9,
+            true,
+            Migrations.MIGRATION_1_2,
+            Migrations.MIGRATION_2_3,
+            Migrations.MIGRATION_3_4,
+            Migrations.MIGRATION_4_5,
+            Migrations.MIGRATION_5_6,
+            Migrations.MIGRATION_6_7,
+            Migrations.MIGRATION_7_8,
+            Migrations.MIGRATION_8_9,
+        )
+
+        db.query("SELECT name, fuel FROM vehicles").use { cursor ->
+            assertTrue(cursor.moveToFirst())
+            assertEquals("Chevrolet Onix", cursor.getString(0))
+            assertEquals("FLEX", cursor.getString(1))
+        }
+    }
+
+    @Test
     fun migracao1para8AtravessaTodasAsEtapas() {
         helper.createDatabase(TEST_DB, 1).use { db ->
             db.execSQL(

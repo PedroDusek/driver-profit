@@ -7,11 +7,13 @@ import com.driverprofit.data.local.database.Migrations
 import com.driverprofit.data.repository.OfflineExpenseRepository
 import com.driverprofit.data.repository.OfflineMaintenanceScheduleRepository
 import com.driverprofit.data.repository.OfflinePersonalUsageRepository
+import com.driverprofit.data.repository.OfflineReconciliationDismissalRepository
 import com.driverprofit.data.repository.OfflineVehicleRepository
 import com.driverprofit.data.repository.OfflineWorkSessionRepository
 import com.driverprofit.domain.repository.ExpenseRepository
 import com.driverprofit.domain.repository.MaintenanceScheduleRepository
 import com.driverprofit.domain.repository.PersonalUsageRepository
+import com.driverprofit.domain.repository.ReconciliationDismissalRepository
 import com.driverprofit.domain.repository.VehicleRepository
 import com.driverprofit.domain.repository.WorkSessionRepository
 import com.driverprofit.domain.usecase.DeleteExpenseUseCase
@@ -33,6 +35,7 @@ import com.driverprofit.domain.usecase.GetPersonalUsageUseCase
 import com.driverprofit.domain.usecase.ObservePersonalUsageInPeriodUseCase
 import com.driverprofit.domain.usecase.ObservePersonalUsageUseCase
 import com.driverprofit.domain.usecase.PersonalUsageValidator
+import com.driverprofit.domain.usecase.DismissReconciliationUseCase
 import com.driverprofit.domain.usecase.ObserveOdometerReconciliationUseCase
 import com.driverprofit.domain.usecase.SavePersonalUsageUseCase
 import com.driverprofit.domain.usecase.SaveReconciledPersonalUsageUseCase
@@ -86,6 +89,7 @@ interface AppContainer {
     val deletePersonalUsage: DeletePersonalUsageUseCase
     val observeOdometerReconciliation: ObserveOdometerReconciliationUseCase
     val saveReconciledPersonalUsage: SaveReconciledPersonalUsageUseCase
+    val dismissReconciliation: DismissReconciliationUseCase
 
     val observeMaintenance: ObserveMaintenanceUseCase
     val saveMaintenanceInterval: SaveMaintenanceIntervalUseCase
@@ -207,7 +211,16 @@ class DefaultAppContainer(private val context: Context) : AppContainer {
             expenseRepository = expenseRepository,
             workSessionRepository = workSessionRepository,
             personalUsageRepository = personalUsageRepository,
+            dismissalRepository = dismissalRepository,
         )
+    }
+
+    private val dismissalRepository: ReconciliationDismissalRepository by lazy {
+        OfflineReconciliationDismissalRepository(database.reconciliationDismissalDao())
+    }
+
+    override val dismissReconciliation: DismissReconciliationUseCase by lazy {
+        DismissReconciliationUseCase(dismissalRepository)
     }
 
     override val saveReconciledPersonalUsage: SaveReconciledPersonalUsageUseCase by lazy {

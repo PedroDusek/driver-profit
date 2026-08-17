@@ -348,6 +348,11 @@ extrato. Só os indicadores por km usam competência.
 - [ ] Gráficos
 - [ ] Custo por km separado por natureza (PRD §22)
 - [ ] Evolução de faturamento, R$/hora e R$/km entre períodos
+- [ ] **Verificar se sobras negativas de odômetro são frequentes.** A v0.10.1 as
+      desconsidera em silêncio, porque uma isolada não tem ação possível. Mas um
+      motorista que anota quilômetro a mais sistematicamente teria o custo/km
+      permanentemente otimista sem nada dizer. É observação sobre um conjunto,
+      não alerta — e só faz sentido com histórico acumulado
 
 ### v0.12.0 — UX Polish
 

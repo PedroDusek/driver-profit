@@ -14,6 +14,51 @@ Versionamento conforme [Semantic Versioning](https://semver.org/lang/pt-BR/).
   erro nenhum. Medido em 16/08/2026: `.db` com 4 KB e `-wal` com 206 KB. O
   `-shm` segue de fora, porque o SQLite o regenera a partir do WAL.
 
+## [0.10.1] — Resolver a sobra do odômetro
+
+A conciliação tinha duas saídas — classificar como uso pessoal ou lançar a
+jornada — e nenhuma servia para o caso mais comum: uma sobra pequena que o
+motorista não consegue explicar. Sem terceira opção, o aviso ficava para sempre.
+
+**Banco na versão 9.**
+
+### Adicionado
+
+- **"Deixar de fora"** — a sobra sai de todos os totais e o app para de perguntar
+  por aquela janela. A tela informa a consequência antes: o custo por km fica um
+  pouco mais alto que o real
+- `reconciliation_dismissals`, guardando **a quantidade dispensada** e não só o
+  intervalo
+- **"Resolver depois"** no lugar de "Cancelar" — o aviso continua lá, e o rótulo
+  agora diz isso
+
+### Alterado
+
+- **Sobra negativa deixa de ser exibida.** Quando os lançamentos somam mais que o
+  painel não há distância faltando, só inconsistência entre dois números do
+  próprio motorista — e como o app **é** a anotação dele, não existe fonte contra
+  a qual conferir. O cartão e o diálogo de divergência introduzidos na v0.9.1 são
+  removidos: foram construídos com boa intenção e não tinham ação associada
+- A sobra negativa **continua sendo calculada e preservada**, só não é mostrada.
+  É ela que faz janelas encadeadas se cancelarem
+- `OdometerWindow` passa a expor `windows()` além de `pending()`, separando o
+  cálculo da política de exibição
+
+### Decisões registradas
+
+- **A dispensa caduca quando a sobra muda.** Aceitar 15 km é aceitar um fato, não
+  um intervalo de tempo. Se a sobra crescer além disso, apareceu distância nova
+  sobre a qual ninguém opinou; se encolher dentro dela, cabe no que já foi aceito
+- **Nunca sugerir um valor corrigido para a leitura.** O número sugerido viria das
+  jornadas, e ajustar o odômetro para concordar com elas destruiria a
+  independência que faz dele um sinal — a conciliação passaria a confirmar a si
+  mesma
+- **Sem saldo global entre janelas.** Netting esconderia erro de digitação e
+  deixaria o número de cada período errado do seu jeito
+- **Alerta sem ação possível é imposto sobre atenção.** Ele ensina a fechar aviso
+  sem ler, e gasta a atenção que manutenção vencida e quilômetro sem explicação
+  precisam ter
+
 ## [0.10.0] — Custos fixos por competência
 
 Custo fixo é pago em bloco e serve a um período. Sem separar as duas coisas, o

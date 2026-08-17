@@ -4,10 +4,12 @@ import com.driverprofit.domain.model.DateRange
 import com.driverprofit.domain.model.Expense
 import com.driverprofit.domain.model.PersonalUsage
 import com.driverprofit.domain.model.PersonalUsageSource
+import com.driverprofit.domain.model.ReconciliationDismissal
 import com.driverprofit.domain.model.Vehicle
 import com.driverprofit.domain.model.WorkSession
 import com.driverprofit.domain.repository.ExpenseRepository
 import com.driverprofit.domain.repository.PersonalUsageRepository
+import com.driverprofit.domain.repository.ReconciliationDismissalRepository
 import com.driverprofit.domain.repository.VehicleRepository
 import com.driverprofit.domain.repository.WorkSessionRepository
 import kotlinx.coroutines.flow.Flow
@@ -95,6 +97,23 @@ object OdometerWindow {
         expenses: List<Expense>,
         sessions: List<WorkSession>,
         personalUsage: List<PersonalUsage>,
+        dismissals: List<ReconciliationDismissal>,
+        vehicleId: Long,
+    ): List<OdometerReconciliation> =
+        windows(expenses, sessions, personalUsage, vehicleId).filter { it.isPending(dismissals) }
+
+    /**
+     * **Todas** as janelas de um veículo, sem filtro de política.
+     *
+     * Separada de [pending] de propósito: aqui vive o cálculo, lá vive a
+     * decisão de o que mostrar. A distinção importa porque a sobra negativa
+     * continua existindo e sendo preservada — é ela que faz janelas
+     * encadeadas se cancelarem — mesmo tendo deixado de ser exibida.
+     */
+    fun windows(
+        expenses: List<Expense>,
+        sessions: List<WorkSession>,
+        personalUsage: List<PersonalUsage>,
         vehicleId: Long,
     ): List<OdometerReconciliation> {
         // Ordenado por leitura, e não por data: odômetro só cresce, e lançar
@@ -126,7 +145,41 @@ object OdometerWindow {
                 workKilometers = work,
                 declaredPersonalKilometers = declared,
             )
-        }.filterNotNull().filter { it.hasUnexplained || it.hasDivergence }
+        }.filterNotNull()
+    }
+
+    /**
+     * Se esta janela ainda precisa de resposta do motorista.
+     *
+     * **Sobra negativa nunca pergunta.** Ela significa que os lançamentos somam
+     * mais que o painel, e isso não é distância faltando: é inconsistência
+     * entre dois números do próprio motorista, sem nada a classificar. Como o
+     * app **é** a anotação dele, não existe fonte contra a qual conferir — e
+     * alerta sem ação possível vira ruído que ensina a fechar aviso sem ler,
+     * gastando a atenção que os alertas úteis precisam ter.
+     *
+     * O efeito de ignorá-la é misto e pequeno: o ganho/km sai pessimista (mais
+     * quilômetros no divisor) e o custo/km sai otimista, ambos na proporção da
+     * sobra, e limitados àquela janela porque não há saldo global.
+     *
+     * **Sobra positiva respeita a dispensa, até o valor dispensado.** Quem
+     * aceitou deixar 15 km de fora aceitou aquele fato; se um lançamento
+     * retroativo explicar parte deles e a sobra cair para 5, ela cabe no que já
+     * foi aceito e o app segue quieto. Se a sobra **crescer** além dos 15,
+     * apareceu distância nova sobre a qual ele não opinou, e a pergunta volta.
+     */
+    private fun OdometerReconciliation.isPending(
+        dismissals: List<ReconciliationDismissal>,
+    ): Boolean {
+        val unexplained = unexplainedKilometers ?: return false
+        if (unexplained <= 0L) return false
+
+        val dismissed = dismissals
+            .firstOrNull { it.vehicleId == vehicleId && it.window == period }
+            ?.dismissedKm
+            ?: 0L
+
+        return unexplained > dismissed
     }
 
     /**
@@ -164,17 +217,45 @@ class ObserveOdometerReconciliationUseCase(
     private val expenseRepository: ExpenseRepository,
     private val workSessionRepository: WorkSessionRepository,
     private val personalUsageRepository: PersonalUsageRepository,
+    private val dismissalRepository: ReconciliationDismissalRepository,
 ) {
     operator fun invoke(): Flow<List<VehicleReconciliation>> = combine(
         vehicleRepository.observeVehicles(),
         expenseRepository.observeExpenses(),
         workSessionRepository.observeSessions(),
         personalUsageRepository.observeAll(),
-    ) { vehicles, expenses, sessions, personalUsage ->
+        dismissalRepository.observeAll(),
+    ) { vehicles, expenses, sessions, personalUsage, dismissals ->
         vehicles.flatMap { vehicle ->
-            OdometerWindow.pending(expenses, sessions, personalUsage, vehicle.id)
+            OdometerWindow.pending(expenses, sessions, personalUsage, dismissals, vehicle.id)
                 .map { VehicleReconciliation(vehicle, it) }
         }
+    }
+}
+
+/**
+ * Aceita a sobra fora da conta.
+ *
+ * Os quilômetros não viram uso pessoal nem trabalho: ficam fora de todos os
+ * totais, e o custo por km segue um pouco mais alto que o real. É decisão
+ * consciente, e a tela diz isso antes de o motorista tomá-la.
+ */
+class DismissReconciliationUseCase(
+    private val repository: ReconciliationDismissalRepository,
+    private val clock: Clock = Clock.systemDefaultZone(),
+) {
+    suspend operator fun invoke(reconciliation: OdometerReconciliation) {
+        val unexplained = reconciliation.unexplainedKilometers ?: return
+        if (unexplained <= 0L) return
+
+        repository.save(
+            ReconciliationDismissal(
+                vehicleId = reconciliation.vehicleId,
+                window = reconciliation.period,
+                dismissedKm = unexplained,
+                createdAt = clock.instant(),
+            ),
+        )
     }
 }
 

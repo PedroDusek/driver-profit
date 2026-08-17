@@ -300,6 +300,32 @@ O resíduo é distribuído proporcionalmente aos dias do intervalo, e o app
 **pergunta** se ele é uso pessoal ou jornada não lançada — os dois têm sinais
 opostos no custo/km.
 
+**A pergunta tem três respostas**, e uma delas é não classificar. Além de "foi
+uso pessoal" e de lançar a jornada em Ganhos, o motorista pode **deixar a sobra
+de fora**: os quilômetros ficam ausentes de todos os totais, e o custo por km
+segue um pouco mais alto que o real. A decisão é gravada com **a quantidade
+dispensada**, e não só com o intervalo — se a sobra daquela janela mudar, a
+dispensa deixa de descrever a situação e a pergunta volta. Uma sobra que
+*encolhe* dentro do que já foi aceito continua em silêncio.
+
+**Sobra negativa não pergunta nada.** Quando os lançamentos somam mais que o
+painel, não há distância faltando: há inconsistência entre dois números do
+próprio motorista, e nada a classificar. Como **o app é a anotação dele**, não
+existe fonte contra a qual conferir — pedir revisão seria exigir uma auditoria
+impossível, e sugerir um valor corrigido seria pior, porque o número sugerido
+viria das jornadas, destruindo a independência que faz do odômetro um sinal.
+
+O app desconsidera em silêncio. O efeito é misto e pequeno: o ganho/km sai
+pessimista, o custo/km sai otimista, ambos na proporção da sobra e limitados
+àquela janela, porque não há saldo global. Alerta sem ação possível vira ruído
+que ensina a fechar aviso sem ler — e gasta a atenção que os alertas úteis
+precisam ter.
+
+> **Não é para sempre.** O caso que o silêncio esconde é o sistemático: alguém
+> que anota quilômetro a mais toda semana teria o custo/km permanentemente
+> otimista sem nada dizer. Isso não é um alerta, é uma observação sobre um
+> conjunto — pertence à v0.11.0, junto de "evolução entre períodos".
+
 Sem dado de uso pessoal, o app calcula com o que tem e **declara a limitação
 na tela**. O estado "sem correção" é ausência de dado, nunca uma chave que o
 motorista liga e desliga: um indicador que muda de definição conforme um botão
