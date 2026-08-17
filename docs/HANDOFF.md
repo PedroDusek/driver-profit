@@ -19,22 +19,33 @@ mergeadas e tagueadas; não há branch de feature em aberto nem PR pendente.
 | v0.8.0 Consumo estimado | ✅ | 6 | ✅ |
 | v0.9.0 Manutenção preventiva | ✅ | **7** | ✅ |
 | v0.9.1 Ciclo do odômetro | ✅ | 7 | ✅ |
+| v0.10.0 Custos fixos por competência | ✅ | **8** | ✅ |
 
 O PRD §58 volta a valer: dá para fazer `git checkout v0.8.0` e reproduzir aquele
 estado.
 
 ### O que fazer primeiro
 
-**A próxima versão é a v0.10.0** — custos fixos por competência, que leva o banco
-para 8. Antes dela, duas coisas valem mais:
+**A última funcionalidade essencial do MVP já entrou.** O que resta é qualidade,
+não escopo:
 
-1. **Investigar Robolectric.** Se o `MigrationTestHelper` do Room 2.8.4 rodar sob
-   ele, as migrações passam a rodar em `testDebugUnitTest`, ou seja no CI, em
-   todo PR. Como a v0.10.0 muda o schema, ela vai depender do cabo de novo — e o
-   cabo já custou duas sessões. Uma tarde aqui vale por todas as versões futuras
-2. **Backup local e crash handling.** Estão na v0.13.0 como dois itens entre
-   seis, e merecem antecipação: o app é offline-first sem nuvem, então **se o
-   celular morrer, o histórico morre junto**
+1. **Exportar e importar arquivo.** O Auto Backup do Android é rede de segurança
+   invisível — o motorista não tem como conferir se funcionou, e ele some se o
+   backup do sistema estiver desligado. Exportação é o backup que ele vê, guarda
+   e leva para outro aparelho. E vira a ponte para a nuvem da v2.0, que o PRD já
+   diz que "começa do presente"
+2. **Crash handling.** Erro não tratado hoje fecha o app sem deixar rastro
+3. **Testes de fluxo** — cadastrar veículo → lançar ganho → lançar despesa →
+   conferir dashboard. Nenhuma tela tem verificação automatizada
+
+**Robolectric foi descartado.** As quedas de cabo desta sessão foram físicas, não
+falha de setup: com o aparelho parado, `connectedDebugAndroidTest` roda em menos
+de um minuto. Montar uma segunda infraestrutura de teste para evitar um passo
+manual de um minuto não se paga. O que resta do argumento — o CI nunca roda esses
+testes, então eles dependem de alguém lembrar — virou regra no template de PR.
+
+Se um dia isso mudar, a pista é o Room 2.8.4: desde a 2.7 o `MigrationTestHelper`
+tem um construtor que roda na JVM com SQLite empacotado, **sem Robolectric**.
 
 ### O que já foi verificado, e o que não foi
 
@@ -51,10 +62,15 @@ para 8. Antes dela, duas coisas valem mais:
 
 ### Armadilhas descobertas em 16/08/2026
 
-- **`adb install` reporta erro com mensagem vazia e mesmo assim instala**, nesta
-  MIUI. Conferir com `dumpsys package ... | grep versionName` antes de concluir
-  que falhou. Já aconteceu nos dois sentidos: erro vazio tendo funcionado, e erro
-  vazio tendo mesmo falhado
+- **O "erro vazio" do `adb install` não é da MIUI — é CRLF.** O adb emite
+  `
+`, e cortar a saída com `tail -1` ou `head -1` no Git Bash faz a linha
+  parecer vazia. A mensagem `Success` está lá. Passar a saída por `tr -d '
+'`
+  resolve, e vale para todo comando do adb nesta máquina
+- **Caminho remoto some no `adb push`.** O MSYS converte `/data/local/tmp` em
+  `C:/Program Files/Git/data/...`. Use `MSYS_NO_PATHCONV=1` **e** caminho local
+  no formato Windows, porque a variável desliga a conversão dos dois lados
 - **O aparelho cai e volta como `offline`.** `adb reconnect` não resolve; o que
   destrava é desbloquear a tela e reautorizar a depuração USB
 - **Merge por rebase reescreve os SHAs**, então branches empilhadas ficam órfãs e
@@ -71,8 +87,8 @@ para 8. Antes dela, duas coisas valem mais:
 | Código | `C:\Users\pedro\Desktop\driver-profit` |
 | Repositório | https://github.com/PedroDusek/driver-profit (público) |
 | Branch estável | `main`, protegida |
-| Última tag | `v0.9.1`, com release publicado |
-| Versão do banco | **7** |
+| Última tag | `v0.10.0`, com release publicado |
+| Versão do banco | **8** |
 
 ⚠️ **O caminho não pode conter acento.** O projeto nasceu em
 `Desktop\RodAí` e o AGP recusa build com caractere não-ASCII no caminho. Se
@@ -185,8 +201,8 @@ estimado em si chega na v0.8.0.
 | v0.5.0 Dashboard | ✅ |
 | v0.6.0 Odômetro · v0.7.0 Uso pessoal · v0.8.0 Consumo | ✅ |
 | v0.9.0 Manutenção preventiva · v0.9.1 Ciclo do odômetro | ✅ |
-| **v0.10.0 Custos fixos por competência** | ⬅️ **próxima** |
-| v0.11.0 Analytics | |
+| v0.10.0 Custos fixos por competência | ✅ |
+| **v0.11.0 Analytics** | ⬅️ próxima em escopo novo |
 | v0.12.0 UX polish · v0.13.0 Hardening · v0.14.0 RC · v1.0.0 MVP | |
 
 O bloco v0.6.0–v0.10.0 foi desenhado em conjunto: cada versão é pequena,
@@ -200,9 +216,8 @@ no PRD §22 e §23.
 Menos funcionalidade do que a contagem de versões sugere, e mais consolidação do
 que o roadmap deixa transparecer.
 
-**Funcionalidade que falta de verdade:** só a **v0.10.0**. Sem ela o IPVA pago em
-janeiro destrói janeiro e isenta o resto do ano. A v0.11.0 (analytics) é
-desejável e não bloqueia.
+**Funcionalidade essencial: nenhuma.** A v0.10.0 fechou a última. A v0.11.0
+(analytics) é desejável e não bloqueia o MVP.
 
 **O que separa "funciona" de "lançável"**, e é o grosso:
 
@@ -253,13 +268,19 @@ extrato. Só os indicadores por km usam competência.
 
 ## 7. Testes instrumentados
 
-São a única verificação real das migrações. Cobrem os cinco DAOs e as sete
-migrações encadeadas (1→2→3→4→5→6→7).
+São a única verificação real das migrações. Cobrem os cinco DAOs e as oito
+migrações encadeadas (1→2→3→4→5→6→7→8).
 
-✅ **Última execução: 16/08/2026, 62 testes, todos passando**, em Redmi Note 8
-Pro com Android 9. Distribuição: `MigrationTest` 17, `ExpenseDaoTest` 14,
+✅ **Última execução: 16/08/2026, 65 testes, todos passando**, em Redmi Note 8
+Pro com Android 9. Distribuição: `MigrationTest` 20, `ExpenseDaoTest` 14,
 `WorkSessionDaoTest` 10, `VehicleDaoTest` 8, `MaintenanceScheduleDaoTest` 8,
 `PersonalUsageDaoTest` 5.
+
+⚠️ **Ele desinstala os dois pacotes ao terminar, e isso apaga os dados.** Se
+você quer exercitar uma migração em cima de dados reais, faça isso **antes** de
+rodar os instrumentados — ou tenha o banco salvo. Puxar uma cópia com
+`adb exec-out run-as <pacote> cat databases/driver_profit.db` custa segundos e
+já salvou esta sessão.
 
 ```bash
 cd C:/Users/pedro/Desktop/driver-profit && ./gradlew connectedDebugAndroidTest
