@@ -4,62 +4,63 @@ Documento de continuidade. Leia isto **antes** de qualquer coisa ao retomar o
 projeto em uma sessão nova, junto com `PRD.md`, `ARCHITECTURE.md` e
 `DEVELOPMENT.md`.
 
-**Última atualização:** v0.9.0
+**Última atualização:** v0.9.1
 
 ---
 
 ## 0. Comece por aqui
 
-O estado não é "tudo na `main`". Três versões estão prontas e **fora da `main`
-de propósito**, empilhadas uma sobre a outra:
+**Está tudo na `main`.** Em 16/08/2026 as quatro versões pendentes foram
+mergeadas e tagueadas; não há branch de feature em aberto nem PR pendente.
 
-| Branch | Versão | Banco | Estado |
+| Versão | Tag | Banco | Release |
 | --- | --- | --- | --- |
-| `main` | v0.6.0 (última tag) | 5 | estável |
-| `feature/personal-usage` | v0.7.0 | **6** | gate verde, migração validada |
-| `feature/fuel-consumption` | v0.8.0 | 6 | empilhada sobre a v0.7.0, gate verde |
-| `feature/maintenance-alerts` | v0.9.0 | **7** | empilhada sobre a v0.8.0, gate verde, migração validada |
+| v0.7.0 Uso pessoal | ✅ | 6 | ✅ |
+| v0.8.0 Consumo estimado | ✅ | 6 | ✅ |
+| v0.9.0 Manutenção preventiva | ✅ | **7** | ✅ |
+| v0.9.1 Ciclo do odômetro | ✅ | 7 | ✅ |
 
-**O impedimento acabou.** Em 16/08/2026 o aparelho foi conectado e as três
-versões foram validadas de uma vez:
-
-- **62 testes instrumentados, todos passando** (eram 42 na v0.6.0), cobrindo os
-  cinco DAOs, as sete migrações encadeadas e a cadeia completa 1→7
-- **A atualização foi exercitada em dados reais**: um aparelho com a v0.6.0
-  instalada e banco na versão 5 recebeu a v0.9.0 por cima, migrou 5→6→7, abriu
-  sem exceção e manteve veículo, jornada e despesa intactos. O Room valida o
-  schema contra o hash esperado ao abrir, então isso prova que as migrações
-  escritas à mão produzem exatamente a estrutura esperada
-
-Nada disso está empurrado ainda. As três branches seguem locais.
-
-A v0.9.0 empilhou sobre a v0.8.0 porque depende do `ConsumptionEstimator` para
-o piso de distância. Ramificar da `main` significaria reimplementá-lo.
+O PRD §58 volta a valer: dá para fazer `git checkout v0.8.0` e reproduzir aquele
+estado.
 
 ### O que fazer primeiro
 
-1. **Conferir os números à mão no aparelho.** Nenhuma tela tem teste de
-   interface (seção 7). É a única verificação que existe do que a tela mostra, e
-   é o que falta antes do merge
-2. `git push` das três branches
-3. PR da v0.7.0 → merge → tag `v0.7.0`; depois v0.8.0; depois v0.9.0. Uma tag
-   por versão, na ordem
-4. Só então a v0.9.1, que já está desenhada
+**A próxima versão é a v0.10.0** — custos fixos por competência, que leva o banco
+para 8. Antes dela, duas coisas valem mais:
 
-### O gargalo que continua de pé
+1. **Investigar Robolectric.** Se o `MigrationTestHelper` do Room 2.8.4 rodar sob
+   ele, as migrações passam a rodar em `testDebugUnitTest`, ou seja no CI, em
+   todo PR. Como a v0.10.0 muda o schema, ela vai depender do cabo de novo — e o
+   cabo já custou duas sessões. Uma tarde aqui vale por todas as versões futuras
+2. **Backup local e crash handling.** Estão na v0.13.0 como dois itens entre
+   seis, e merecem antecipação: o app é offline-first sem nuvem, então **se o
+   celular morrer, o histórico morre junto**
 
-O CI **não roda testes de migração** — eles exigem aparelho. Toda versão com
-schema novo vai continuar esperando o cabo, como as três acima esperaram.
+### O que já foi verificado, e o que não foi
 
-- **Celular** (Redmi Note 8 Pro, Android 9): funciona. A MIUI às vezes recusa a
-  instalação e o `adb install` pode reportar erro vazio **tendo funcionado** —
-  conferir com `dumpsys package` antes de concluir que falhou. Contornos na
-  seção 7
-- **Emulador: descartado por decisão do Pedro.** Não perder tempo com isso
-- **Robolectric — não investigado, e continua sendo a melhor pista.** Se o
-  `MigrationTestHelper` do Room 2.8.4 rodar sob ele, as migrações passam a
-  rodar em `testDebugUnitTest`, ou seja **no CI, em todo PR, para sempre**.
-  Resolveria o gargalo de vez, em vez de resolvê-lo uma vez por versão
+- **62 testes instrumentados** passando em Redmi Note 8 Pro (Android 9),
+  cobrindo os cinco DAOs e as sete migrações encadeadas, inclusive 1→7
+- **Migração validada em dados reais**: aparelho com banco na versão 5 recebeu a
+  v0.9.0 por cima, migrou 5→6→7, abriu sem exceção e manteve os dados. Como o
+  Room confere o schema contra o hash esperado ao abrir, isso prova que as
+  migrações escritas à mão produzem exatamente a estrutura que ele espera
+- **Os onze indicadores do dashboard foram conferidos à mão** contra lançamentos
+  reais, na v0.9.1. Bateram todos
+- ⚠️ **Nenhuma tela tem teste automatizado.** O `androidTest` só cobre
+  `data/local`. Toda verificação de interface até hoje foi feita a olho
+
+### Armadilhas descobertas em 16/08/2026
+
+- **`adb install` reporta erro com mensagem vazia e mesmo assim instala**, nesta
+  MIUI. Conferir com `dumpsys package ... | grep versionName` antes de concluir
+  que falhou. Já aconteceu nos dois sentidos: erro vazio tendo funcionado, e erro
+  vazio tendo mesmo falhado
+- **O aparelho cai e volta como `offline`.** `adb reconnect` não resolve; o que
+  destrava é desbloquear a tela e reautorizar a depuração USB
+- **Merge por rebase reescreve os SHAs**, então branches empilhadas ficam órfãs e
+  o PR seguinte aparece como `CONFLICTING`. A saída é rebasear cada branch sobre
+  a `main` nova antes do merge dela — o git descarta os commits duplicados pelo
+  conteúdo sozinho. `--force-with-lease`, e **só em branch de feature**
 
 ---
 
@@ -70,7 +71,7 @@ schema novo vai continuar esperando o cabo, como as três acima esperaram.
 | Código | `C:\Users\pedro\Desktop\driver-profit` |
 | Repositório | https://github.com/PedroDusek/driver-profit (público) |
 | Branch estável | `main`, protegida |
-| Última tag | `v0.6.0`. v0.7.0, v0.8.0 e v0.9.0 prontas, **sem teste em aparelho** |
+| Última tag | `v0.9.1`, com release publicado |
 | Versão do banco | **7** |
 
 ⚠️ **O caminho não pode conter acento.** O projeto nasceu em
@@ -94,7 +95,7 @@ mensagem em um arquivo e use `git commit -F <arquivo>`. Vale para
 ## 3. Como o produto é hoje
 
 Aplicativo Android offline-first para medir **rentabilidade operacional** de
-motorista de aplicativo. Quatro telas, todas alcançáveis pelos ícones do
+motorista de aplicativo. Cinco telas, todas alcançáveis pelos ícones do
 dashboard:
 
 - **Veículos** — nome + tipo de combustível, só isso
@@ -110,6 +111,14 @@ dashboard:
 - **Dashboard** — tela principal. Indicadores do período escolhido: lucro em
   destaque, faturamento e despesas, volume (km, horas, corridas), R$/km,
   R$/hora, R$/corrida, custo/km, lucro/km, lucro/hora e despesas por natureza
+
+No topo do dashboard aparecem dois avisos, e **nenhum dos dois pertence ao
+período selecionado** — cada um declara na tela a que intervalo se refere:
+
+- **Odômetro não confere**, quando há janela entre leituras com quilometragem
+  sem explicação. Toca e cai no diálogo que pergunta se foi uso pessoal ou
+  jornada não lançada
+- **Manutenção pede atenção**, quando há item vencido ou próximo
 
 ## 4. Decisões de produto que divergem do PRD original
 
@@ -175,9 +184,9 @@ estimado em si chega na v0.8.0.
 | v0.4.0 / v0.4.1 Expenses | ✅ |
 | v0.5.0 Dashboard | ✅ |
 | v0.6.0 Odômetro · v0.7.0 Uso pessoal · v0.8.0 Consumo | ✅ |
-| v0.9.0 Manutenção preventiva | ✅ |
-| **v0.9.1 Fechar o ciclo do odômetro** | ⬅️ **próxima**, desenhada, sem código |
-| v0.10.0 Custos fixos · v0.11.0 Analytics | |
+| v0.9.0 Manutenção preventiva · v0.9.1 Ciclo do odômetro | ✅ |
+| **v0.10.0 Custos fixos por competência** | ⬅️ **próxima** |
+| v0.11.0 Analytics | |
 | v0.12.0 UX polish · v0.13.0 Hardening · v0.14.0 RC · v1.0.0 MVP | |
 
 O bloco v0.6.0–v0.10.0 foi desenhado em conjunto: cada versão é pequena,
@@ -186,38 +195,30 @@ detalhamento com critério de saída e impacto no banco está em
 [`ROADMAP.md`](ROADMAP.md); as regras de produto que sustentam tudo isso estão
 no PRD §22 e §23.
 
-### Três versões prontas para merge
+### O que falta para o MVP
 
-`feature/personal-usage` (v0.7.0), `feature/fuel-consumption` (v0.8.0) e
-`feature/maintenance-alerts` (v0.9.0) estão **não mergeadas e não empurradas**,
-cada uma empilhada sobre a anterior.
+Menos funcionalidade do que a contagem de versões sugere, e mais consolidação do
+que o roadmap deixa transparecer.
 
-O que as segurava — migração sem teste em aparelho — foi resolvido em
-16/08/2026 (seção 0). Falta a conferência manual dos números na tela, o push e
-a fila de PRs na ordem.
+**Funcionalidade que falta de verdade:** só a **v0.10.0**. Sem ela o IPVA pago em
+janeiro destrói janeiro e isenta o resto do ano. A v0.11.0 (analytics) é
+desejável e não bloqueia.
 
-### O que a v0.9.1 precisa fazer
+**O que separa "funciona" de "lançável"**, e é o grosso:
 
-**Fechar o ciclo do odômetro.** Desenho completo na seção v0.9.1 do
-[`ROADMAP.md`](ROADMAP.md); decisões de produto no PRD §22 e §23. Escrito para
-revisão — **nenhuma linha de código foi escrita**.
+- **Zero testes de interface.** Nenhuma tela tem verificação automatizada. Para
+  um app cujo produto é a exatidão de um número, é a maior lacuna aberta
+- **Sem backup.** Offline-first sem nuvem: se o celular morrer, o histórico morre
+  junto
+- **Sem crash handling.** Erro não tratado fecha o app sem deixar rastro
 
-O problema: a conciliação da v0.7.0 existe mas **não gira sozinha**. É manual,
-mensal e só no primeiro veículo. Quem nunca aperta o botão fica com uso pessoal
-zerado, e o custo/km volta a ser o inflado da v0.5.0.
+**Três decisões que congelam na primeira instalação de terceiro** (PRD §48):
 
-Cinco itens, **em ordem de dependência**:
-
-1. **Discrepância negativa tratada** — pré-requisito. Hoje é `coerceAtLeast(0L)`,
-   o que quebra o cancelamento entre janelas e grava km pessoal inexistente
-2. **Conciliação por janela entre leituras**, por veículo, disparada pela
-   leitura nova — em vez de mês de calendário
-3. **"Não sei a leitura"** em lançamento retroativo, gravando `NULL`
-4. **Nota de limitação** quando falta dado de uso pessoal (PRD §22 manda, e não
-   está implementado)
-5. **Proporção na repartição** do custo/km
-
-**Sem alteração de banco** — não depende de nova rodada de teste de migração.
+- **O nome do produto ainda é placeholder.** Trocar o `applicationId` depois
+  **apaga os dados de quem já instalou**
+- **Não há build de release assinado.** A release publica APK de *debug*, e
+  assinatura de debug e de release não se atualizam entre si
+- **Sem LICENSE**, por escolha do Pedro — efeito é todos os direitos reservados
 
 ### O que a v0.10.0 precisa fazer
 
