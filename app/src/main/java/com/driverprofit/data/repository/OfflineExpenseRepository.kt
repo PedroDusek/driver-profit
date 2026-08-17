@@ -30,6 +30,11 @@ class OfflineExpenseRepository(
             .map { entities -> entities.map { it.toDomain() } }
             .flowOn(ioDispatcher)
 
+    override fun observeAccruedBetween(start: LocalDate, end: LocalDate): Flow<List<Expense>> =
+        expenseDao.observeAccruedBetween(start.toEpochDay(), end.toEpochDay())
+            .map { entities -> entities.map { it.toDomain() } }
+            .flowOn(ioDispatcher)
+
     override fun observeLatestOdometer(vehicleId: Long): Flow<Long?> =
         expenseDao.observeLatestOdometer(vehicleId).flowOn(ioDispatcher)
 

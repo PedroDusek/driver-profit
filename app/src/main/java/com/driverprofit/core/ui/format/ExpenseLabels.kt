@@ -74,6 +74,7 @@ object ExpenseLabels {
         ExpenseField.PLACE -> R.string.expense_place
         ExpenseField.MAINTENANCE_CATEGORY -> R.string.expense_maintenance_category
         ExpenseField.WORKSHOP -> R.string.expense_workshop
+        ExpenseField.ACCRUAL -> R.string.expense_accrual
     }
 
     @StringRes
@@ -87,6 +88,7 @@ object ExpenseLabels {
         ExpenseValidationError.VEHICLE_CANNOT_CHARGE -> R.string.error_vehicle_cannot_charge
         ExpenseValidationError.ODOMETER_OUT_OF_RANGE -> R.string.error_odometer_out_of_range
         ExpenseValidationError.ODOMETER_INCONSISTENT -> R.string.error_odometer_inconsistent
+        ExpenseValidationError.ACCRUAL_INCOMPLETE -> R.string.error_accrual_incomplete
         ExpenseValidationError.TEXT_TOO_LONG -> R.string.error_text_too_long
     }
 }

@@ -15,6 +15,9 @@ enum class ExpenseField {
     PLACE,
     MAINTENANCE_CATEGORY,
     WORKSHOP,
+
+    /** Período de competência do custo fixo (PRD §22). */
+    ACCRUAL,
 }
 
 /**
@@ -61,6 +64,9 @@ enum class ExpenseValidationError {
      * envenena consumo, marco de manutenção e conciliação.
      */
     ODOMETER_INCONSISTENT,
+
+    /** Competência com só uma das pontas preenchida. */
+    ACCRUAL_INCOMPLETE,
 
     TEXT_TOO_LONG,
 }

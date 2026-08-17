@@ -2,7 +2,7 @@
 
 Room sobre SQLite, local ao aparelho. Nome do arquivo: `driver_profit.db`.
 
-**Versão atual do schema: 7**
+**Versão atual do schema: 8**
 
 O JSON do schema é exportado em `app/schemas/` e **é versionado no Git**. Ele é
 o que torna possível escrever testes de migração de verdade. Os schemas
@@ -79,6 +79,8 @@ Todas as despesas em **uma tabela só**, com as colunas de detalhe anuláveis.
 | `maintenance_category` | TEXT | **sim** | Item da manutenção |
 | `place` | TEXT | **sim** | Posto, eletroposto ou oficina, conforme a categoria |
 | `odometer_km` | INTEGER | **sim** | Leitura do painel, em km inteiros. Desde a v0.6.0 |
+| `accrual_start` | INTEGER | **sim** | Epoch day do início da competência. Desde a v0.10.0 |
+| `accrual_end` | INTEGER | **sim** | Epoch day do fim da competência, inclusive |
 | `created_at` | INTEGER | não | Epoch millis (UTC) |
 
 **Índices:** `date` e `vehicle_id`.
@@ -92,6 +94,15 @@ contamina consumo estimado, quilômetro pessoal e alerta de manutenção.
 
 A obrigatoriedade vive em `ExpenseValidator`: ela vale para o que se grava de
 agora em diante e não invalida retroativamente o histórico.
+
+**Competência é anulável, e `NULL` é o caso comum**, não a exceção: significa
+"o valor conta no próprio dia", que vale para todo custo variável e para todo
+lançamento anterior à v0.10.0. Só custo fixo — seguro, IPVA e financiamento —
+recebe intervalo, porque só ele é pago em bloco e serve a um período (PRD §22).
+
+As duas colunas andam juntas: uma ponta só não define intervalo, e o
+`ExpenseValidator` recusa o par incompleto. A `date` continua sendo **quando o
+dinheiro saiu**; histórico, "Despesas" e lucro seguem exibindo caixa.
 
 **Por que uma tabela só:** o PRD §17 pede explicitamente que adicionar
 categoria não exija mudança estrutural. Com uma tabela por natureza de
@@ -262,6 +273,7 @@ Um PR que altera apenas a Entity está incompleto.
 | 5 | v0.6.0 | Adiciona `odometer_km` em `expenses` (odômetro por lançamento) |
 | 6 | v0.7.0 | Adiciona `personal_usage` (quilometragem fora do trabalho) |
 | 7 | v0.9.0 | Adiciona `maintenance_schedules` (intervalos de manutenção) |
+| 8 | v0.10.0 | Adiciona `accrual_start` e `accrual_end` em `expenses` (competência) |
 
 #### Migração 1 → 2
 
@@ -338,6 +350,19 @@ Os alertas também não precisam de dado novo: o marco de cada item vem do
 histórico de manutenção que já está em `expenses`, com odômetro desde a v0.6.0.
 Consequência assumida: um item só passa a alertar depois do primeiro serviço
 lançado **com leitura**. Antes disso ele se declara sem dados, que é a verdade.
+
+#### Migração 7 → 8
+
+`ALTER TABLE expenses ADD COLUMN` duas vezes, para `accrual_start` e
+`accrual_end`. Aditiva e sem reescrita de tabela.
+
+As colunas são **anuláveis e sem default**, e `NULL` aqui não é ausência de
+dado a lamentar: é o significado "a competência é a própria data", que descreve
+corretamente todo lançamento anterior a esta versão.
+
+Preencher as despesas existentes com a própria data produziria o mesmo número,
+mas apagaria a distinção entre "não tem competência" e "tem competência de um
+dia só" — e o app perderia a chance de oferecer o campo em edição depois.
 
 ## Desvios registrados em relação ao PRD
 

@@ -252,6 +252,27 @@ object Migrations {
         }
     }
 
+    /**
+     * 7 → 8: competência dos custos fixos.
+     *
+     * Acrescenta `accrual_start` e `accrual_end` a `expenses`. Aditiva e sem
+     * reescrita de tabela.
+     *
+     * As duas colunas são **anuláveis e sem default**, e `NULL` é o caso comum,
+     * não a exceção: significa "a competência é a própria data", que é o
+     * comportamento de todo custo variável e de todo lançamento anterior a esta
+     * versão. Preencher as despesas existentes com a própria data seria
+     * equivalente, porém apagaria a distinção entre "não tem competência" e
+     * "tem competência de um dia só" — e o app perderia a chance de oferecer o
+     * campo em edição depois.
+     */
+    val MIGRATION_7_8 = object : Migration(7, 8) {
+        override fun migrate(db: SupportSQLiteDatabase) {
+            db.execSQL("ALTER TABLE `expenses` ADD COLUMN `accrual_start` INTEGER")
+            db.execSQL("ALTER TABLE `expenses` ADD COLUMN `accrual_end` INTEGER")
+        }
+    }
+
     /** Todas as migrações conhecidas, na ordem. */
     val ALL: Array<Migration> = arrayOf(
         MIGRATION_1_2,
@@ -260,5 +281,6 @@ object Migrations {
         MIGRATION_4_5,
         MIGRATION_5_6,
         MIGRATION_6_7,
+        MIGRATION_7_8,
     )
 }

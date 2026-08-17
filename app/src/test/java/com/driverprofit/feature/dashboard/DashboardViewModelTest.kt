@@ -8,6 +8,7 @@ import com.driverprofit.domain.model.Expense
 import com.driverprofit.domain.model.ExpenseCategory
 import com.driverprofit.domain.model.Platform
 import com.driverprofit.domain.model.WorkSession
+import com.driverprofit.domain.usecase.ObserveAccruedExpensesUseCase
 import com.driverprofit.domain.usecase.ObserveDashboardUseCase
 import com.driverprofit.domain.usecase.ObserveExpensesBetweenUseCase
 import com.driverprofit.domain.usecase.ObserveMaintenanceUseCase
@@ -108,6 +109,7 @@ class DashboardViewModelTest {
             observeWorkSessionsBetween = ObserveWorkSessionsBetweenUseCase(sessions),
             observeExpensesBetween = ObserveExpensesBetweenUseCase(expenses),
             observePersonalUsageInPeriod = ObservePersonalUsageInPeriodUseCase(personalUsage),
+            observeAccruedInPeriod = ObserveAccruedExpensesUseCase(expenses),
         ),
         observeMaintenance = ObserveMaintenanceUseCase(vehicles, expenses, schedules),
         observeReconciliation = ObserveOdometerReconciliationUseCase(

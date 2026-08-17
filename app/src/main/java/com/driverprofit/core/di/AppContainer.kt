@@ -21,6 +21,7 @@ import com.driverprofit.domain.usecase.ExpenseValidator
 import com.driverprofit.domain.usecase.GetExpenseUseCase
 import com.driverprofit.domain.usecase.GetVehicleUseCase
 import com.driverprofit.domain.usecase.GetWorkSessionUseCase
+import com.driverprofit.domain.usecase.ObserveAccruedExpensesUseCase
 import com.driverprofit.domain.usecase.ObserveDashboardUseCase
 import com.driverprofit.domain.usecase.ObserveMaintenanceUseCase
 import com.driverprofit.domain.usecase.ResetMaintenanceIntervalUseCase
@@ -239,6 +240,7 @@ class DefaultAppContainer(private val context: Context) : AppContainer {
             observeExpensesBetween = ObserveExpensesBetweenUseCase(expenseRepository),
             observePersonalUsageInPeriod =
                 ObservePersonalUsageInPeriodUseCase(personalUsageRepository),
+            observeAccruedInPeriod = ObserveAccruedExpensesUseCase(expenseRepository),
         )
     }
 }

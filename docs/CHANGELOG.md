@@ -14,6 +14,42 @@ Versionamento conforme [Semantic Versioning](https://semver.org/lang/pt-BR/).
   erro nenhum. Medido em 16/08/2026: `.db` com 4 KB e `-wal` com 206 KB. O
   `-shm` segue de fora, porque o SQLite o regenera a partir do WAL.
 
+## [0.10.0] — Custos fixos por competência
+
+Custo fixo é pago em bloco e serve a um período. Sem separar as duas coisas, o
+IPVA de R$ 1.200 pago em janeiro faz janeiro parecer catastrófico e o resto do
+ano parecer isento — e nenhum dos doze meses diz a verdade.
+
+### Adicionado
+
+- **Período de competência na despesa** (`accrual_start`, `accrual_end`),
+  separando "quando paguei" de "a que período o valor se refere"
+- `Expense.amountWithin(period)` — rateio pelos dias do intervalo
+- **Custo fixo do período** e **custo fixo por km trabalhado** no dashboard
+- Campos de competência no formulário, oferecidos **só em custo fixo**
+- `maintenance_schedules` intacta; **banco na versão 8**, migração aditiva
+
+### Decisões registradas
+
+- **Só os indicadores por quilômetro usam competência.** Histórico, "Despesas" e
+  lucro continuam exibindo **caixa**, para conferir com o extrato. Resultado por
+  competência é assunto pós-MVP (PRD §22).
+- **O divisor do custo fixo por km é o quilômetro trabalhado**, não o total.
+  Financiamento, seguro e IPVA existem pela decisão de ter o carro para
+  trabalhar; levar o carro ao mercado não gera parcela. Por isso ele é um
+  indicador separado, e não uma parcela do custo/km — os dois têm denominadores
+  diferentes, e somá-los seria somar razões de bases distintas.
+- **O rateio é por dias iguais**, não por dias trabalhados: seguro e IPVA correm
+  no calendário, não no uso. Um mês parado custa o mesmo que um mês rodando, que
+  é o que faz deles custo fixo.
+- **A consulta é de sobreposição**, não de contenção: o IPVA pago em 15/01 com
+  competência anual precisa aparecer em agosto, e a data dele está a sete meses
+  de distância.
+- **Competência não pela metade.** Uma ponta só não define intervalo, e aceitá-la
+  obrigaria o cálculo a inventar a outra.
+- **`NULL` é o caso comum**, e significa "conta no próprio dia" — o comportamento
+  de todo custo variável e de todo lançamento anterior a esta versão.
+
 ## [0.9.1] — Fechar o ciclo do odômetro
 
 O ciclo que a v0.7.0 construiu existia mas **não girava sozinho**: a conciliação

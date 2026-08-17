@@ -69,6 +69,20 @@ data class Expense(
     val description: String = "",
     val detail: ExpenseDetail? = null,
     val odometerKm: Long? = null,
+    /**
+     * A que intervalo o valor se refere, quando ele não se esgota no dia do
+     * pagamento (PRD §22).
+     *
+     * `null` é o caso comum e significa "conta no próprio dia" — combustível,
+     * pedágio, lavagem. Custo fixo é diferente: o IPVA de R$ 1.200 pago em
+     * janeiro serve ao ano inteiro, e sem separar as duas coisas janeiro parece
+     * catastrófico e os outros onze meses parecem isentos.
+     *
+     * **A [date] continua sendo quando o dinheiro saiu.** Histórico, "Despesas"
+     * e lucro seguem exibindo caixa, para conferir com o extrato; só os
+     * indicadores por quilômetro usam competência.
+     */
+    val accrual: DateRange? = null,
     val createdAt: Instant,
 ) {
     /**
@@ -103,6 +117,30 @@ data class Expense(
      */
     val pricePerUnit: Money?
         get() = quantity?.let { amount.per(it.toUnits()) }
+
+    /**
+     * Quanto deste lançamento pertence a [period], pela competência.
+     *
+     * Sem competência declarada, o valor inteiro cai no dia do pagamento — ou
+     * zero, se esse dia estiver fora do período. Com competência, o valor é
+     * repartido pelos dias do intervalo e devolvido na proporção que couber.
+     *
+     * O rateio é por dias iguais, e não por dias trabalhados: seguro e IPVA
+     * correm no calendário, não no uso. Um mês parado custa o mesmo que um mês
+     * rodando, que é justamente o que faz deles custo fixo.
+     */
+    fun amountWithin(period: DateRange): Money {
+        val accrual = accrual ?: return if (date in period) amount else Money.ZERO
+
+        val start = maxOf(accrual.start, period.start)
+        val end = minOf(accrual.end, period.end)
+        if (end.isBefore(start)) return Money.ZERO
+
+        val overlapDays = DateRange(start, end).days
+        if (overlapDays >= accrual.days) return amount
+
+        return Money(Math.round(amount.cents.toDouble() * overlapDays / accrual.days))
+    }
 
     companion object {
         /** Id atribuído a uma despesa que ainda não foi persistida. */

@@ -35,6 +35,23 @@ interface ExpenseDao {
     )
     fun observeBetween(startEpochDay: Long, endEpochDay: Long): Flow<List<ExpenseEntity>>
 
+    /**
+     * Despesas cuja **competência encosta** no período (PRD §22).
+     *
+     * Sobreposição, e não contenção: o IPVA pago em 15/01 com competência de
+     * 01/01 a 31/12 precisa aparecer em agosto, e a `date` dele está a sete
+     * meses de distância. Filtrar por data perderia exatamente o lançamento que
+     * esta consulta existe para encontrar.
+     */
+    @Query(
+        """
+        SELECT * FROM expenses
+        WHERE accrual_start IS NOT NULL AND accrual_end IS NOT NULL
+          AND accrual_start <= :endEpochDay AND accrual_end >= :startEpochDay
+        """,
+    )
+    fun observeAccruedBetween(startEpochDay: Long, endEpochDay: Long): Flow<List<ExpenseEntity>>
+
     @Query("SELECT * FROM expenses WHERE id = :id")
     suspend fun findById(id: Long): ExpenseEntity?
 
