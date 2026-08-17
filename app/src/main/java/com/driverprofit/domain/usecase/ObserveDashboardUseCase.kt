@@ -1,5 +1,6 @@
 package com.driverprofit.domain.usecase
 
+import com.driverprofit.core.common.Money
 import com.driverprofit.domain.model.DashboardMetrics
 import com.driverprofit.domain.model.DateRange
 import kotlinx.coroutines.flow.Flow
@@ -17,13 +18,15 @@ class ObserveDashboardUseCase(
     private val observeWorkSessionsBetween: ObserveWorkSessionsBetweenUseCase,
     private val observeExpensesBetween: ObserveExpensesBetweenUseCase,
     private val observePersonalUsageInPeriod: ObservePersonalUsageInPeriodUseCase,
+    private val observeAccruedInPeriod: ObserveAccruedExpensesUseCase,
 ) {
 
     operator fun invoke(range: DateRange): Flow<DashboardMetrics> = combine(
         observeWorkSessionsBetween(range.start, range.end),
         observeExpensesBetween(range.start, range.end),
         observePersonalUsageInPeriod(range),
-    ) { sessions, expenses, personalUsage ->
+        observeAccruedInPeriod(range),
+    ) { sessions, expenses, personalUsage, accrued ->
         DashboardMetrics.of(
             sessions = sessions,
             expenses = expenses,
@@ -31,6 +34,13 @@ class ObserveDashboardUseCase(
             // que atravessa a virada do mês entra nos dois períodos, cada um
             // com a fatia de dias que lhe cabe (PRD §22).
             personalKilometers = personalUsage.sumOf { it.kilometersWithin(range) },
+            // Mesma ideia do recorte proporcional acima, aplicada a dinheiro:
+            // o IPVA anual entrega a cada mês a fatia de dias que lhe cabe.
+            // Só custo fixo entra — variável se esgota no dia em que foi pago.
+            accruedFixedCost = Money.sum(
+                accrued.filterNot { it.category.isOperationalCost }
+                    .map { it.amountWithin(range) },
+            ),
         )
     }
 }

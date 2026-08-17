@@ -23,6 +23,14 @@ interface ExpenseRepository {
     fun observeExpensesBetween(start: LocalDate, end: LocalDate): Flow<List<Expense>>
 
     /**
+     * Despesas cuja competência encosta no período (PRD §22).
+     *
+     * Sobreposição, e não contenção — um custo fixo se refere a um intervalo
+     * que costuma ser bem maior que o dia em que foi pago.
+     */
+    fun observeAccruedBetween(start: LocalDate, end: LocalDate): Flow<List<Expense>>
+
+    /**
      * Maior leitura de odômetro registrada para um veículo, ou `null` quando
      * ainda não há nenhuma.
      *

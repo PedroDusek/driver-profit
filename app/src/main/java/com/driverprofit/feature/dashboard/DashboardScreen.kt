@@ -445,6 +445,27 @@ private fun CostRatiosCard(metrics: DashboardMetrics) {
                 color = MaterialTheme.colorScheme.onSurfaceVariant,
             )
         }
+
+        // Competência, não caixa — e por isso pode aparecer num mês em que
+        // nenhum custo fixo foi pago. O IPVA de janeiro compete a agosto
+        // também, e é isso que impede janeiro de parecer catastrófico e agosto
+        // de parecer isento (PRD §22).
+        if (!metrics.accruedFixedCost.isZero) {
+            HorizontalDivider()
+            MetricRow(
+                label = stringResource(R.string.dashboard_fixed_accrued),
+                value = BrazilianFormatter.money(metrics.accruedFixedCost),
+            )
+            MetricRow(
+                label = stringResource(R.string.dashboard_fixed_per_km),
+                value = BrazilianFormatter.moneyOrUnavailable(metrics.fixedCostPerKm),
+            )
+            Text(
+                text = stringResource(R.string.dashboard_fixed_accrual_note),
+                style = MaterialTheme.typography.bodySmall,
+                color = MaterialTheme.colorScheme.onSurfaceVariant,
+            )
+        }
     }
 }
 

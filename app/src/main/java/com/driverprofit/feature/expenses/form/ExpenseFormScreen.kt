@@ -78,6 +78,8 @@ fun ExpenseFormScreen(
 ) {
     val uiState by viewModel.uiState.collectAsStateWithLifecycle()
     var showDatePicker by remember { mutableStateOf(false) }
+    var showAccrualStartPicker by remember { mutableStateOf(false) }
+    var showAccrualEndPicker by remember { mutableStateOf(false) }
 
     LaunchedEffect(uiState.savedExpenseId) {
         if (uiState.savedExpenseId != null) {
@@ -242,6 +244,47 @@ fun ExpenseFormScreen(
                 }
             }
 
+            // Só em custo fixo. Combustível queimado na terça não serve à
+            // quarta — competência ali seria pergunta sem resposta útil.
+            if (uiState.showAccrual) {
+                Text(
+                    text = stringResource(R.string.expense_accrual_hint),
+                    style = MaterialTheme.typography.bodySmall,
+                    color = MaterialTheme.colorScheme.onSurfaceVariant,
+                )
+                Row(
+                    modifier = Modifier.fillMaxWidth(),
+                    horizontalArrangement = Arrangement.spacedBy(8.dp),
+                ) {
+                    AccrualField(
+                        label = stringResource(R.string.expense_accrual_start),
+                        date = uiState.accrualStart,
+                        isError = uiState.errorFor(ExpenseField.ACCRUAL) != null,
+                        onClick = { showAccrualStartPicker = true },
+                        modifier = Modifier.weight(1f),
+                    )
+                    AccrualField(
+                        label = stringResource(R.string.expense_accrual_end),
+                        date = uiState.accrualEnd,
+                        isError = uiState.errorFor(ExpenseField.ACCRUAL) != null,
+                        onClick = { showAccrualEndPicker = true },
+                        modifier = Modifier.weight(1f),
+                    )
+                }
+                uiState.errorFor(ExpenseField.ACCRUAL)?.let { error ->
+                    Text(
+                        text = stringResource(ExpenseLabels.error(error)),
+                        style = MaterialTheme.typography.bodySmall,
+                        color = MaterialTheme.colorScheme.error,
+                    )
+                }
+                if (uiState.accrualStart != null || uiState.accrualEnd != null) {
+                    TextButton(onClick = viewModel::onAccrualCleared) {
+                        Text(stringResource(R.string.expense_accrual_clear))
+                    }
+                }
+            }
+
             when (uiState.detailKind) {
                 ExpenseDetailKind.REFUEL -> {
                     Dropdown(
@@ -315,6 +358,28 @@ fun ExpenseFormScreen(
         }
     }
 
+    if (showAccrualStartPicker) {
+        DatePickerModal(
+            initialDate = uiState.accrualStart ?: uiState.date,
+            onDismiss = { showAccrualStartPicker = false },
+            onConfirm = { date ->
+                viewModel.onAccrualStartChange(date)
+                showAccrualStartPicker = false
+            },
+        )
+    }
+
+    if (showAccrualEndPicker) {
+        DatePickerModal(
+            initialDate = uiState.accrualEnd ?: uiState.accrualStart ?: uiState.date,
+            onDismiss = { showAccrualEndPicker = false },
+            onConfirm = { date ->
+                viewModel.onAccrualEndChange(date)
+                showAccrualEndPicker = false
+            },
+        )
+    }
+
     if (showDatePicker) {
         DatePickerModal(
             initialDate = uiState.date,
@@ -325,6 +390,30 @@ fun ExpenseFormScreen(
             },
         )
     }
+}
+
+/** Campo de data somente leitura, aberto por toque. */
+@Composable
+private fun AccrualField(
+    label: String,
+    date: java.time.LocalDate?,
+    isError: Boolean,
+    onClick: () -> Unit,
+    modifier: Modifier = Modifier,
+) {
+    OutlinedTextField(
+        value = date?.let(BrazilianFormatter::date).orEmpty(),
+        onValueChange = {},
+        readOnly = true,
+        label = { Text(label) },
+        isError = isError,
+        trailingIcon = {
+            IconButton(onClick = onClick) {
+                Icon(imageVector = Icons.Default.DateRange, contentDescription = label)
+            }
+        },
+        modifier = modifier,
+    )
 }
 
 /** Campo de quantidade, com a unidade certa no rótulo (litro, m³ ou kWh). */

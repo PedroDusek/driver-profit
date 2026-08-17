@@ -51,7 +51,8 @@ abstract class DriverProfitDatabase : RoomDatabase() {
 
     companion object {
         /**
-         * Versão 7 — adiciona `maintenance_schedules` (intervalos de manutenção).
+         * Versão 8 — adiciona competência (`accrual_start`, `accrual_end`) em `expenses`.
+         * Versão 7 adicionou `maintenance_schedules` (intervalos de manutenção).
          * Versão 6 adicionou `personal_usage` (quilometragem fora do trabalho).
          * Versão 5 adicionou `odometer_km` em `expenses` (odômetro por lançamento).
          * Versão 4 adicionou `expenses` (registro de despesas).
@@ -59,7 +60,7 @@ abstract class DriverProfitDatabase : RoomDatabase() {
          * Versão 2 simplificou o veículo para nome + combustível.
          * Versão 1 tinha marca, modelo, ano, odômetro e três eixos de propulsão.
          */
-        const val VERSION = 7
+        const val VERSION = 8
 
         const val NAME = "driver_profit.db"
     }

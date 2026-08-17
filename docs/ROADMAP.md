@@ -325,14 +325,14 @@ consumiu. Os reais continuam porque são o que fecha com o extrato.
 **Critério de saída:** as duas linhas somam a despesa operacional e a proporção
 responde "quanto do carro o trabalho divide com a vida pessoal".
 
-### v0.10.0 — Custos fixos por competência
+### v0.10.0 — Custos fixos por competência ✅ concluída
 
-- [ ] Período de competência na despesa (início e fim), separando "quando
+- [x] Período de competência na despesa (início e fim), separando "quando
       paguei" de "a que período se refere"
-- [ ] Diluição do valor pelos dias do período
-- [ ] Financiamento, seguro e IPVA atribuídos **100% ao trabalho** (PRD §22)
-- [ ] Custo fixo por km trabalhado
-- [ ] Migração 7→8 + testes instrumentados
+- [x] Diluição do valor pelos dias do período
+- [x] Financiamento, seguro e IPVA atribuídos **100% ao trabalho** (PRD §22)
+- [x] Custo fixo por km trabalhado
+- [x] Migração 7→8 + testes instrumentados escritos
 
 **Critério de saída:** o IPVA pago em janeiro não faz janeiro parecer
 catastrófico nem o resto do ano parecer isento.

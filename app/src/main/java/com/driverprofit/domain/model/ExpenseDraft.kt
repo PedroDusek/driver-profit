@@ -39,6 +39,12 @@ data class ExpenseDraft(
      */
     val odometerUnknown: Boolean = false,
 
+    /** Início da competência do custo fixo (PRD §22). Nulo é o caso comum. */
+    val accrualStart: LocalDate? = null,
+
+    /** Fim da competência, inclusive. Preenchido junto com [accrualStart]. */
+    val accrualEnd: LocalDate? = null,
+
     // --- Abastecimento ---
     val fuelType: FuelType? = null,
     val quantity: Quantity? = null,

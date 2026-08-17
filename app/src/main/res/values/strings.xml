@@ -95,7 +95,10 @@
     <string name="dashboard_profit_per_km">Lucro por km</string>
     <string name="dashboard_profit_per_hour">Lucro por hora</string>
     <string name="dashboard_fixed_note">Seguro, IPVA e financiamento entram no lucro, mas ficam fora do custo por km: eles não variam com o quanto você roda.</string>
-    <string name="dashboard_fixed_expenses">Custos fixos no período</string>
+    <string name="dashboard_fixed_expenses">Custos fixos pagos no período</string>
+    <string name="dashboard_fixed_accrued">Custo fixo do período</string>
+    <string name="dashboard_fixed_per_km">Custo fixo por km trabalhado</string>
+    <string name="dashboard_fixed_accrual_note">Rateado pelos dias de competência: o IPVA do ano entrega a cada mês a fatia que lhe cabe, mesmo tendo sido pago de uma vez. Dividido só pelos km de trabalho, porque esses custos existem por ter o carro para trabalhar.</string>
 
     <string name="dashboard_section_expenses">Despesas por natureza</string>
 
@@ -194,6 +197,11 @@
     <string name="expense_amount_hint">Zero é válido: recarga gratuita conta</string>
     <string name="expense_vehicle">Veículo</string>
     <string name="expense_vehicle_none">Cadastre um veículo antes de lançar esta despesa</string>
+    <string name="expense_accrual">Período de competência</string>
+    <string name="expense_accrual_hint">A que intervalo este valor se refere. O IPVA do ano inteiro deixa de pesar todo num mês só.</string>
+    <string name="expense_accrual_start">Competência: início</string>
+    <string name="expense_accrual_end">Competência: fim</string>
+    <string name="expense_accrual_clear">Sem competência (conta no dia do pagamento)</string>
     <string name="expense_odometer_unknown">Não sei a leitura deste dia</string>
     <string name="expense_odometer_unknown_hint">Só para lançamento antigo. O valor e as despesas contam normalmente; a distância deste lançamento fica de fora.</string>
     <string name="expense_odometer">Odômetro (km)</string>
@@ -264,6 +272,7 @@
     <string name="error_vehicle_cannot_charge">Esse veículo não é recarregável</string>
     <string name="error_text_too_long">Texto muito longo</string>
     <string name="error_odometer_out_of_range">Quilometragem inválida</string>
+    <string name="error_accrual_incomplete">Preencha o início e o fim do período</string>
     <string name="error_odometer_inconsistent">Essa leitura não bate com as datas vizinhas: o odômetro só cresce</string>
     <string name="error_end_before_start">O fim não pode ser antes do início</string>
     <string name="error_distance_out_of_range">Distância inválida</string>

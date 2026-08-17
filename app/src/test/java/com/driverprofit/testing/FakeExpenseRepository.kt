@@ -33,6 +33,20 @@ class FakeExpenseRepository(
     override fun observeExpensesBetween(start: LocalDate, end: LocalDate): Flow<List<Expense>> =
         expenses.map { list -> list.filter { it.date >= start && it.date <= end }.sorted() }
 
+    /**
+     * Sobreposição de competência, como o DAO — e não contenção por data.
+     *
+     * É o filtro mais fácil de errar aqui: o IPVA pago em janeiro precisa
+     * aparecer em agosto, e a data dele está a sete meses de distância.
+     */
+    override fun observeAccruedBetween(start: LocalDate, end: LocalDate): Flow<List<Expense>> =
+        expenses.map { list ->
+            list.filter { expense ->
+                val accrual = expense.accrual
+                accrual != null && accrual.start <= end && accrual.end >= start
+            }.sorted()
+        }
+
     /** `MAX`, como o DAO: odômetro só cresce e o lançamento pode vir fora de ordem. */
     override fun observeLatestOdometer(vehicleId: Long): Flow<Long?> = expenses.map { list ->
         list.filter { it.vehicleId == vehicleId }.mapNotNull { it.odometerKm }.maxOrNull()

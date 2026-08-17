@@ -8,6 +8,7 @@ import androidx.room.PrimaryKey
 import com.driverprofit.core.common.Money
 import com.driverprofit.core.common.Quantity
 import com.driverprofit.domain.model.ChargingLocation
+import com.driverprofit.domain.model.DateRange
 import com.driverprofit.domain.model.Expense
 import com.driverprofit.domain.model.ExpenseCategory
 import com.driverprofit.domain.model.ExpenseDetail
@@ -99,6 +100,20 @@ data class ExpenseEntity(
     val odometerKm: Long? = null,
 
     /** Epoch millis em UTC. */
+    /**
+     * Início da competência — a que intervalo o valor se refere (PRD §22).
+     *
+     * Anulável, e `NULL` é o caso comum: significa "conta no próprio dia", que
+     * é o comportamento de toda despesa anterior à v0.10.0 e de todo custo
+     * variável.
+     */
+    @ColumnInfo(name = "accrual_start")
+    val accrualStart: LocalDate? = null,
+
+    /** Fim da competência, inclusive. Nulo junto com [accrualStart]. */
+    @ColumnInfo(name = "accrual_end")
+    val accrualEnd: LocalDate? = null,
+
     @ColumnInfo(name = "created_at")
     val createdAt: Instant,
 )
@@ -112,6 +127,7 @@ fun ExpenseEntity.toDomain(): Expense = Expense(
     description = description,
     detail = toDetail(),
     odometerKm = odometerKm,
+    accrual = accrualStart?.let { start -> accrualEnd?.let { DateRange(start, it) } },
     createdAt = createdAt,
 )
 

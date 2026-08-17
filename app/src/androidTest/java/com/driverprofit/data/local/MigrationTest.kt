@@ -397,6 +397,89 @@ class MigrationTest {
     }
 
     @Test
+    fun migracao7para8AcrescentaCompetenciaSemTocarNasDespesas() {
+        helper.createDatabase(TEST_DB, 7).use { db ->
+            db.execSQL(
+                """
+                INSERT INTO expenses
+                    (id, vehicle_id, date, category, amount_cents, description,
+                     odometer_km, created_at)
+                VALUES (1, NULL, 20000, 'VEHICLE_TAX', 120000, 'IPVA', NULL, 1000)
+                """.trimIndent(),
+            )
+        }
+
+        val db = helper.runMigrationsAndValidate(TEST_DB, 8, true, Migrations.MIGRATION_7_8)
+
+        // A despesa continua inteira, e a competência fica NULL — que é a
+        // verdade: ninguém declarou intervalo antes da v0.10.0. NULL significa
+        // "conta no próprio dia", o comportamento que já existia.
+        db.query("SELECT amount_cents, accrual_start, accrual_end FROM expenses WHERE id = 1")
+            .use { cursor ->
+                assertTrue(cursor.moveToFirst())
+                assertEquals(120000, cursor.getInt(0))
+                assertTrue(cursor.isNull(1))
+                assertTrue(cursor.isNull(2))
+            }
+    }
+
+    @Test
+    fun migracao7para8AceitaCompetenciaDepoisDeMigrar() {
+        helper.createDatabase(TEST_DB, 7).close()
+
+        val db = helper.runMigrationsAndValidate(TEST_DB, 8, true, Migrations.MIGRATION_7_8)
+
+        db.execSQL(
+            """
+            INSERT INTO expenses
+                (id, vehicle_id, date, category, amount_cents, description,
+                 accrual_start, accrual_end, created_at)
+            VALUES (1, NULL, 20468, 'VEHICLE_TAX', 120000, 'IPVA', 20454, 20818, 1000)
+            """.trimIndent(),
+        )
+
+        db.query("SELECT accrual_start, accrual_end FROM expenses WHERE id = 1").use { cursor ->
+            assertTrue(cursor.moveToFirst())
+            assertEquals(20454, cursor.getInt(0))
+            assertEquals(20818, cursor.getInt(1))
+        }
+    }
+
+    @Test
+    fun migracao1para8AtravessaTodasAsEtapas() {
+        helper.createDatabase(TEST_DB, 1).use { db ->
+            db.execSQL(
+                """
+                INSERT INTO vehicles
+                    (id, brand, model, year, initial_odometer_km, powertrain,
+                     combustion_fuel, charging_capability, created_at)
+                VALUES
+                    (1, 'Chevrolet', 'Onix', 2020, 50000, 'COMBUSTION', 'FLEX', NULL, 1000)
+                """.trimIndent(),
+            )
+        }
+
+        val db = helper.runMigrationsAndValidate(
+            TEST_DB,
+            8,
+            true,
+            Migrations.MIGRATION_1_2,
+            Migrations.MIGRATION_2_3,
+            Migrations.MIGRATION_3_4,
+            Migrations.MIGRATION_4_5,
+            Migrations.MIGRATION_5_6,
+            Migrations.MIGRATION_6_7,
+            Migrations.MIGRATION_7_8,
+        )
+
+        db.query("SELECT name, fuel FROM vehicles").use { cursor ->
+            assertTrue(cursor.moveToFirst())
+            assertEquals("Chevrolet Onix", cursor.getString(0))
+            assertEquals("FLEX", cursor.getString(1))
+        }
+    }
+
+    @Test
     fun migracao1para7AtravessaTodasAsEtapas() {
         helper.createDatabase(TEST_DB, 1).use { db ->
             db.execSQL(

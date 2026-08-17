@@ -1,5 +1,6 @@
 package com.driverprofit.domain.usecase
 
+import com.driverprofit.domain.model.DateRange
 import com.driverprofit.domain.model.Expense
 import com.driverprofit.domain.model.ExpenseDraft
 import com.driverprofit.domain.model.ExpenseFieldError
@@ -83,6 +84,17 @@ class ObserveExpensesBetweenUseCase(
 ) {
     operator fun invoke(start: LocalDate, end: LocalDate): Flow<List<Expense>> =
         repository.observeExpensesBetween(start, end)
+}
+
+/**
+ * Despesas cuja competência encosta no período — base do custo fixo por km
+ * (PRD §22).
+ */
+class ObserveAccruedExpensesUseCase(
+    private val repository: ExpenseRepository,
+) {
+    operator fun invoke(range: DateRange): Flow<List<Expense>> =
+        repository.observeAccruedBetween(range.start, range.end)
 }
 
 /**

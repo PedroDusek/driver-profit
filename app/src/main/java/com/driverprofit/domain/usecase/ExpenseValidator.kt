@@ -1,5 +1,6 @@
 package com.driverprofit.domain.usecase
 
+import com.driverprofit.domain.model.DateRange
 import com.driverprofit.domain.model.Expense
 import com.driverprofit.domain.model.ExpenseDetail
 import com.driverprofit.domain.model.ExpenseDetailKind
@@ -50,6 +51,8 @@ class ExpenseValidator(
             add(error(ExpenseField.DESCRIPTION, ExpenseValidationError.TEXT_TOO_LONG))
         }
 
+        addAll(validateAccrual(draft))
+
         if (category != null) {
             addAll(validateVehicle(category, draft, vehicle))
             addAll(validateOdometer(category, draft, history))
@@ -70,6 +73,27 @@ class ExpenseValidator(
      * Pedágio, estacionamento, seguro e IPVA não pedem: não há veículo em jogo
      * e cobrar a leitura ali só criaria atrito.
      */
+    /**
+     * A competência é opcional, mas não pela metade.
+     *
+     * Uma ponta só não define intervalo, e aceitar isso obrigaria o cálculo a
+     * inventar a outra — que é exatamente o tipo de suposição silenciosa que o
+     * projeto evita. O fim antes do início é barrado pelo próprio `DateRange`.
+     */
+    private fun validateAccrual(draft: ExpenseDraft): List<ExpenseFieldError> {
+        val start = draft.accrualStart
+        val end = draft.accrualEnd
+
+        return when {
+            start == null && end == null -> emptyList()
+            start == null || end == null ->
+                listOf(error(ExpenseField.ACCRUAL, ExpenseValidationError.ACCRUAL_INCOMPLETE))
+            end.isBefore(start) ->
+                listOf(error(ExpenseField.ACCRUAL, ExpenseValidationError.ACCRUAL_INCOMPLETE))
+            else -> emptyList()
+        }
+    }
+
     private fun validateOdometer(
         category: com.driverprofit.domain.model.ExpenseCategory,
         draft: ExpenseDraft,
@@ -127,6 +151,9 @@ class ExpenseValidator(
         // domínio já sabe lidar com ela.
         odometerKm = draft.odometerKm
             .takeIf { draft.category.requiresVehicle && !draft.odometerUnknown },
+        accrual = draft.accrualStart?.let { start ->
+            draft.accrualEnd?.let { end -> DateRange(start, end) }
+        },
         createdAt = createdAt,
     )
 

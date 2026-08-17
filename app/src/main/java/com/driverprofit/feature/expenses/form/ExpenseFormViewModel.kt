@@ -62,6 +62,10 @@ data class ExpenseFormUiState(
     val chargingLocation: ChargingLocation? = null,
     val place: String = "",
     val maintenanceCategory: MaintenanceCategory? = null,
+    /** Início da competência, quando o motorista declarou (PRD §22). */
+    val accrualStart: LocalDate? = null,
+    /** Fim da competência, inclusive. */
+    val accrualEnd: LocalDate? = null,
     val errors: Map<ExpenseField, ExpenseValidationError> = emptyMap(),
     val savedExpenseId: Long? = null,
 ) {
@@ -102,6 +106,16 @@ data class ExpenseFormUiState(
     val lastOdometerKm: Long? get() = vehicleId?.let { odometers[it] }
 
     val showVehicle: Boolean get() = category?.requiresVehicle == true
+
+    /**
+     * A competência só é oferecida em custo fixo — seguro, IPVA e
+     * financiamento (PRD §22).
+     *
+     * Custo variável se esgota no dia em que foi pago: combustível queimado na
+     * terça não serve à quarta. Oferecer o campo ali só criaria uma pergunta
+     * sem resposta útil, e um lugar a mais para errar.
+     */
+    val showAccrual: Boolean get() = category?.isOperationalCost == false
 
     /** O odômetro só é pedido onde há veículo em jogo (PRD §23). */
     val showOdometer: Boolean get() = showVehicle
@@ -180,6 +194,8 @@ class ExpenseFormViewModel(
                     place = loaded?.let { it.station.ifEmpty { it.place.ifEmpty { it.workshop } } }
                         .orEmpty(),
                     maintenanceCategory = loaded?.maintenanceCategory,
+                    accrualStart = loaded?.accrualStart,
+                    accrualEnd = loaded?.accrualEnd,
                 )
             }
         }
@@ -261,6 +277,21 @@ class ExpenseFormViewModel(
 
     fun onPlaceChange(value: String) = updateField(ExpenseField.PLACE) { copy(place = value) }
 
+    fun onAccrualStartChange(value: LocalDate) = updateField(ExpenseField.ACCRUAL) {
+        // O fim acompanha o início quando ainda não existe ou ficou para trás:
+        // um intervalo invertido não é escolha, é ordem de preenchimento.
+        copy(accrualStart = value, accrualEnd = accrualEnd?.takeIf { !it.isBefore(value) })
+    }
+
+    fun onAccrualEndChange(value: LocalDate) = updateField(ExpenseField.ACCRUAL) {
+        copy(accrualEnd = value)
+    }
+
+    /** Limpa a competência — a despesa volta a contar no próprio dia. */
+    fun onAccrualCleared() = updateField(ExpenseField.ACCRUAL) {
+        copy(accrualStart = null, accrualEnd = null)
+    }
+
     /** Dia de referência, para decidir se o lançamento é retroativo. */
     fun today(): LocalDate = LocalDate.now(clock)
 
@@ -325,6 +356,8 @@ internal fun ExpenseFormUiState.toDraft(expenseId: Long = Expense.UNSAVED_ID): E
         category = category,
         amount = amount,
         description = description,
+        accrualStart = accrualStart.takeIf { showAccrual },
+        accrualEnd = accrualEnd.takeIf { showAccrual },
         odometerKm = odometerKm.takeIf { showOdometer && !odometerUnknown },
         odometerUnknown = odometerUnknown && showOdometer,
         fuelType = fuelType,

@@ -30,6 +30,14 @@ data class DashboardMetrics(
     val workKilometers: Long,
     val personalKilometers: Long = 0L,
     val totalOnlineTime: WorkDuration,
+    /**
+     * Custo fixo que **compete** ao período, já rateado pelos dias (PRD §22).
+     *
+     * Diferente de [fixedExpenses], que é caixa: aquele é o que saiu do bolso
+     * dentro do período, este é o que o período consumiu. O IPVA pago em
+     * janeiro aparece nos doze meses aqui, e só em janeiro lá.
+     */
+    val accruedFixedCost: Money = Money.ZERO,
 ) {
 
     /**
@@ -119,6 +127,21 @@ data class DashboardMetrics(
      */
     val costPerKm: Money? get() = operationalExpenses.per(totalKilometers)
 
+    /**
+     * Custo fixo por quilômetro **trabalhado**.
+     *
+     * O divisor é [workKilometers], e não a distância total: financiamento,
+     * seguro e IPVA existem pela decisão de ter o carro para trabalhar, e não
+     * são causados pelo uso (PRD §22). Levar o carro ao mercado no domingo não
+     * gera parcela nem aumenta o prêmio, então ratear esses custos pelo
+     * quilômetro pessoal os atribuiria a algo que não os causou.
+     *
+     * É por isso que ele é um indicador separado, e não uma parcela do
+     * [costPerKm]: os dois têm denominadores diferentes e somá-los seria somar
+     * razões de bases distintas.
+     */
+    val fixedCostPerKm: Money? get() = accruedFixedCost.per(workKilometers)
+
     val profitPerKm: Money? get() = netProfit.per(workKilometers)
 
     val profitPerHour: Money? get() = netProfit.per(totalOnlineTime.toHours())
@@ -191,6 +214,7 @@ data class DashboardMetrics(
             sessions: List<WorkSession>,
             expenses: List<Expense>,
             personalKilometers: Long = 0L,
+            accruedFixedCost: Money = Money.ZERO,
         ): DashboardMetrics = DashboardMetrics(
             totalRevenue = Money.sum(sessions.map { it.revenue }),
             totalExpenses = Money.sum(expenses.map { it.amount }),
@@ -201,6 +225,7 @@ data class DashboardMetrics(
             workKilometers = sessions.sumOf { it.distanceKm },
             personalKilometers = personalKilometers,
             totalOnlineTime = WorkDuration.sum(sessions.map { it.onlineTime }),
+            accruedFixedCost = accruedFixedCost,
         )
     }
 }
