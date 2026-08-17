@@ -1,4 +1,5 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
-    <color name="window_background">#1A1C1A</color>
+    <!-- Neutral10 (core/ui/theme/Color.kt), o mesmo `background` do tema escuro. -->
+    <color name="window_background">#131318</color>
 </resources>
