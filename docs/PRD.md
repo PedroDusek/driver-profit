@@ -627,6 +627,45 @@ mesmo para sincronizar existe a saída de começar do presente, sem reconstruir
 o passado. Por isso **não** se antecipam colunas de sincronização: seria
 complexidade sem uso, contra o §54.
 
+#### Identidade da conta: sem CPF
+
+> **Decisão registrada.** O cadastro é vinculado à **conta Google**, e o app
+> **não coleta CPF nem qualquer outro identificador pessoal**.
+
+A ideia de limitar uma conta por CPF foi considerada e descartada. Ela não
+entrega o que promete: validar CPF no aplicativo é conferir dígitos
+verificadores, cujo algoritmo é público, e qualquer pessoa gera um número válido
+em segundos. Verificação real exigiria consulta paga à Receita ou conferência de
+documento — custo recorrente e fricção no cadastro, que é onde mais se perde
+usuário.
+
+O resultado seria o pior arranjo possível: **responsabilidade jurídica real,
+proteção nenhuma.** Guardar CPF sujeita o projeto à LGPD por inteiro — base
+legal, finalidade, prazo de retenção, direito de exclusão e dever de notificar
+vazamento — em troca de uma barreira que não barra.
+
+**O Play Billing já resolve o que o CPF tentava resolver.** A assinatura é
+amarrada à conta Google, e a elegibilidade de teste gratuito é controlada por
+ela. É mecanismo mantido e auditado por terceiro, sem custo para o projeto.
+
+E o incentivo a compartilhar login é baixo por construção: dois motoristas com o
+mesmo acesso dividiriam **os mesmos dados** — mesmo carro, mesmos ganhos, mesmo
+odômetro — e o aplicativo ficaria inútil para os dois. Diferente de um serviço de
+streaming, onde dividir é ganho puro, aqui a carona se pune sozinha.
+
+**A propriedade que isso preserva vale dinheiro:** o app não guarda dado pessoal.
+Um vazamento de banco deixa de ser incidente com dever de notificação e passa a
+expor quanto um motorista anônimo gastou de combustível.
+
+A decisão é **reversível na direção segura**. Se abuso aparecer, entra
+verificação por telefone, com dado mostrando que é necessária — em vez de coletar
+por precaução. Começar guardando CPF não teria volta.
+
+**O que reabriria esta decisão:** necessidade de emitir nota fiscal diretamente
+ao motorista. Não é o caso com Play Billing, em que quem cobra é o Google — o
+repasse é dele para o desenvolvedor, e o CPF do motorista não participa dessa
+relação.
+
 ### Distribuição para grupo de teste
 
 Antes do lançamento oficial, o app será entregue a um grupo restrito. Três

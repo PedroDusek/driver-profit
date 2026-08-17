@@ -395,6 +395,12 @@ Não implementar agora. A arquitetura já está preparada para receber:
 > `user_id` nas tabelas; o que é caro é sincronização — ids estáveis, marcas
 > de exclusão e `updated_at`. Nada disso é antecipado.
 >
+> A conta é vinculada à **conta Google**, sem CPF nem outro identificador
+> pessoal. Limitar uma conta por CPF foi considerado e descartado: validação de
+> dígito verificador é trivialmente burlável, verificação real custa e cria
+> fricção, e o Play Billing já amarra a assinatura a uma conta. Motivo completo
+> no PRD §48.
+>
 > Antes de distribuir a **qualquer terceiro**, ver a seção de distribuição no
 > PRD §48: o `applicationId` congela na primeira instalação, e trocá-lo depois
 > apaga os dados dos testadores.
