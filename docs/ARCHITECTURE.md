@@ -360,6 +360,52 @@ entre fabricantes — a mesma categoria de instabilidade que o MIUI já causou
 neste projeto (`docs/HANDOFF.md`) — e não vale o risco para uma tela que o
 motorista abre uma vez a cada troca de aparelho.
 
+### Identidade visual (v0.14.0)
+
+O app tinha Material 3 "de fábrica": cor primária = verde de resultado
+financeiro, cards sem hierarquia, zero visualização de dado além de texto,
+seis ícones sem rótulo na TopAppBar do Dashboard como navegação. A v0.14.0
+resolveu isso junto com o nome do produto (`HANDOFF.md §0`), porque as duas
+coisas — nome e identidade visual — precisavam existir de propósito antes da
+primeira instalação de terceiro, não só o nome.
+
+**Cor de marca separada da cor semântica de resultado.** `core/ui/theme/
+Color.kt` define `BrandIndigo*` (primária — botão, FAB, chip selecionado,
+navegação) e `ProfitColors` (verde/vermelho — só onde o número exibido é
+lucro ou prejuízo em si). Antes, a primária **era** o verde de `ProfitColors`,
+o que misturava as duas coisas: qualquer botão comum "parecia" um resultado
+positivo. `ProfitColors` ganhou pares contêiner/on-contêiner por tema
+(`Theme.kt: ProfitColors.container()/onContainer()`) para o card de lucro do
+Dashboard usar a cor de fundo em si como sinal, não só o texto.
+
+**Material You (`dynamicColor`) desligado por padrão.** Um app que acabou de
+fixar identidade visual própria não deveria trocar de cor conforme o papel de
+parede do aparelho. O parâmetro continua existindo em `DriverProTheme` para
+quem quiser ligar, e para preview/teste pedirem resultado determinístico.
+
+**Forma e tipografia.** `core/ui/theme/Shape.kt` define um raio de canto maior
+que o padrão M3 (20–24dp contra ~12dp) — a assinatura visual que diferencia o
+app do Material 3 puro. A fonte do sistema continua (ver acima, "Cadastro de
+veículo mínimo" não mexe nisso) — o que mudou foi passar a usar algarismo
+tabular (`fontFeatureSettings = "tnum"`, `core/ui/theme/Type.kt`) nos números
+financeiros grandes, para os dígitos não mudarem de largura ao recompor.
+
+**Componentes novos em `core/ui/component/`** substituem padrões que estavam
+duplicados tela a tela: `IconChip` (círculo tonal colorido, deriva o fundo de
+uma cor semente por composição em vez de guardar um par claro/escuro por
+categoria — ver `ExpenseCategoryVisuals.kt`), `StatTile` (grade de
+indicadores 2 colunas), `CategoryBarRow` (barra proporcional — primeira
+visualização de dado do app além de texto) e `ListItemCard` (padroniza
+ícone-chip + conteúdo + ação, usado pelas quatro telas de lista).
+
+**Navegação: barra inferior substitui a fileira de ícones.** `DashboardScreen`
+ganhou `bottomBar` com `NavigationBar` (Dashboard, Ganhos, Despesas, Veículos,
+Mais). Mudança só de apresentação — cada item chama exatamente o
+`navController.navigate(...)` que já existia. Uso pessoal, manutenção e backup
+saíram da TopAppBar e viraram entradas em `feature/more/MoreScreen.kt`, novo
+destino (`DriverProDestination.MORE`) que não existia antes; nenhuma tela de
+destino mudou de comportamento, só como se chega até ela.
+
 ## Regras de dependência
 
 Antes de adicionar uma biblioteca (PRD §55):

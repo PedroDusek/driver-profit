@@ -372,7 +372,7 @@ criado — a base para comparar histórico entre carros depois.
 
 **Banco:** versão 10.
 
-### v0.13.0 — Exportar e importar arquivo
+### v0.13.0 — Exportar e importar arquivo ✅ concluída
 
 - [x] Exportação copia o banco (checkpoint de WAL + cópia de arquivo) para um
       `Uri` escolhido via Storage Access Framework — sem permissão nova
@@ -391,17 +391,41 @@ completo.
 **Banco:** sem migração — o formato de exportação é o próprio arquivo do
 banco, não um formato novo.
 
-### v0.14.0 — Crash handling
+### v0.14.0 — Nome e redesign visual (DriverPro)
+
+- [x] `com.driverprofit` → `com.driverpro` em todo o projeto, resolvendo a
+      pendência do nome (PRD §10) — seguro porque nenhuma instalação de
+      terceiro tinha acontecido ainda
+- [x] Cor de marca separada da cor semântica de lucro/prejuízo
+      (`core/ui/theme/Color.kt`)
+- [x] Componentes novos (`core/ui/component`): `IconChip`, `StatTile`,
+      `CategoryBarRow`, `ListItemCard`
+- [x] Navegação: barra inferior no lugar de seis ícones na TopAppBar; uso
+      pessoal, manutenção e backup viram entradas em "Mais"
+      (`feature/more/MoreScreen.kt`)
+- [x] Ícone do launcher redesenhado na cor de marca nova
+- [ ] `connectedDebugAndroidTest` no aparelho físico (a pasta de schemas do
+      Room mudou de nome — ver `DATABASE.md`)
+
+**Critério de saída:** o app se chama DriverPro em todo lugar (pacote, banco,
+ícone, documentação), e a interface deixa de ser Material 3 "de fábrica".
+
+**Banco:** sem migração de schema — a classe e o arquivo do banco só mudaram
+de nome (`DriverProDatabase`, `driverpro.db`); os schemas exportados
+(versões 1–10) foram movidos para a pasta com o novo nome de classe, não
+alterados.
+
+### v0.15.0 — Crash handling
 
 - [ ] Erro não tratado hoje fecha o app sem deixar rastro
 - [ ] Sem Firebase/Crashlytics (PRD §48) — precisa ser 100% local
 
-### v0.15.0 — Testes de fluxo
+### v0.16.0 — Testes de fluxo
 
 - [ ] Cadastrar veículo → lançar ganho → lançar despesa → conferir dashboard
 - [ ] Nenhuma tela tem verificação automatizada hoje
 
-### v0.16.0 — Analytics
+### v0.17.0 — Analytics
 
 - [ ] Gráficos
 - [ ] Custo por km separado por natureza (PRD §22)
@@ -414,7 +438,7 @@ banco, não um formato novo.
       permanentemente otimista sem nada dizer. É observação sobre um conjunto,
       não alerta — e só faz sentido com histórico acumulado
 
-### v0.17.0 — UX Polish
+### v0.18.0 — UX Polish
 
 - [ ] Estados vazios, loading e erro
 - [ ] Animações moderadas
@@ -422,14 +446,14 @@ banco, não um formato novo.
 - [ ] Acessibilidade
 - [ ] Formatação brasileira em toda a interface
 
-### v0.18.0 — Hardening
+### v0.19.0 — Hardening
 
 - [ ] Cobertura de testes ampliada
 - [ ] Performance
 - [ ] Validações e tratamento de erros
 - [ ] Migrações testadas
 
-### v0.19.0 — Release Candidate
+### v0.20.0 — Release Candidate
 
 Congelamento de funcionalidades. A partir daqui: apenas correções,
 performance, segurança, UX, testes e estabilidade.

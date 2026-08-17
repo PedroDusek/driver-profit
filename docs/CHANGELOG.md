@@ -5,6 +5,31 @@ Versionamento conforme [Semantic Versioning](https://semver.org/lang/pt-BR/).
 
 ## [Não publicado]
 
+### Alterado
+
+- **Nome do produto: DriverPro.** `com.driverprofit` virou `com.driverpro` em
+  todo o projeto — pacote Kotlin, `applicationId`, banco (`driverpro.db`),
+  ícone e documentação. Seguro agora porque nenhuma instalação de terceiro
+  aconteceu ainda (PRD §48)
+- **Redesign visual completo.** Cor de marca separada da cor semântica de
+  lucro/prejuízo (antes o verde de resultado fazia as duas coisas); nova
+  paleta índigo, raio de canto maior, algarismos tabulares nos números
+  grandes, Material You desligado por padrão para manter identidade
+  consistente entre aparelhos
+- **Navegação: barra inferior no lugar de seis ícones na TopAppBar.**
+  Dashboard, Ganhos, Despesas, Veículos e "Mais" (uso pessoal, manutenção e
+  backup, antes soltos na barra superior)
+- Ícone do launcher redesenhado na cor de marca nova — o anterior já se
+  declarava provisório no próprio comentário do arquivo
+
+### Adicionado
+
+- Componentes reutilizáveis (`core/ui/component`): `IconChip`, `StatTile`,
+  `CategoryBarRow` (primeira visualização de dado do app além de texto) e
+  `ListItemCard`, substituindo padrões repetidos em cada tela de lista
+
+## [0.13.0] — Exportar e importar arquivo
+
 ### Adicionado
 
 - **Exportar e importar arquivo.** Exportação copia o banco (checkpoint de

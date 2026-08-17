@@ -8,6 +8,14 @@ O JSON do schema é exportado em `app/schemas/` e **é versionado no Git**. Ele 
 o que torna possível escrever testes de migração de verdade. Os schemas
 antigos são mantidos: sem o `1.json`, não há como testar a migração 1→2.
 
+> **v0.14.0:** a pasta de schemas mudou de nome — de
+> `com.driverprofit.data.local.database.DriverProfitDatabase` para
+> `com.driverpro.data.local.database.DriverProDatabase` — porque o
+> `MigrationTestHelper` localiza os arquivos pelo FQCN da classe do banco, e o
+> rename do pacote/produto (`HANDOFF.md §0`) trocou os dois. Os dez arquivos
+> (`1.json` a `10.json`) foram movidos, não alterados — nenhum schema mudou,
+> só o caminho onde ele mora.
+
 ## Entidades
 
 ### `vehicles` (v2, `is_current` desde v10)
