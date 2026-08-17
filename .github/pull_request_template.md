@@ -21,6 +21,11 @@
 
 **Existe migration?** <!-- Sim / Não. Se sim, a versão do banco foi incrementada e a migration testada? -->
 
+> ⚠️ **Se este PR mexe no banco, `connectedDebugAndroidTest` é obrigatório antes
+> do merge.** O CI não roda teste de migração — ele exige aparelho. Sem essa
+> execução, o gate verde não diz nada sobre a migração, e já aconteceu de uma
+> migração atravessar duas versões sem ninguém exercitá-la.
+
 ## Checklist
 
 - [ ] Build passa
