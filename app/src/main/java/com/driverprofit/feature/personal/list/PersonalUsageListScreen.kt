@@ -165,6 +165,7 @@ fun PersonalUsageListScreen(
             reconciliation = it,
             onDismiss = viewModel::onReconcileDismissed,
             onConfirmPersonal = viewModel::onReconcileConfirmedAsPersonal,
+            onLeaveOut = viewModel::onReconcileLeftOut,
         )
     }
 }
@@ -181,35 +182,18 @@ private fun ReconcileDialog(
     reconciliation: OdometerReconciliation,
     onDismiss: () -> Unit,
     onConfirmPersonal: () -> Unit,
+    onLeaveOut: () -> Unit,
 ) {
     val unexplained = reconciliation.unexplainedKilometers
 
     AlertDialog(
         onDismissRequest = onDismiss,
-        title = {
-            Text(
-                text = if (reconciliation.hasDivergence) {
-                    stringResource(R.string.reconcile_divergence_title)
-                } else {
-                    stringResource(R.string.reconcile_title)
-                },
-            )
-        },
+        title = { Text(stringResource(R.string.reconcile_title)) },
         text = {
             Column(verticalArrangement = Arrangement.spacedBy(8.dp)) {
                 when {
                     reconciliation.odometerKilometers == null ->
                         Text(stringResource(R.string.reconcile_no_readings))
-
-                    // Lançado a mais que o painel. Não é uso pessoal negativo:
-                    // é erro de digitação em algum dos dois números, e é o
-                    // único sinal que o app tem para apontá-lo.
-                    reconciliation.hasDivergence -> Text(
-                        stringResource(
-                            R.string.reconcile_divergence_message,
-                            BrazilianFormatter.kilometers(-(unexplained ?: 0L)),
-                        ),
-                    )
 
                     !reconciliation.hasUnexplained ->
                         Text(stringResource(R.string.reconcile_all_explained))
@@ -253,6 +237,19 @@ private fun ReconcileDialog(
                             style = MaterialTheme.typography.bodySmall,
                             color = MaterialTheme.colorScheme.onSurfaceVariant,
                         )
+                        HorizontalDivider()
+                        // Terceira saída: nem pessoal, nem jornada a lançar.
+                        // Fica no corpo porque um diálogo só tem dois lugares
+                        // de botão, e as duas primeiras respostas são as que o
+                        // motorista escolhe no caso comum.
+                        TextButton(onClick = onLeaveOut) {
+                            Text(stringResource(R.string.reconcile_leave_out))
+                        }
+                        Text(
+                            text = stringResource(R.string.reconcile_leave_out_message),
+                            style = MaterialTheme.typography.bodySmall,
+                            color = MaterialTheme.colorScheme.onSurfaceVariant,
+                        )
                     }
                 }
             }
@@ -268,7 +265,9 @@ private fun ReconcileDialog(
         },
         dismissButton = {
             if (reconciliation.hasUnexplained) {
-                TextButton(onClick = onDismiss) { Text(stringResource(R.string.action_cancel)) }
+                // "Resolver depois", e não "Cancelar": o aviso vai continuar
+                // lá, e dizer isso evita a impressão de que fechar é decidir.
+                TextButton(onClick = onDismiss) { Text(stringResource(R.string.reconcile_later)) }
             }
         },
     )

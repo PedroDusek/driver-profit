@@ -5,6 +5,7 @@ import androidx.lifecycle.viewModelScope
 import com.driverprofit.domain.model.DateRange
 import com.driverprofit.domain.model.PersonalUsage
 import com.driverprofit.domain.usecase.DeletePersonalUsageUseCase
+import com.driverprofit.domain.usecase.DismissReconciliationUseCase
 import com.driverprofit.domain.usecase.ObserveOdometerReconciliationUseCase
 import com.driverprofit.domain.usecase.ObservePersonalUsageUseCase
 import com.driverprofit.domain.usecase.OdometerReconciliation
@@ -37,6 +38,7 @@ class PersonalUsageListViewModel(
     observeReconciliation: ObserveOdometerReconciliationUseCase,
     private val deletePersonalUsage: DeletePersonalUsageUseCase,
     private val saveReconciled: SaveReconciledPersonalUsageUseCase,
+    private val dismissReconciliation: DismissReconciliationUseCase,
 ) : ViewModel() {
 
     private val pendingDeletion = MutableStateFlow<PersonalUsage?>(null)
@@ -96,6 +98,17 @@ class PersonalUsageListViewModel(
      * Gravar o lançamento já zera a divergência sozinho: a sobra da janela
      * passa a ser descontada como uso pessoal declarado, e o `Flow` recalcula.
      */
+    /**
+     * O motorista aceitou deixar a sobra fora da conta.
+     *
+     * Gravar a dispensa já a tira da lista sozinho: o `Flow` recalcula, a sobra
+     * passa a caber no que foi aceito, e a janela deixa de ser pendente.
+     */
+    fun onReconcileLeftOut() {
+        val pending = pendingReconciliation.value ?: return
+        viewModelScope.launch { dismissReconciliation(pending) }
+    }
+
     fun onReconcileConfirmedAsPersonal() {
         val pending = pendingReconciliation.value ?: return
         viewModelScope.launch {

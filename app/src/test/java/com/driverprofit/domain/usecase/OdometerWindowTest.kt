@@ -7,6 +7,7 @@ import com.driverprofit.domain.model.Expense
 import com.driverprofit.domain.model.ExpenseCategory
 import com.driverprofit.domain.model.PersonalUsage
 import com.driverprofit.domain.model.PersonalUsageSource
+import com.driverprofit.domain.model.ReconciliationDismissal
 import com.driverprofit.domain.model.Platform
 import com.driverprofit.domain.model.WorkSession
 import org.junit.Assert.assertEquals
@@ -54,7 +55,16 @@ class OdometerWindowTest {
         expenses: List<Expense>,
         sessions: List<WorkSession> = emptyList(),
         personalUsage: List<PersonalUsage> = emptyList(),
-    ) = OdometerWindow.pending(expenses, sessions, personalUsage, vehicleId = 1)
+        dismissals: List<ReconciliationDismissal> = emptyList(),
+    ) = OdometerWindow.pending(expenses, sessions, personalUsage, dismissals, vehicleId = 1)
+
+    private fun dismissal(start: LocalDate, end: LocalDate, km: Long) = ReconciliationDismissal(
+        id = nextId++,
+        vehicleId = 1,
+        window = DateRange(start, end),
+        dismissedKm = km,
+        createdAt = Instant.EPOCH,
+    )
 
     /** Ultima janela pendente, que e a que a tela mostra primeiro. */
     private fun latest(
@@ -138,16 +148,79 @@ class OdometerWindowTest {
     }
 
     @Test
-    fun `lancado a mais que o painel vira divergencia e nao uso pessoal negativo`() {
-        // Antes da v0.9.1 isto era zerado em silencio.
-        val r = latest(
-            expenses = listOf(reading(100_000, DIA_1), reading(100_700, DIA_4)),
-            sessions = listOf(session(DIA_2, 800)),
-        )!!
+    fun `lancado a mais que o painel nao pergunta nada`() {
+        // Sobra negativa nao e distancia faltando: e inconsistencia entre dois
+        // numeros do proprio motorista, sem nada a classificar. Como o app e a
+        // anotacao dele, nao existe fonte contra a qual conferir — e alerta sem
+        // acao possivel vira ruido.
+        val expenses = listOf(reading(100_000, DIA_1), reading(100_700, DIA_4))
+        val sessions = listOf(session(DIA_2, 800))
 
-        assertEquals(-100L, r.unexplainedKilometers)
-        assertTrue(r.hasDivergence)
-        assertFalse(r.hasUnexplained)
+        assertTrue(pending(expenses, sessions).isEmpty())
+
+        // Mas ela continua sendo calculada e preservada, e nao zerada: e isso
+        // que faz janelas encadeadas se cancelarem.
+        val janela = OdometerWindow.windows(expenses, sessions, emptyList(), 1).single()
+        assertEquals(-100L, janela.unexplainedKilometers)
+        assertTrue(janela.hasDivergence)
+    }
+
+    // --- Dispensa ---
+
+    @Test
+    fun `sobra dispensada some da lista`() {
+        val expenses = listOf(reading(100_000, DIA_1), reading(101_000, DIA_4))
+        val sessions = listOf(session(DIA_2, 900))
+
+        assertEquals(100L, pending(expenses, sessions).single().unexplainedKilometers)
+
+        val comDispensa = pending(
+            expenses, sessions,
+            dismissals = listOf(dismissal(DIA_2, DIA_4, 100)),
+        )
+        assertTrue(comDispensa.isEmpty())
+    }
+
+    @Test
+    fun `sobra que encolhe dentro do dispensado continua em silencio`() {
+        // Dispensou 100 e depois lancou jornada que explica parte. O motorista
+        // aceitou deixar ate 100 de fora; 40 cabe nisso.
+        val expenses = listOf(reading(100_000, DIA_1), reading(101_000, DIA_4))
+        val sessions = listOf(session(DIA_2, 900), session(DIA_3, 60))
+
+        val r = pending(
+            expenses, sessions,
+            dismissals = listOf(dismissal(DIA_2, DIA_4, 100)),
+        )
+
+        assertTrue(r.isEmpty())
+    }
+
+    @Test
+    fun `sobra que cresce alem do dispensado pergunta de novo`() {
+        // Apareceu distancia nova sobre a qual ele nao opinou.
+        val expenses = listOf(reading(100_000, DIA_1), reading(101_500, DIA_4))
+        val sessions = listOf(session(DIA_2, 900))
+
+        val r = pending(
+            expenses, sessions,
+            dismissals = listOf(dismissal(DIA_2, DIA_4, 100)),
+        )
+
+        assertEquals(600L, r.single().unexplainedKilometers)
+    }
+
+    @Test
+    fun `dispensa de outra janela nao silencia esta`() {
+        val expenses = listOf(reading(100_000, DIA_1), reading(101_000, DIA_4))
+        val sessions = listOf(session(DIA_2, 900))
+
+        val r = pending(
+            expenses, sessions,
+            dismissals = listOf(dismissal(DIA_5, DIA_6, 100)),
+        )
+
+        assertEquals(100L, r.single().unexplainedKilometers)
     }
 
     @Test
@@ -164,12 +237,13 @@ class OdometerWindowTest {
         )
         val sessions = listOf(session(DIA_2, 900), session(DIA_5, 800))
 
-        val segunda = OdometerWindow.pending(expenses, sessions, emptyList(), 1).last()
+        val segunda = OdometerWindow.windows(expenses, sessions, emptyList(), 1).last()
         assertEquals(700L, segunda.odometerKilometers)
         assertEquals(800L, segunda.workKilometers)
         assertEquals(-100L, segunda.unexplainedKilometers)
 
-        val primeira = OdometerWindow.pending(expenses.dropLast(1), sessions, emptyList(), 1)
+        val primeira = OdometerWindow
+            .windows(expenses.dropLast(1), sessions, emptyList(), 1)
             .single()
         assertEquals(100L, primeira.unexplainedKilometers)
 

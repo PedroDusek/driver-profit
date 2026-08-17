@@ -6,11 +6,13 @@ import androidx.room.TypeConverters
 import com.driverprofit.data.local.dao.ExpenseDao
 import com.driverprofit.data.local.dao.MaintenanceScheduleDao
 import com.driverprofit.data.local.dao.PersonalUsageDao
+import com.driverprofit.data.local.dao.ReconciliationDismissalDao
 import com.driverprofit.data.local.dao.VehicleDao
 import com.driverprofit.data.local.dao.WorkSessionDao
 import com.driverprofit.data.local.entity.ExpenseEntity
 import com.driverprofit.data.local.entity.MaintenanceScheduleEntity
 import com.driverprofit.data.local.entity.PersonalUsageEntity
+import com.driverprofit.data.local.entity.ReconciliationDismissalEntity
 import com.driverprofit.data.local.entity.VehicleEntity
 import com.driverprofit.data.local.entity.WorkSessionEntity
 
@@ -32,6 +34,7 @@ import com.driverprofit.data.local.entity.WorkSessionEntity
         ExpenseEntity::class,
         PersonalUsageEntity::class,
         MaintenanceScheduleEntity::class,
+        ReconciliationDismissalEntity::class,
     ],
     version = DriverProfitDatabase.VERSION,
     exportSchema = true,
@@ -49,9 +52,12 @@ abstract class DriverProfitDatabase : RoomDatabase() {
 
     abstract fun maintenanceScheduleDao(): MaintenanceScheduleDao
 
+    abstract fun reconciliationDismissalDao(): ReconciliationDismissalDao
+
     companion object {
         /**
-         * Versão 8 — adiciona competência (`accrual_start`, `accrual_end`) em `expenses`.
+         * Versão 9 — adiciona `reconciliation_dismissals` (sobras aceitas fora da conta).
+         * Versão 8 adicionou competência (`accrual_start`, `accrual_end`) em `expenses`.
          * Versão 7 adicionou `maintenance_schedules` (intervalos de manutenção).
          * Versão 6 adicionou `personal_usage` (quilometragem fora do trabalho).
          * Versão 5 adicionou `odometer_km` em `expenses` (odômetro por lançamento).
@@ -60,7 +66,7 @@ abstract class DriverProfitDatabase : RoomDatabase() {
          * Versão 2 simplificou o veículo para nome + combustível.
          * Versão 1 tinha marca, modelo, ano, odômetro e três eixos de propulsão.
          */
-        const val VERSION = 8
+        const val VERSION = 9
 
         const val NAME = "driver_profit.db"
     }

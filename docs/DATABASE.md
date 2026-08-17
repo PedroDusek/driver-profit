@@ -2,7 +2,7 @@
 
 Room sobre SQLite, local ao aparelho. Nome do arquivo: `driver_profit.db`.
 
-**Versão atual do schema: 8**
+**Versão atual do schema: 9**
 
 O JSON do schema é exportado em `app/schemas/` e **é versionado no Git**. Ele é
 o que torna possível escrever testes de migração de verdade. Os schemas
@@ -202,6 +202,35 @@ manutenção daquela categoria com odômetro, em `expenses` — dado que já exi
 desde a v0.4.0, com a leitura desde a v0.6.0. Duplicá-lo numa coluna criaria
 duas verdades que divergiriam na primeira correção de lançamento.
 
+### `reconciliation_dismissals` (v9)
+
+Sobra de odômetro que o motorista aceitou deixar fora da conta (PRD §22).
+
+| Coluna | Tipo SQL | Nulo | Descrição |
+| --- | --- | --- | --- |
+| `id` | INTEGER PK AUTOINCREMENT | não | Identificador |
+| `vehicle_id` | INTEGER | não | FK para `vehicles`, `ON DELETE CASCADE` |
+| `start_date` | INTEGER | não | Epoch day do primeiro dia da janela |
+| `end_date` | INTEGER | não | Epoch day do último dia, inclusive |
+| `dismissed_km` | INTEGER | não | Quantos quilômetros foram aceitos fora |
+| `created_at` | INTEGER | não | Epoch millis (UTC) |
+
+**Índice:** `(vehicle_id, start_date, end_date)`, **único** — uma janela tem uma
+decisão, e decidir de novo substitui a anterior. É ele que sustenta o `REPLACE`
+do DAO e, por começar em `vehicle_id`, atende a exigência do Room para a FK.
+
+**`dismissed_km` é o que faz a tabela funcionar.** Guardar só o intervalo tornaria
+a dispensa válida sobre um pedaço do calendário; guardando a quantidade, ela vale
+sobre um **fato**. Se a sobra daquela janela mudar — um lançamento retroativo, uma
+leitura corrigida — a dispensa deixa de descrever a situação e a pergunta volta.
+Sem isso, um lançamento novo entraria calado numa janela já resolvida.
+
+**Ausência de linha significa "nada foi dispensado"**, o que descreve corretamente
+todo o histórico anterior à v0.10.1.
+
+**`ON DELETE CASCADE`**, como `maintenance_schedules`: isto é decisão sobre um
+intervalo de um carro, não histórico financeiro.
+
 ## Convenções
 
 ### Nomes
@@ -274,6 +303,7 @@ Um PR que altera apenas a Entity está incompleto.
 | 6 | v0.7.0 | Adiciona `personal_usage` (quilometragem fora do trabalho) |
 | 7 | v0.9.0 | Adiciona `maintenance_schedules` (intervalos de manutenção) |
 | 8 | v0.10.0 | Adiciona `accrual_start` e `accrual_end` em `expenses` (competência) |
+| 9 | v0.10.1 | Adiciona `reconciliation_dismissals` (sobras aceitas fora da conta) |
 
 #### Migração 1 → 2
 

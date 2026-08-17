@@ -48,6 +48,7 @@ object DriverProfitViewModelFactory {
                 observeReconciliation = container().observeOdometerReconciliation,
                 deletePersonalUsage = container().deletePersonalUsage,
                 saveReconciled = container().saveReconciledPersonalUsage,
+                dismissReconciliation = container().dismissReconciliation,
             )
         }
         initializer {

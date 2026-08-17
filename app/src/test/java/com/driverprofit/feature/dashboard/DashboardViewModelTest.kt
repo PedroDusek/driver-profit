@@ -18,6 +18,7 @@ import com.driverprofit.domain.usecase.ObserveWorkSessionsBetweenUseCase
 import com.driverprofit.testing.FakeExpenseRepository
 import com.driverprofit.testing.FakeMaintenanceScheduleRepository
 import com.driverprofit.testing.FakePersonalUsageRepository
+import com.driverprofit.testing.FakeReconciliationDismissalRepository
 import com.driverprofit.testing.FakeVehicleRepository
 import com.driverprofit.testing.FakeWorkSessionRepository
 import com.driverprofit.testing.MainDispatcherRule
@@ -117,6 +118,7 @@ class DashboardViewModelTest {
             expenses,
             sessions,
             personalUsage,
+            FakeReconciliationDismissalRepository(),
         ),
         clock = clock,
     )
