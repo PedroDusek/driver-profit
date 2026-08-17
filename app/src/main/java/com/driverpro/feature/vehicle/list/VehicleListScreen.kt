@@ -3,9 +3,7 @@ package com.driverpro.feature.vehicle.list
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.PaddingValues
-import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxSize
-import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
@@ -13,11 +11,11 @@ import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.ArrowBack
 import androidx.compose.material.icons.filled.Add
 import androidx.compose.material.icons.filled.Delete
+import androidx.compose.material.icons.filled.DirectionsCar
 import androidx.compose.material.icons.filled.Edit
 import androidx.compose.material.icons.filled.Star
 import androidx.compose.material.icons.outlined.StarBorder
 import androidx.compose.material3.AlertDialog
-import androidx.compose.material3.Card
 import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.ExtendedFloatingActionButton
@@ -40,6 +38,8 @@ import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.lifecycle.viewmodel.compose.viewModel
 import com.driverpro.R
 import com.driverpro.core.ui.DriverProViewModelFactory
+import com.driverpro.core.ui.component.IconChip
+import com.driverpro.core.ui.component.ListItemCard
 import com.driverpro.core.ui.format.BrazilianFormatter
 import com.driverpro.core.ui.format.VehicleLabels
 import com.driverpro.core.ui.theme.DriverProTheme
@@ -143,38 +143,15 @@ private fun VehicleCard(
     showCurrentToggle: Boolean,
     odometerKm: Long? = null,
 ) {
-    Card(modifier = Modifier.fillMaxWidth()) {
-        Row(
-            modifier = Modifier
-                .fillMaxWidth()
-                .padding(start = 16.dp, top = 12.dp, end = 4.dp, bottom = 12.dp),
-            verticalAlignment = Alignment.CenterVertically,
-        ) {
-            Column(modifier = Modifier.weight(1f)) {
-                Text(
-                    text = vehicle.name,
-                    style = MaterialTheme.typography.titleLarge,
-                )
-                Text(
-                    text = stringResource(VehicleLabels.fuel(vehicle.fuel)),
-                    style = MaterialTheme.typography.bodyLarge,
-                    color = MaterialTheme.colorScheme.onSurfaceVariant,
-                )
-                // Quilometragem segundo o app: a maior leitura já lançada.
-                // Ausente enquanto nenhum abastecimento registrou odômetro.
-                Text(
-                    text = odometerKm
-                        ?.let {
-                            stringResource(
-                                R.string.vehicle_odometer,
-                                BrazilianFormatter.kilometers(it),
-                            )
-                        }
-                        ?: stringResource(R.string.vehicle_odometer_unknown),
-                    style = MaterialTheme.typography.labelMedium,
-                    color = MaterialTheme.colorScheme.onSurfaceVariant,
-                )
-            }
+    ListItemCard(
+        leading = {
+            IconChip(
+                icon = Icons.Default.DirectionsCar,
+                tint = MaterialTheme.colorScheme.primary,
+                contentDescription = null,
+            )
+        },
+        trailing = {
             if (showCurrentToggle) {
                 IconButton(onClick = onSetCurrent) {
                     if (vehicle.isCurrent) {
@@ -201,7 +178,31 @@ private fun VehicleCard(
                     tint = MaterialTheme.colorScheme.error,
                 )
             }
-        }
+        },
+    ) {
+        Text(
+            text = vehicle.name,
+            style = MaterialTheme.typography.titleLarge,
+        )
+        Text(
+            text = stringResource(VehicleLabels.fuel(vehicle.fuel)),
+            style = MaterialTheme.typography.bodyLarge,
+            color = MaterialTheme.colorScheme.onSurfaceVariant,
+        )
+        // Quilometragem segundo o app: a maior leitura já lançada.
+        // Ausente enquanto nenhum abastecimento registrou odômetro.
+        Text(
+            text = odometerKm
+                ?.let {
+                    stringResource(
+                        R.string.vehicle_odometer,
+                        BrazilianFormatter.kilometers(it),
+                    )
+                }
+                ?: stringResource(R.string.vehicle_odometer_unknown),
+            style = MaterialTheme.typography.labelMedium,
+            color = MaterialTheme.colorScheme.onSurfaceVariant,
+        )
     }
 }
 

@@ -45,10 +45,15 @@ import com.driverpro.R
 import com.driverpro.core.common.Money
 import com.driverpro.core.common.Quantity
 import com.driverpro.core.ui.DriverProViewModelFactory
+import com.driverpro.core.ui.component.CategoryBarRow
+import com.driverpro.core.ui.component.IconChip
+import com.driverpro.core.ui.component.ListItemCard
+import com.driverpro.core.ui.component.visual
 import com.driverpro.core.ui.format.BrazilianFormatter
 import com.driverpro.core.ui.format.ExpenseLabels
 import com.driverpro.core.ui.format.QuantityInput
 import com.driverpro.core.ui.theme.DriverProTheme
+import com.driverpro.core.ui.theme.TabularFigures
 import com.driverpro.domain.model.ConsumptionEstimate
 import com.driverpro.domain.model.Expense
 import com.driverpro.domain.model.ExpenseCategory
@@ -202,7 +207,7 @@ private fun SummaryCard(summary: ExpensesSummary) {
     Card(
         modifier = Modifier.fillMaxWidth(),
         colors = CardDefaults.cardColors(
-            containerColor = MaterialTheme.colorScheme.errorContainer,
+            containerColor = MaterialTheme.colorScheme.surfaceContainerLow,
         ),
     ) {
         Column(
@@ -217,27 +222,21 @@ private fun SummaryCard(summary: ExpensesSummary) {
             )
             Text(
                 text = BrazilianFormatter.money(summary.total),
-                style = MaterialTheme.typography.displaySmall,
+                style = MaterialTheme.typography.displaySmall.copy(fontFeatureSettings = TabularFigures),
             )
 
             if (summary.byCategory.size > 1) {
                 HorizontalDivider()
+                val total = summary.byCategory.values.sumOf { it.cents }.coerceAtLeast(1)
                 summary.byCategory.entries
                     .sortedByDescending { it.value.cents }
                     .forEach { (category, amount) ->
-                        Row(
-                            modifier = Modifier.fillMaxWidth(),
-                            horizontalArrangement = Arrangement.SpaceBetween,
-                        ) {
-                            Text(
-                                text = stringResource(ExpenseLabels.category(category)),
-                                style = MaterialTheme.typography.bodyLarge,
-                            )
-                            Text(
-                                text = BrazilianFormatter.money(amount),
-                                style = MaterialTheme.typography.bodyLarge,
-                            )
-                        }
+                        CategoryBarRow(
+                            label = stringResource(ExpenseLabels.category(category)),
+                            value = BrazilianFormatter.money(amount),
+                            fraction = amount.cents.toFloat() / total.toFloat(),
+                            color = category.visual().color,
+                        )
                     }
             }
         }
@@ -251,48 +250,12 @@ private fun ExpenseCard(
     onDelete: () -> Unit,
     consumption: ConsumptionEstimate? = null,
 ) {
-    Card(modifier = Modifier.fillMaxWidth()) {
-        Row(
-            modifier = Modifier
-                .fillMaxWidth()
-                .padding(start = 16.dp, top = 12.dp, end = 4.dp, bottom = 12.dp),
-            verticalAlignment = Alignment.CenterVertically,
-        ) {
-            Column(modifier = Modifier.weight(1f)) {
-                Text(
-                    text = BrazilianFormatter.money(expense.amount),
-                    style = MaterialTheme.typography.titleLarge,
-                )
-                Text(
-                    text = "${BrazilianFormatter.date(expense.date)} · " +
-                        stringResource(ExpenseLabels.category(expense.category)),
-                    style = MaterialTheme.typography.bodyLarge,
-                    color = MaterialTheme.colorScheme.onSurfaceVariant,
-                )
-                expenseDetails(expense)?.let {
-                    Text(
-                        text = it,
-                        style = MaterialTheme.typography.labelMedium,
-                        color = MaterialTheme.colorScheme.onSurfaceVariant,
-                    )
-                }
-                // Sempre rotulado como estimado (PRD §23): o numero so seria
-                // exato se os dois abastecimentos tivessem enchido o tanque
-                // nas mesmas condicoes, e ninguem garante isso.
-                consumption?.let { estimate ->
-                    Text(
-                        text = stringResource(
-                            R.string.consumption_estimated,
-                            BrazilianFormatter.consumption(
-                                estimate.consumption,
-                                stringResource(ExpenseLabels.unit(estimate.unit)),
-                            ),
-                        ),
-                        style = MaterialTheme.typography.labelMedium,
-                        color = MaterialTheme.colorScheme.onSurfaceVariant,
-                    )
-                }
-            }
+    val visual = expense.category.visual()
+    ListItemCard(
+        leading = {
+            IconChip(icon = visual.icon, tint = visual.color, contentDescription = null)
+        },
+        trailing = {
             IconButton(onClick = onEdit) {
                 Icon(Icons.Default.Edit, contentDescription = stringResource(R.string.action_edit))
             }
@@ -303,6 +266,40 @@ private fun ExpenseCard(
                     tint = MaterialTheme.colorScheme.error,
                 )
             }
+        },
+    ) {
+        Text(
+            text = BrazilianFormatter.money(expense.amount),
+            style = MaterialTheme.typography.titleLarge.copy(fontFeatureSettings = TabularFigures),
+        )
+        Text(
+            text = "${BrazilianFormatter.date(expense.date)} · " +
+                stringResource(ExpenseLabels.category(expense.category)),
+            style = MaterialTheme.typography.bodyLarge,
+            color = MaterialTheme.colorScheme.onSurfaceVariant,
+        )
+        expenseDetails(expense)?.let {
+            Text(
+                text = it,
+                style = MaterialTheme.typography.labelMedium,
+                color = MaterialTheme.colorScheme.onSurfaceVariant,
+            )
+        }
+        // Sempre rotulado como estimado (PRD §23): o numero so seria
+        // exato se os dois abastecimentos tivessem enchido o tanque
+        // nas mesmas condicoes, e ninguem garante isso.
+        consumption?.let { estimate ->
+            Text(
+                text = stringResource(
+                    R.string.consumption_estimated,
+                    BrazilianFormatter.consumption(
+                        estimate.consumption,
+                        stringResource(ExpenseLabels.unit(estimate.unit)),
+                    ),
+                ),
+                style = MaterialTheme.typography.labelMedium,
+                color = MaterialTheme.colorScheme.onSurfaceVariant,
+            )
         }
     }
 }

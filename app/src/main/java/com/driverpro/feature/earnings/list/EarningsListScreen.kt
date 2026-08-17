@@ -14,6 +14,7 @@ import androidx.compose.material.icons.automirrored.filled.ArrowBack
 import androidx.compose.material.icons.filled.Add
 import androidx.compose.material.icons.filled.Delete
 import androidx.compose.material.icons.filled.Edit
+import androidx.compose.material.icons.filled.LocalTaxi
 import androidx.compose.material3.AlertDialog
 import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
@@ -43,9 +44,12 @@ import com.driverpro.R
 import com.driverpro.core.common.Money
 import com.driverpro.core.common.WorkDuration
 import com.driverpro.core.ui.DriverProViewModelFactory
+import com.driverpro.core.ui.component.IconChip
+import com.driverpro.core.ui.component.ListItemCard
 import com.driverpro.core.ui.format.BrazilianFormatter
 import com.driverpro.core.ui.format.EarningsLabels
 import com.driverpro.core.ui.theme.DriverProTheme
+import com.driverpro.core.ui.theme.TabularFigures
 import com.driverpro.domain.model.Platform
 import com.driverpro.domain.model.WorkSession
 import java.time.Instant
@@ -164,7 +168,7 @@ private fun SummaryCard(summary: EarningsSummary) {
             )
             Text(
                 text = BrazilianFormatter.money(summary.totalRevenue),
-                style = MaterialTheme.typography.displaySmall,
+                style = MaterialTheme.typography.displaySmall.copy(fontFeatureSettings = TabularFigures),
             )
 
             HorizontalDivider()
@@ -210,30 +214,15 @@ private fun SessionCard(
     onEdit: () -> Unit,
     onDelete: () -> Unit,
 ) {
-    Card(modifier = Modifier.fillMaxWidth()) {
-        Row(
-            modifier = Modifier
-                .fillMaxWidth()
-                .padding(start = 16.dp, top = 12.dp, end = 4.dp, bottom = 12.dp),
-            verticalAlignment = Alignment.CenterVertically,
-        ) {
-            Column(modifier = Modifier.weight(1f)) {
-                Text(
-                    text = BrazilianFormatter.money(session.revenue),
-                    style = MaterialTheme.typography.titleLarge,
-                )
-                Text(
-                    text = "${BrazilianFormatter.date(session.date)} · " +
-                        stringResource(EarningsLabels.platform(session.platform)),
-                    style = MaterialTheme.typography.bodyLarge,
-                    color = MaterialTheme.colorScheme.onSurfaceVariant,
-                )
-                Text(
-                    text = sessionDetails(session),
-                    style = MaterialTheme.typography.labelMedium,
-                    color = MaterialTheme.colorScheme.onSurfaceVariant,
-                )
-            }
+    ListItemCard(
+        leading = {
+            IconChip(
+                icon = Icons.Default.LocalTaxi,
+                tint = MaterialTheme.colorScheme.primary,
+                contentDescription = null,
+            )
+        },
+        trailing = {
             IconButton(onClick = onEdit) {
                 Icon(Icons.Default.Edit, contentDescription = stringResource(R.string.action_edit))
             }
@@ -244,7 +233,23 @@ private fun SessionCard(
                     tint = MaterialTheme.colorScheme.error,
                 )
             }
-        }
+        },
+    ) {
+        Text(
+            text = BrazilianFormatter.money(session.revenue),
+            style = MaterialTheme.typography.titleLarge.copy(fontFeatureSettings = TabularFigures),
+        )
+        Text(
+            text = "${BrazilianFormatter.date(session.date)} · " +
+                stringResource(EarningsLabels.platform(session.platform)),
+            style = MaterialTheme.typography.bodyLarge,
+            color = MaterialTheme.colorScheme.onSurfaceVariant,
+        )
+        Text(
+            text = sessionDetails(session),
+            style = MaterialTheme.typography.labelMedium,
+            color = MaterialTheme.colorScheme.onSurfaceVariant,
+        )
     }
 }
 

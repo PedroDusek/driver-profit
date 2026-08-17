@@ -15,8 +15,8 @@ import androidx.compose.material.icons.filled.Add
 import androidx.compose.material.icons.filled.Delete
 import androidx.compose.material.icons.filled.Edit
 import androidx.compose.material.icons.filled.Sync
+import androidx.compose.material.icons.filled.Weekend
 import androidx.compose.material3.AlertDialog
-import androidx.compose.material3.Card
 import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.ExtendedFloatingActionButton
@@ -39,7 +39,10 @@ import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.lifecycle.viewmodel.compose.viewModel
 import com.driverpro.R
 import com.driverpro.core.ui.DriverProViewModelFactory
+import com.driverpro.core.ui.component.IconChip
+import com.driverpro.core.ui.component.ListItemCard
 import com.driverpro.core.ui.format.BrazilianFormatter
+import com.driverpro.core.ui.theme.TabularFigures
 import com.driverpro.domain.model.PersonalUsage
 import com.driverpro.domain.model.PersonalUsageSource
 import com.driverpro.domain.usecase.OdometerReconciliation
@@ -298,48 +301,15 @@ private fun UsageCard(
     onEdit: () -> Unit,
     onDelete: () -> Unit,
 ) {
-    Card(modifier = Modifier.fillMaxWidth()) {
-        Row(
-            modifier = Modifier
-                .fillMaxWidth()
-                .padding(start = 16.dp, top = 12.dp, end = 4.dp, bottom = 12.dp),
-            verticalAlignment = Alignment.CenterVertically,
-        ) {
-            Column(modifier = Modifier.weight(1f)) {
-                Text(
-                    text = BrazilianFormatter.kilometers(usage.distanceKm),
-                    style = MaterialTheme.typography.titleLarge,
-                )
-                Text(
-                    text = if (usage.range.isSingleDay) {
-                        BrazilianFormatter.date(usage.range.start)
-                    } else {
-                        stringResource(
-                            R.string.personal_usage_period,
-                            BrazilianFormatter.date(usage.range.start),
-                            BrazilianFormatter.date(usage.range.end),
-                        )
-                    },
-                    style = MaterialTheme.typography.bodyLarge,
-                    color = MaterialTheme.colorScheme.onSurfaceVariant,
-                )
-                // Estimado e declarado não têm a mesma confiança, e o motorista
-                // precisa saber qual está olhando antes de decidir corrigir.
-                if (usage.source == PersonalUsageSource.RECONCILED) {
-                    Text(
-                        text = stringResource(R.string.personal_usage_source_reconciled),
-                        style = MaterialTheme.typography.labelMedium,
-                        color = MaterialTheme.colorScheme.onSurfaceVariant,
-                    )
-                }
-                usage.note.takeIf { it.isNotBlank() }?.let {
-                    Text(
-                        text = it,
-                        style = MaterialTheme.typography.labelMedium,
-                        color = MaterialTheme.colorScheme.onSurfaceVariant,
-                    )
-                }
-            }
+    ListItemCard(
+        leading = {
+            IconChip(
+                icon = Icons.Default.Weekend,
+                tint = MaterialTheme.colorScheme.secondary,
+                contentDescription = null,
+            )
+        },
+        trailing = {
             IconButton(onClick = onEdit) {
                 Icon(Icons.Default.Edit, contentDescription = stringResource(R.string.action_edit))
             }
@@ -350,6 +320,40 @@ private fun UsageCard(
                     tint = MaterialTheme.colorScheme.error,
                 )
             }
+        },
+    ) {
+        Text(
+            text = BrazilianFormatter.kilometers(usage.distanceKm),
+            style = MaterialTheme.typography.titleLarge.copy(fontFeatureSettings = TabularFigures),
+        )
+        Text(
+            text = if (usage.range.isSingleDay) {
+                BrazilianFormatter.date(usage.range.start)
+            } else {
+                stringResource(
+                    R.string.personal_usage_period,
+                    BrazilianFormatter.date(usage.range.start),
+                    BrazilianFormatter.date(usage.range.end),
+                )
+            },
+            style = MaterialTheme.typography.bodyLarge,
+            color = MaterialTheme.colorScheme.onSurfaceVariant,
+        )
+        // Estimado e declarado não têm a mesma confiança, e o motorista
+        // precisa saber qual está olhando antes de decidir corrigir.
+        if (usage.source == PersonalUsageSource.RECONCILED) {
+            Text(
+                text = stringResource(R.string.personal_usage_source_reconciled),
+                style = MaterialTheme.typography.labelMedium,
+                color = MaterialTheme.colorScheme.onSurfaceVariant,
+            )
+        }
+        usage.note.takeIf { it.isNotBlank() }?.let {
+            Text(
+                text = it,
+                style = MaterialTheme.typography.labelMedium,
+                color = MaterialTheme.colorScheme.onSurfaceVariant,
+            )
         }
     }
 }
