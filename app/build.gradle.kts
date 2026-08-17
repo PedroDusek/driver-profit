@@ -19,8 +19,8 @@ android {
         targetSdk = libs.versions.targetSdk.get().toInt()
 
         // versionName segue o Semantic Versioning do projeto (PRD §40).
-        versionCode = 19
-        versionName = "0.10.1"
+        versionCode = 21
+        versionName = "0.12.0"
 
         testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
         vectorDrawables { useSupportLibrary = true }
