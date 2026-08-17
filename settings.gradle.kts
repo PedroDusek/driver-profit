@@ -15,6 +15,6 @@ dependencyResolutionManagement {
     }
 }
 
-rootProject.name = "DriverProfit"
+rootProject.name = "DriverPro"
 
 include(":app")

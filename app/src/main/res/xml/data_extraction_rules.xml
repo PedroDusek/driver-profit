@@ -15,17 +15,17 @@
     <cloud-backup>
         <include
             domain="database"
-            path="driver_profit.db" />
+            path="driverpro.db" />
         <include
             domain="database"
-            path="driver_profit.db-wal" />
+            path="driverpro.db-wal" />
     </cloud-backup>
     <device-transfer>
         <include
             domain="database"
-            path="driver_profit.db" />
+            path="driverpro.db" />
         <include
             domain="database"
-            path="driver_profit.db-wal" />
+            path="driverpro.db-wal" />
     </device-transfer>
 </data-extraction-rules>

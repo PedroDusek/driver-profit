@@ -50,8 +50,8 @@ de rentabilidade com JUnit, sem emulador.
 ## Estrutura de pacotes
 
 ```
-com.driverprofit/
-├── DriverProfitApplication.kt   # cria o AppContainer
+com.driverpro/
+├── DriverProApplication.kt   # cria o AppContainer
 ├── MainActivity.kt              # única Activity
 ├── core/
 │   ├── common/                  # Money, WorkDuration — tipos base do domínio
@@ -329,7 +329,7 @@ Ver [DATABASE.md](DATABASE.md).
 
 `data/backup/ExportBackupUseCase.kt` e `ImportBackupUseCase.kt` (v0.13.0)
 vivem em `data/`, não em `domain/usecase/`, e recebem `Context` e
-`DriverProfitDatabase` diretamente — desvio deliberado da regra "domínio não
+`DriverProDatabase` diretamente — desvio deliberado da regra "domínio não
 conhece Android" que vale para o resto do projeto.
 
 Motivo: a funcionalidade inteira **é** infraestrutura. Exportar é um
@@ -337,7 +337,7 @@ checkpoint de WAL (`PRAGMA wal_checkpoint(FULL)`, mesmo motivo do
 `backup_rules.xml`) seguido de copiar bytes de um arquivo para um `Uri` do
 Storage Access Framework. Importar é o inverso, com uma validação antes:
 copia para um arquivo temporário, abre só leitura, confere
-`PRAGMA user_version` contra `DriverProfitDatabase.VERSION` e a presença da
+`PRAGMA user_version` contra `DriverProDatabase.VERSION` e a presença da
 tabela `vehicles`. Não há regra de negócio para isolar em domínio puro — só
 haveria uma camada de indireção sem função.
 

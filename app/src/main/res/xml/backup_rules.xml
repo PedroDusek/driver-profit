@@ -24,8 +24,8 @@
 <full-backup-content>
     <include
         domain="database"
-        path="driver_profit.db" />
+        path="driverpro.db" />
     <include
         domain="database"
-        path="driver_profit.db-wal" />
+        path="driverpro.db-wal" />
 </full-backup-content>

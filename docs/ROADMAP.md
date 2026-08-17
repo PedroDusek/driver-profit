@@ -377,7 +377,7 @@ criado — a base para comparar histórico entre carros depois.
 - [x] Exportação copia o banco (checkpoint de WAL + cópia de arquivo) para um
       `Uri` escolhido via Storage Access Framework — sem permissão nova
 - [x] Importação valida antes de trocar: `PRAGMA user_version` contra
-      `DriverProfitDatabase.VERSION`, presença da tabela `vehicles`
+      `DriverProDatabase.VERSION`, presença da tabela `vehicles`
 - [x] Importação substitui tudo (sem mesclar); tela avisa a consequência antes
       de confirmar
 - [x] Sexto ícone no dashboard; sem migração de banco — só I/O

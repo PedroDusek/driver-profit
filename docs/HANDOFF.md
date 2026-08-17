@@ -4,18 +4,39 @@ Documento de continuidade. Leia isto **antes** de qualquer coisa ao retomar o
 projeto em uma sessão nova, junto com `PRD.md`, `ARCHITECTURE.md` e
 `DEVELOPMENT.md`.
 
-**Última atualização:** v0.13.0
+**Última atualização:** v0.14.0
 
 ---
 
 ## 0. Comece por aqui
 
-**Está tudo na `main`, publicado.** v0.11.0 e v0.12.0 — pedidos de produto do
-Pedro, não itens do roadmap original — foram mergeadas por fast-forward,
-tagueadas, empurradas para `origin` e liberadas com sucesso (CI e workflow de
-Release verdes, `gh release list` confirma os dois). v0.13.0 está pronta numa
-branch de feature (`feature/backup-export-import`), aguardando o mesmo
-caminho.
+**Está tudo na `main`, publicado.** v0.11.0, v0.12.0 e v0.13.0 — pedidos de
+produto do Pedro, não itens do roadmap original — foram mergeadas, tagueadas,
+empurradas para `origin` e liberadas com sucesso. v0.14.0 (este rebrand) está
+pronta numa branch de feature (`feature/driverpro-rebrand`), aguardando o
+mesmo caminho.
+
+> **Correção:** esta seção dizia que v0.13.0 ainda estava numa branch
+> aguardando merge. Não estava mais — `git log`/`git tag` confirmam que já
+> tinha sido mergeada e tagueada na `main` antes desta sessão. A lição de
+> `DEVELOPMENT.md §5` ("nunca assuma que o projeto está limpo") vale também
+> para os próprios documentos: releia o histórico real antes de confiar no que
+> o handoff anterior registrou.
+
+> **Decisão de produto registrada (v0.14.0): o nome deixou de ser
+> placeholder.** O produto se chama **DriverPro** — iniciais de Pedro Dusek.
+> `com.driverprofit` virou `com.driverpro` em todo o projeto (pacote Kotlin,
+> `applicationId`, banco, ícone, documentação). Isso resolve a pendência do
+> PRD §10 e só foi seguro fazer agora: nenhuma instalação de terceiro ainda
+> aconteceu (sem keystore de release, sem upload à Play Console — PRD §48).
+> Junto veio o primeiro redesign visual completo do app, documentado em
+> `ARCHITECTURE.md`.
+>
+> Efeito prático em aparelhos de desenvolvimento com o app antigo instalado:
+> `com.driverprofit.debug` e `com.driverpro.debug` são pacotes diferentes para
+> o Android, então o novo instala do zero, sem os dados do antigo. Quem quiser
+> preservar dados de teste deve exportar um backup pela tela "Exportar e
+> importar" (v0.13.0) antes de instalar a versão renomeada, e importar depois.
 
 | Versão | Tag | Banco | Release |
 | --- | --- | --- | --- |
@@ -27,7 +48,8 @@ caminho.
 | v0.10.1 Resolver a sobra do odômetro | ✅ | **9** | ✅ |
 | v0.11.0 IPVA sem competência | ✅ | 9 | ✅ |
 | v0.12.0 Veículo atual | ✅ | **10** | ✅ |
-| v0.13.0 Exportar e importar arquivo | branch pronta | 10 | — |
+| v0.13.0 Exportar e importar arquivo | ✅ | 10 | ✅ |
+| v0.14.0 Nome e redesign visual (DriverPro) | branch pronta | 10 | — |
 
 O PRD §58 volta a valer: dá para fazer `git checkout v0.8.0` e reproduzir aquele
 estado.
@@ -98,7 +120,7 @@ tem um construtor que roda na JVM com SQLite empacotado, **sem Robolectric**.
 | Código | `C:\Users\pedro\Desktop\driver-profit` |
 | Repositório | https://github.com/PedroDusek/driver-profit (público) |
 | Branch estável | `main`, protegida |
-| Última tag | `v0.12.0`, sem release publicado (ver aviso na seção 0) |
+| Última tag | `v0.13.0` |
 | Versão do banco | **10** |
 
 ⚠️ **O caminho não pode conter acento.** O projeto nasceu em
@@ -224,9 +246,10 @@ estimado em si chega na v0.8.0.
 | v0.10.1 Resolver a sobra do odômetro | ✅ |
 | v0.11.0 IPVA sem competência | ✅ |
 | v0.12.0 Veículo atual | ✅ |
-| **v0.13.0 Exportar e importar arquivo** | ⬅️ pronta, branch não mergeada |
-| v0.14.0 Crash handling · v0.15.0 Testes de fluxo | |
-| v0.16.0 Analytics · v0.17.0 UX polish · v0.18.0 Hardening · v0.19.0 RC · v1.0.0 MVP | |
+| v0.13.0 Exportar e importar arquivo | ✅ |
+| **v0.14.0 Nome e redesign visual (DriverPro)** | ⬅️ pronta, branch não mergeada |
+| v0.15.0 Crash handling · v0.16.0 Testes de fluxo | |
+| v0.17.0 Analytics · v0.18.0 UX polish · v0.19.0 Hardening · v0.20.0 RC · v1.0.0 MVP | |
 
 O bloco v0.6.0–v0.10.0 foi desenhado em conjunto: cada versão é pequena,
 testável e reversível, e a ordem é de dependência, não de preferência. O
@@ -240,9 +263,9 @@ Menos funcionalidade do que a contagem de versões sugere, e mais consolidação
 que o roadmap deixa transparecer.
 
 **Funcionalidade essencial: nenhuma.** A v0.10.0 fechou a última. v0.11.0
-(IPVA sem competência) e v0.12.0 (veículo atual) foram pedidos de produto do
-Pedro, já mergeados e tagueados. v0.13.0 (analytics) é desejável e não
-bloqueia o MVP.
+(IPVA sem competência), v0.12.0 (veículo atual) e v0.13.0 (exportar/importar)
+foram pedidos de produto do Pedro, já mergeados e tagueados. v0.14.0 (nome e
+redesign visual) é desejável e não bloqueia o MVP.
 
 **O que separa "funciona" de "lançável"**, e é o grosso:
 
@@ -254,10 +277,10 @@ bloqueia o MVP.
   desligado. Exportar/importar arquivo é o item 1 da seção 0
 - **Sem crash handling.** Erro não tratado fecha o app sem deixar rastro
 
-**Três decisões que congelam na primeira instalação de terceiro** (PRD §48):
+**Duas decisões que ainda congelam na primeira instalação de terceiro** (PRD
+§48) — o nome já não é uma delas: a v0.14.0 fixou `com.driverpro` antes de
+qualquer instalação externa acontecer:
 
-- **O nome do produto ainda é placeholder.** Trocar o `applicationId` depois
-  **apaga os dados de quem já instalou**
 - **Não há build de release assinado.** A release publica APK de *debug*, e
   assinatura de debug e de release não se atualizam entre si
 - **Sem LICENSE**, por escolha do Pedro — efeito é todos os direitos reservados
@@ -328,18 +351,18 @@ o único DAO dos seis sem cobertura própria — a tabela nova da v0.10.1 é
 exercitada só via `MigrationTest`.
 
 ⚠️ **`BackupTest` opera no caminho real do banco** (`context.getDatabasePath
-(DriverProfitDatabase.NAME)`), o mesmo que `AppContainer` usa em produção —
+(DriverProDatabase.NAME)`), o mesmo que `AppContainer` usa em produção —
 diferente dos DAOs, que usam `Room.inMemoryDatabaseBuilder`. É proposital:
 exportar/importar são operações sobre o **arquivo**, não sobre a conexão, e
 banco em memória não tem arquivo para copiar. O teste limpa antes e depois
 (`@Before`/`@After`), então não interfere com os outros — mas por isso mesmo
 não pode rodar em paralelo com outro teste que também toque
-`driver_profit.db` fora de memória.
+`driverpro.db` fora de memória.
 
 ⚠️ **Ele desinstala os dois pacotes ao terminar, e isso apaga os dados.** Se
 você quer exercitar uma migração em cima de dados reais, faça isso **antes** de
 rodar os instrumentados — ou tenha o banco salvo. Puxar uma cópia com
-`adb exec-out run-as <pacote> cat databases/driver_profit.db` custa segundos e
+`adb exec-out run-as <pacote> cat databases/driverpro.db` custa segundos e
 já salvou esta sessão.
 
 ```bash
@@ -362,7 +385,7 @@ recusando a instalação — instale os dois APKs à mão e chame o runner diret
 ```bash
 adb install -r -t app/build/outputs/apk/debug/app-debug.apk
 adb install -r -t app/build/outputs/apk/androidTest/debug/app-debug-androidTest.apk
-adb shell am instrument -w com.driverprofit.debug.test/androidx.test.runner.AndroidJUnitRunner
+adb shell am instrument -w com.driverpro.debug.test/androidx.test.runner.AndroidJUnitRunner
 ```
 
 ⚠️ O `connectedDebugAndroidTest` **desinstala os dois pacotes ao terminar**. Se
@@ -400,8 +423,6 @@ O manifesto não declara **nenhuma** permissão. Manter assim.
 
 ## 10. Pendências de decisão
 
-- **Nome do produto** ainda não é definitivo. `Driver Profit` /
-  `com.driverprofit` são placeholders
 - **Sem LICENSE**, por escolha do Pedro. Efeito legal: todos os direitos
   reservados
 - **Repositório é público** de propósito: no plano Free, proteção de branch só

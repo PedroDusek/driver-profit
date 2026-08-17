@@ -5,7 +5,7 @@
         Compose (core/ui/theme). Este XML existe para evitar o "flash" de tela
         branca/preta antes do primeiro frame do Compose.
     -->
-    <style name="Theme.DriverProfit" parent="android:Theme.Material.Light.NoActionBar">
+    <style name="Theme.DriverPro" parent="android:Theme.Material.Light.NoActionBar">
         <item name="android:windowBackground">@color/window_background</item>
         <item name="android:statusBarColor">@android:color/transparent</item>
         <item name="android:navigationBarColor">@android:color/transparent</item>

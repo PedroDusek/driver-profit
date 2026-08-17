@@ -10,17 +10,17 @@ plugins {
 }
 
 android {
-    namespace = "com.driverprofit"
+    namespace = "com.driverpro"
     compileSdk = libs.versions.compileSdk.get().toInt()
 
     defaultConfig {
-        applicationId = "com.driverprofit"
+        applicationId = "com.driverpro"
         minSdk = libs.versions.minSdk.get().toInt()
         targetSdk = libs.versions.targetSdk.get().toInt()
 
         // versionName segue o Semantic Versioning do projeto (PRD §40).
-        versionCode = 22
-        versionName = "0.13.0"
+        versionCode = 23
+        versionName = "0.14.0"
 
         testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
         vectorDrawables { useSupportLibrary = true }

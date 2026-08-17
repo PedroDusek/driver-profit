@@ -1,6 +1,6 @@
 # Banco de dados
 
-Room sobre SQLite, local ao aparelho. Nome do arquivo: `driver_profit.db`.
+Room sobre SQLite, local ao aparelho. Nome do arquivo: `driverpro.db`.
 
 **Versão atual do schema: 10**
 
@@ -301,7 +301,7 @@ builder em `core/di/AppContainer.kt`.
 Toda alteração de schema exige, no mesmo PR:
 
 1. Alterar a `@Entity`
-2. Incrementar `DriverProfitDatabase.VERSION`
+2. Incrementar `DriverProDatabase.VERSION`
 3. Escrever a `Migration(n, n+1)` e adicioná-la a `Migrations.ALL`
 4. Escrever o teste da migração em `app/src/androidTest/.../MigrationTest.kt`
 5. Atualizar este documento
