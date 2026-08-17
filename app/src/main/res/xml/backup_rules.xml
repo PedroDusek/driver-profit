@@ -1,11 +1,31 @@
 <?xml version="1.0" encoding="utf-8"?>
 <!--
     Backup automático (Android 11 e anteriores).
+
     Todo o dado do motorista vive no banco local, então ele entra no backup.
     Não há credenciais ou tokens a excluir — o MVP não tem login (PRD §48).
+
+    ⚠️ O arquivo `-wal` é tão obrigatório quanto o `.db`. O Room usa
+    write-ahead logging, e as escritas recentes ficam no WAL até um checkpoint
+    movê-las para o arquivo principal. Sem ele, o backup copia um SQLite válido
+    e quase vazio — e a restauração devolve um histórico incompleto **sem erro
+    nenhum**, que é a pior falha possível num backup: ele não quebra, ele mente.
+
+    Medido em 16/08/2026 neste projeto: `.db` com 4 KB e `-wal` com 206 KB.
+
+    O `-shm` fica de fora de propósito: é memória compartilhada, o SQLite o
+    regenera a partir do WAL ao abrir, e restaurar uma cópia velha dele só
+    atrapalha.
+
+    Copiar `.db` + `-wal` num instante arbitrário é equivalente a uma queda de
+    energia, e o SQLite sabe se recuperar disso: transações confirmadas são
+    reaplicadas, as demais descartadas.
 -->
 <full-backup-content>
     <include
         domain="database"
         path="driver_profit.db" />
+    <include
+        domain="database"
+        path="driver_profit.db-wal" />
 </full-backup-content>
