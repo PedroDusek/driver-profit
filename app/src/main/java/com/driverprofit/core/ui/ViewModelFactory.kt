@@ -7,6 +7,7 @@ import androidx.lifecycle.viewmodel.initializer
 import androidx.lifecycle.viewmodel.viewModelFactory
 import com.driverprofit.DriverProfitApplication
 import com.driverprofit.core.di.AppContainer
+import com.driverprofit.feature.backup.BackupViewModel
 import com.driverprofit.feature.dashboard.DashboardViewModel
 import com.driverprofit.feature.earnings.form.EarningsFormViewModel
 import com.driverprofit.feature.earnings.list.EarningsListViewModel
@@ -101,6 +102,12 @@ object DriverProfitViewModelFactory {
                 observeVehicleOdometers = container().observeVehicleOdometers,
                 getExpense = container().getExpense,
                 saveExpense = container().saveExpense,
+            )
+        }
+        initializer {
+            BackupViewModel(
+                exportBackup = container().exportBackup,
+                importBackup = container().importBackup,
             )
         }
     }

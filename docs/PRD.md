@@ -347,7 +347,7 @@ precisam ter.
 > **Não é para sempre.** O caso que o silêncio esconde é o sistemático: alguém
 > que anota quilômetro a mais toda semana teria o custo/km permanentemente
 > otimista sem nada dizer. Isso não é um alerta, é uma observação sobre um
-> conjunto — pertence à v0.13.0, junto de "evolução entre períodos".
+> conjunto — pertence à v0.16.0, junto de "evolução entre períodos".
 
 Sem dado de uso pessoal, o app calcula com o que tem e **declara a limitação
 na tela**. O estado "sem correção" é ausência de dado, nunca uma chave que o
@@ -657,6 +657,25 @@ Não implementar agora; manter a arquitetura preparada.
 > **Manutenção preventiva e custos fixos foram antecipados** para v0.9.0 e
 > v0.10.0. Sem eles o custo/km fica incompleto, e o custo/km é o produto
 > (§2). Ver [`ROADMAP.md`](ROADMAP.md).
+
+> **Decisão de produto registrada (v0.13.0): exportar e importar arquivo.**
+> Ponte manual entre o Auto Backup invisível do Android e a nuvem da v2.0 —
+> "começa do presente" continua valendo para a sincronização, mas o motorista
+> não devia esperar até lá para ter um backup que ele vê, guarda e leva para
+> outro aparelho.
+>
+> **O formato é uma cópia do próprio banco Room, não um formato novo.** O
+> arquivo exportado já é auto-descritivo — schema e versão inclusos via
+> `PRAGMA user_version` — e importar reaproveita as migrações que já existem;
+> não há código de serialização por tabela para manter sincronizado com o
+> domínio.
+>
+> **Importar substitui todos os dados atuais — não existe mesclar.** Um swap
+> de arquivo SQLite não tem como reconciliar com o banco vivo. A tela avisa a
+> consequência antes de confirmar, e sugere exportar primeiro se o motorista
+> não tiver certeza. Depois de importar, o app pede para fechar e abrir de
+> novo — ver a decisão técnica em `docs/ARCHITECTURE.md` sobre por que ele não
+> tenta se reiniciar sozinho.
 
 ## 48. Funcionalidades não autorizadas
 

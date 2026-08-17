@@ -325,6 +325,41 @@ Repositories recebem `CoroutineDispatcher` como parâmetro com default
 Apagar o banco do motorista para resolver mudança de schema não é uma opção.
 Ver [DATABASE.md](DATABASE.md).
 
+### Backup toca Context e SQLite bruto de propósito
+
+`data/backup/ExportBackupUseCase.kt` e `ImportBackupUseCase.kt` (v0.13.0)
+vivem em `data/`, não em `domain/usecase/`, e recebem `Context` e
+`DriverProfitDatabase` diretamente — desvio deliberado da regra "domínio não
+conhece Android" que vale para o resto do projeto.
+
+Motivo: a funcionalidade inteira **é** infraestrutura. Exportar é um
+checkpoint de WAL (`PRAGMA wal_checkpoint(FULL)`, mesmo motivo do
+`backup_rules.xml`) seguido de copiar bytes de um arquivo para um `Uri` do
+Storage Access Framework. Importar é o inverso, com uma validação antes:
+copia para um arquivo temporário, abre só leitura, confere
+`PRAGMA user_version` contra `DriverProfitDatabase.VERSION` e a presença da
+tabela `vehicles`. Não há regra de negócio para isolar em domínio puro — só
+haveria uma camada de indireção sem função.
+
+O arquivo exportado é uma **cópia crua do banco**, não um formato próprio.
+Isso resolve compatibilidade de versão de graça: um arquivo de schema mais
+antigo é aceito e migra sozinho — pelas `Migrations.ALL` já cadastradas em
+`AppContainer` — na próxima vez que o Room abrir o arquivo trocado, no
+próximo lançamento do app. Um arquivo de schema mais novo é rejeitado antes
+de tocar no banco vivo, porque não dá para abrir versão futura com app mais
+velho.
+
+**Depois de importar, `database.close()` é chamado e a instância fica
+inutilizável — o app pede para fechar e reabrir, em vez de tentar se
+reiniciar sozinho.** `AppContainer` e `database` são singletons vivos no
+processo; trocar o arquivo por baixo deles sem reiniciar o processo não é
+seguro (DAOs de repositórios já instanciados ficariam presos à conexão
+antiga). Reiniciar o processo automaticamente (`AlarmManager` + `killProcess`)
+é possível, mas é exatamente o tipo de mecanismo que se comporta diferente
+entre fabricantes — a mesma categoria de instabilidade que o MIUI já causou
+neste projeto (`docs/HANDOFF.md`) — e não vale o risco para uma tela que o
+motorista abre uma vez a cada troca de aparelho.
+
 ## Regras de dependência
 
 Antes de adicionar uma biblioteca (PRD §55):

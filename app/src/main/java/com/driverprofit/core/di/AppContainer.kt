@@ -2,6 +2,8 @@ package com.driverprofit.core.di
 
 import android.content.Context
 import androidx.room.Room
+import com.driverprofit.data.backup.ExportBackupUseCase
+import com.driverprofit.data.backup.ImportBackupUseCase
 import com.driverprofit.data.local.database.DriverProfitDatabase
 import com.driverprofit.data.local.database.Migrations
 import com.driverprofit.data.repository.OfflineExpenseRepository
@@ -96,6 +98,9 @@ interface AppContainer {
     val observeMaintenance: ObserveMaintenanceUseCase
     val saveMaintenanceInterval: SaveMaintenanceIntervalUseCase
     val resetMaintenanceInterval: ResetMaintenanceIntervalUseCase
+
+    val exportBackup: ExportBackupUseCase
+    val importBackup: ImportBackupUseCase
 }
 
 class DefaultAppContainer(private val context: Context) : AppContainer {
@@ -109,6 +114,14 @@ class DefaultAppContainer(private val context: Context) : AppContainer {
             .addMigrations(*Migrations.ALL)
             // Sem fallbackToDestructiveMigration: ver DriverProfitDatabase.
             .build()
+    }
+
+    override val exportBackup: ExportBackupUseCase by lazy {
+        ExportBackupUseCase(context.applicationContext, database)
+    }
+
+    override val importBackup: ImportBackupUseCase by lazy {
+        ImportBackupUseCase(context.applicationContext, database)
     }
 
     override val vehicleRepository: VehicleRepository by lazy {

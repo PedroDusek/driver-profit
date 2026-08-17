@@ -309,4 +309,23 @@
     <string name="maintenance_dashboard_note">Conta a quilometragem do carro, não o período selecionado acima.</string>
     <string name="maintenance_dashboard_line">%1$s — %2$s · próxima aos %3$s</string>
     <string name="error_interval_out_of_range">Intervalo inválido</string>
+
+    <!-- Backup (v0.13.0) -->
+    <string name="backup_title">Exportar e importar</string>
+    <string name="backup_export_hint">Cria um arquivo com todo o seu histórico, para guardar ou levar para outro aparelho.</string>
+    <string name="backup_action_export">Exportar backup</string>
+    <string name="backup_export_success_title">Backup exportado</string>
+    <string name="backup_export_success_message">O arquivo foi salvo no local que você escolheu.</string>
+    <string name="backup_export_failed_title">Não foi possível exportar</string>
+    <string name="backup_import_hint">Escolhe um arquivo de backup e substitui todos os dados deste aparelho por ele.</string>
+    <string name="backup_action_import">Importar backup</string>
+    <string name="backup_import_confirm_title">Importar substitui todos os dados atuais</string>
+    <string name="backup_import_confirm_message">Ganhos, despesas, veículos e manutenções deste aparelho serão apagados e trocados pelo conteúdo do arquivo escolhido. Não tem como desfazer. Se não tiver certeza, exporte um backup do estado atual antes de continuar.</string>
+    <string name="backup_import_success_title">Importação concluída</string>
+    <string name="backup_import_success_message">Os dados foram trocados. Feche o app e abra de novo para ver o histórico importado.</string>
+    <string name="backup_import_failed_title">Não foi possível importar</string>
+    <string name="backup_action_close_app">Fechar o app</string>
+    <string name="backup_error_invalid_file">Este arquivo não é um backup do Driver Profit</string>
+    <string name="backup_error_newer_version">Este backup é de uma versão mais nova do app — atualize antes de importar</string>
+    <string name="backup_error_io">Falha ao ler ou gravar o arquivo</string>
 </resources>

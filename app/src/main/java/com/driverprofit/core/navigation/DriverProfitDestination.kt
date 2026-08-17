@@ -72,6 +72,11 @@ object DriverProfitDestination {
     /** Alertas de manutenção preventiva por quilometragem (PRD §18). */
     const val MAINTENANCE = "maintenance"
 
+    // --- Backup ---
+
+    /** Exportar e importar arquivo (v0.13.0). */
+    const val BACKUP = "backup"
+
     /** Destino inicial do grafo de navegação. */
     const val START = DASHBOARD
 }

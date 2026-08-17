@@ -7,6 +7,19 @@ Versionamento conforme [Semantic Versioning](https://semver.org/lang/pt-BR/).
 
 ### Adicionado
 
+- **Exportar e importar arquivo.** Exportação copia o banco (checkpoint de
+  WAL + cópia do arquivo) para um `Uri` escolhido via Storage Access
+  Framework — sem permissão nova. Importação valida antes de trocar
+  (`PRAGMA user_version` contra o schema atual, presença da tabela
+  `vehicles`) e substitui tudo — não existe mesclar; a tela avisa a
+  consequência antes de confirmar. Depois de importar, pede para fechar e
+  reabrir o app. Sexto ícone no dashboard. Sem migração de banco: o formato
+  de exportação é o próprio arquivo do banco Room
+
+## [0.12.0] — Veículo atual
+
+### Adicionado
+
 - **Veículo atual.** Com um veículo cadastrado, ele é automaticamente o
   atual; com dois ou mais, um botão na tela de veículos escolhe qual é.
   Ganhos e despesas gravam o veículo atual automaticamente no momento do

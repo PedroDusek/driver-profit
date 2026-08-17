@@ -4,15 +4,18 @@ Documento de continuidade. Leia isto **antes** de qualquer coisa ao retomar o
 projeto em uma sessão nova, junto com `PRD.md`, `ARCHITECTURE.md` e
 `DEVELOPMENT.md`.
 
-**Última atualização:** v0.12.0
+**Última atualização:** v0.13.0
 
 ---
 
 ## 0. Comece por aqui
 
-**Está tudo na `main`.** Em 17/08/2026, v0.11.0 e v0.12.0 — pedidos de
-produto do Pedro, não itens do roadmap original — foram mergeadas por
-fast-forward e tagueadas; não há branch de feature em aberto nem PR pendente.
+**Está tudo na `main`, publicado.** v0.11.0 e v0.12.0 — pedidos de produto do
+Pedro, não itens do roadmap original — foram mergeadas por fast-forward,
+tagueadas, empurradas para `origin` e liberadas com sucesso (CI e workflow de
+Release verdes, `gh release list` confirma os dois). v0.13.0 está pronta numa
+branch de feature (`feature/backup-export-import`), aguardando o mesmo
+caminho.
 
 | Versão | Tag | Banco | Release |
 | --- | --- | --- | --- |
@@ -22,28 +25,26 @@ fast-forward e tagueadas; não há branch de feature em aberto nem PR pendente.
 | v0.9.1 Ciclo do odômetro | ✅ | 7 | ✅ |
 | v0.10.0 Custos fixos por competência | ✅ | **8** | ✅ |
 | v0.10.1 Resolver a sobra do odômetro | ✅ | **9** | ✅ |
-| v0.11.0 IPVA sem competência | ✅ | 9 | — |
-| v0.12.0 Veículo atual | ✅ | **10** | — |
+| v0.11.0 IPVA sem competência | ✅ | 9 | ✅ |
+| v0.12.0 Veículo atual | ✅ | **10** | ✅ |
+| v0.13.0 Exportar e importar arquivo | branch pronta | 10 | — |
 
 O PRD §58 volta a valer: dá para fazer `git checkout v0.8.0` e reproduzir aquele
 estado.
 
-⚠️ **v0.11.0 e v0.12.0 não têm release do GitHub** — só a tag local. A v0.10.1
-foi a última com `git push` e release publicado; as duas seguintes ficaram
-commitadas e tagueadas em `main`, mas ninguém rodou `git push origin main
---tags` nem disparou o workflow de release. Fazer isso é decisão do Pedro, não
-automática.
+⚠️ **`app/build.gradle.kts` também ficou parado em `0.10.1` por duas versões**
+— `versionCode`/`versionName` não acompanharam as tags v0.11.0 e v0.12.0,
+apesar de `DEVELOPMENT.md` pedir isso a cada release. Corrigido num commit
+avulso (`chore(release): bump versionCode/versionName to 0.12.0`) depois do
+fato; a lição é conferir isso **antes** de taguear, não depois.
 
 ### O que fazer primeiro
 
 **A última funcionalidade essencial do MVP já entrou.** O que resta é qualidade,
 não escopo:
 
-1. **Exportar e importar arquivo.** O Auto Backup do Android é rede de segurança
-   invisível — o motorista não tem como conferir se funcionou, e ele some se o
-   backup do sistema estiver desligado. Exportação é o backup que ele vê, guarda
-   e leva para outro aparelho. E vira a ponte para a nuvem da v2.0, que o PRD já
-   diz que "começa do presente"
+1. ✅ **Exportar e importar arquivo** — v0.13.0, pronta na branch
+   `feature/backup-export-import`
 2. **Crash handling.** Erro não tratado hoje fecha o app sem deixar rastro
 3. **Testes de fluxo** — cadastrar veículo → lançar ganho → lançar despesa →
    conferir dashboard. Nenhuma tela tem verificação automatizada
@@ -121,7 +122,7 @@ mensagem em um arquivo e use `git commit -F <arquivo>`. Vale para
 ## 3. Como o produto é hoje
 
 Aplicativo Android offline-first para medir **rentabilidade operacional** de
-motorista de aplicativo. Cinco telas, todas alcançáveis pelos ícones do
+motorista de aplicativo. Seis telas, todas alcançáveis pelos ícones do
 dashboard:
 
 - **Veículos** — nome + tipo de combustível, só isso
@@ -137,6 +138,9 @@ dashboard:
 - **Dashboard** — tela principal. Indicadores do período escolhido: lucro em
   destaque, faturamento e despesas, volume (km, horas, corridas), R$/km,
   R$/hora, R$/corrida, custo/km, lucro/km, lucro/hora e despesas por natureza
+- **Exportar e importar** (v0.13.0) — backup manual que o motorista vê,
+  guarda e leva para outro aparelho. Exportar copia o banco; importar
+  substitui tudo (sem mesclar) e pede para fechar e reabrir o app
 
 No topo do dashboard aparecem dois avisos, e **nenhum dos dois pertence ao
 período selecionado** — cada um declara na tela a que intervalo se refere:
@@ -220,8 +224,9 @@ estimado em si chega na v0.8.0.
 | v0.10.1 Resolver a sobra do odômetro | ✅ |
 | v0.11.0 IPVA sem competência | ✅ |
 | v0.12.0 Veículo atual | ✅ |
-| **v0.13.0 Analytics** | ⬅️ próxima em escopo novo |
-| v0.14.0 UX polish · v0.15.0 Hardening · v0.16.0 RC · v1.0.0 MVP | |
+| **v0.13.0 Exportar e importar arquivo** | ⬅️ pronta, branch não mergeada |
+| v0.14.0 Crash handling · v0.15.0 Testes de fluxo | |
+| v0.16.0 Analytics · v0.17.0 UX polish · v0.18.0 Hardening · v0.19.0 RC · v1.0.0 MVP | |
 
 O bloco v0.6.0–v0.10.0 foi desenhado em conjunto: cada versão é pequena,
 testável e reversível, e a ordem é de dependência, não de preferência. O
@@ -306,21 +311,30 @@ sempre.
 
 ## 7. Testes instrumentados
 
-São a única verificação real das migrações. Cobrem cinco dos seis DAOs e as
-dez migrações encadeadas (1→2→3→4→5→6→7→8→9→10).
+São a única verificação real das migrações — e, desde a v0.13.0, também de
+exportar/importar backup, que é I/O de verdade e não cabe em teste unitário.
+Cobrem cinco dos seis DAOs, as dez migrações encadeadas
+(1→2→3→4→5→6→7→8→9→10) e o roundtrip de backup.
 
-✅ **Última execução confirmada em dispositivo: 17/08/2026, 76 testes, todos
-passando**, em Redmi Note 8 Pro com Android 9, já em `main` pós-merge da
-v0.12.0 (banco 10): `MigrationTest` 27, `ExpenseDaoTest` 14,
-`WorkSessionDaoTest` 10, `VehicleDaoTest` 12, `MaintenanceScheduleDaoTest` 8,
-`PersonalUsageDaoTest` 5.
-
-A v0.11.0 (banco 9, sem migração) rodou os 68 testes anteriores à v0.12.0 —
-todos passando — antes do merge, na branch `feature/vehicle-tax-cash-basis`.
+✅ **Última execução confirmada em dispositivo: 17/08/2026, 81 testes, todos
+passando**, em Redmi Note 8 Pro com Android 9, na branch
+`feature/backup-export-import` (banco 10, igual ao de `main`):
+`MigrationTest` 27, `ExpenseDaoTest` 14, `WorkSessionDaoTest` 10,
+`VehicleDaoTest` 12, `MaintenanceScheduleDaoTest` 8, `PersonalUsageDaoTest` 5,
+`BackupTest` 5 (novo).
 
 ⚠️ **`ReconciliationDismissalDao` não tem teste instrumentado dedicado.** É
 o único DAO dos seis sem cobertura própria — a tabela nova da v0.10.1 é
 exercitada só via `MigrationTest`.
+
+⚠️ **`BackupTest` opera no caminho real do banco** (`context.getDatabasePath
+(DriverProfitDatabase.NAME)`), o mesmo que `AppContainer` usa em produção —
+diferente dos DAOs, que usam `Room.inMemoryDatabaseBuilder`. É proposital:
+exportar/importar são operações sobre o **arquivo**, não sobre a conexão, e
+banco em memória não tem arquivo para copiar. O teste limpa antes e depois
+(`@Before`/`@After`), então não interfere com os outros — mas por isso mesmo
+não pode rodar em paralelo com outro teste que também toque
+`driver_profit.db` fora de memória.
 
 ⚠️ **Ele desinstala os dois pacotes ao terminar, e isso apaga os dados.** Se
 você quer exercitar uma migração em cima de dados reais, faça isso **antes** de

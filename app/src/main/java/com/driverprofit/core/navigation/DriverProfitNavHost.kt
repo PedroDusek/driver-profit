@@ -12,6 +12,7 @@ import com.driverprofit.domain.model.Expense
 import com.driverprofit.domain.model.PersonalUsage
 import com.driverprofit.domain.model.Vehicle
 import com.driverprofit.domain.model.WorkSession
+import com.driverprofit.feature.backup.BackupScreen
 import com.driverprofit.feature.dashboard.DashboardScreen
 import com.driverprofit.feature.earnings.form.EarningsFormScreen
 import com.driverprofit.feature.earnings.list.EarningsListScreen
@@ -48,11 +49,18 @@ fun DriverProfitNavHost(
                 onOpenMaintenance = {
                     navController.navigate(DriverProfitDestination.MAINTENANCE)
                 },
+                onOpenBackup = {
+                    navController.navigate(DriverProfitDestination.BACKUP)
+                },
             )
         }
 
         composable(route = DriverProfitDestination.MAINTENANCE) {
             MaintenanceScreen(onBack = navController::popBackStack)
+        }
+
+        composable(route = DriverProfitDestination.BACKUP) {
+            BackupScreen(onBack = navController::popBackStack)
         }
 
         composable(route = DriverProfitDestination.VEHICLE_LIST) {

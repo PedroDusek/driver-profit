@@ -17,6 +17,7 @@ import androidx.compose.material.icons.filled.Build
 import androidx.compose.material.icons.filled.DateRange
 import androidx.compose.material.icons.filled.DirectionsCar
 import androidx.compose.material.icons.filled.Payments
+import androidx.compose.material.icons.filled.SettingsBackupRestore
 import androidx.compose.material.icons.filled.Weekend
 import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
@@ -83,6 +84,7 @@ fun DashboardScreen(
     onOpenExpenses: () -> Unit,
     onOpenPersonalUsage: () -> Unit,
     onOpenMaintenance: () -> Unit,
+    onOpenBackup: () -> Unit,
     modifier: Modifier = Modifier,
     viewModel: DashboardViewModel = viewModel(factory = DriverProfitViewModelFactory.Factory),
 ) {
@@ -125,6 +127,12 @@ fun DashboardScreen(
                         Icon(
                             imageVector = Icons.Default.DirectionsCar,
                             contentDescription = stringResource(R.string.vehicle_list_title),
+                        )
+                    }
+                    IconButton(onClick = onOpenBackup) {
+                        Icon(
+                            imageVector = Icons.Default.SettingsBackupRestore,
+                            contentDescription = stringResource(R.string.backup_title),
                         )
                     }
                 },
