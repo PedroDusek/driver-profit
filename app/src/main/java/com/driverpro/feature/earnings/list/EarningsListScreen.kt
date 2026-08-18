@@ -1,14 +1,18 @@
 package com.driverpro.feature.earnings.list
 
+import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
+import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.ArrowBack
 import androidx.compose.material.icons.filled.Add
@@ -33,6 +37,7 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.res.pluralStringResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.style.TextAlign
@@ -49,11 +54,13 @@ import com.driverpro.core.ui.component.ListItemCard
 import com.driverpro.core.ui.format.BrazilianFormatter
 import com.driverpro.core.ui.format.EarningsLabels
 import com.driverpro.core.ui.theme.DriverProTheme
+import com.driverpro.core.ui.theme.PlatformAccentColors
 import com.driverpro.core.ui.theme.TabularFigures
 import com.driverpro.domain.model.Platform
 import com.driverpro.domain.model.WorkSession
 import java.time.Instant
 import java.time.LocalDate
+import kotlin.math.roundToInt
 
 /** Histórico de sessões de trabalho (PRD §19). */
 @OptIn(ExperimentalMaterial3Api::class)
@@ -193,6 +200,26 @@ private fun SummaryCard(summary: EarningsSummary) {
                 stringResource(R.string.earnings_summary_per_km),
                 BrazilianFormatter.moneyPerUnit(summary.revenuePerKm, "km"),
             )
+
+            // Só quando há mais de uma plataforma: com uma só, "por
+            // plataforma" e o total seriam o mesmo número.
+            if (summary.byPlatform.size > 1) {
+                HorizontalDivider()
+                Text(
+                    text = stringResource(R.string.earnings_summary_by_platform),
+                    style = MaterialTheme.typography.labelMedium,
+                )
+                val total = summary.byPlatform.values.sumOf { it.cents }.coerceAtLeast(1)
+                summary.byPlatform.entries
+                    .sortedByDescending { it.value.cents }
+                    .forEach { (platform, amount) ->
+                        PlatformRow(
+                            platform = platform,
+                            value = BrazilianFormatter.money(amount),
+                            fraction = amount.cents.toFloat() / total.toFloat(),
+                        )
+                    }
+            }
         }
     }
 }
@@ -205,6 +232,61 @@ private fun SummaryRow(label: String, value: String) {
     ) {
         Text(text = label, style = MaterialTheme.typography.bodyLarge)
         Text(text = value, style = MaterialTheme.typography.bodyLarge)
+    }
+}
+
+/**
+ * Linha do breakdown "Por plataforma": crachá quadrado colorido (iniciais),
+ * nome, valor e percentual — mesma ideia da lista de categoria de despesa,
+ * mas com crachá quadrado em vez de bolinha, para não confundir as duas
+ * legendas de relance.
+ */
+@Composable
+private fun PlatformRow(platform: Platform, value: String, fraction: Float) {
+    Row(
+        modifier = Modifier.fillMaxWidth(),
+        horizontalArrangement = Arrangement.SpaceBetween,
+        verticalAlignment = Alignment.CenterVertically,
+    ) {
+        Row(verticalAlignment = Alignment.CenterVertically) {
+            PlatformBadge(platform)
+            Text(
+                text = stringResource(EarningsLabels.platform(platform)),
+                style = MaterialTheme.typography.bodyLarge,
+                modifier = Modifier.padding(start = 10.dp),
+            )
+        }
+        Row(verticalAlignment = Alignment.CenterVertically) {
+            Text(text = value, style = MaterialTheme.typography.bodyLarge)
+            Text(
+                text = "${(fraction * 100).roundToInt()}%",
+                style = MaterialTheme.typography.labelMedium,
+                color = MaterialTheme.colorScheme.onSurfaceVariant,
+                modifier = Modifier.padding(start = 8.dp),
+            )
+        }
+    }
+}
+
+@Composable
+private fun PlatformBadge(platform: Platform) {
+    val (initials, color) = when (platform) {
+        Platform.UBER -> "U" to PlatformAccentColors.uber
+        Platform.NINETY_NINE -> "99" to PlatformAccentColors.ninetyNine
+        Platform.INDRIVE -> "iD" to PlatformAccentColors.inDrive
+        Platform.OTHER -> "?" to PlatformAccentColors.other
+    }
+    Box(
+        modifier = Modifier
+            .size(28.dp)
+            .background(color = color, shape = RoundedCornerShape(8.dp)),
+        contentAlignment = Alignment.Center,
+    ) {
+        Text(
+            text = initials,
+            style = MaterialTheme.typography.labelMedium,
+            color = Color.White,
+        )
     }
 }
 

@@ -4,6 +4,7 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.driverpro.core.common.Money
 import com.driverpro.core.common.WorkDuration
+import com.driverpro.domain.model.Platform
 import com.driverpro.domain.model.WorkSession
 import com.driverpro.domain.usecase.DeleteWorkSessionUseCase
 import com.driverpro.domain.usecase.ObserveWorkSessionsUseCase
@@ -27,6 +28,7 @@ data class EarningsSummary(
     val totalRides: Int,
     val totalOnlineTime: WorkDuration,
     val totalDistanceKm: Long,
+    val byPlatform: Map<Platform, Money>,
 ) {
     /** `null` quando não houve tempo online — não é zero, é indisponível. */
     val revenuePerHour: Money? get() = totalRevenue.per(totalOnlineTime.toHours())
@@ -39,6 +41,9 @@ data class EarningsSummary(
             totalRides = sessions.sumOf { it.rides },
             totalOnlineTime = WorkDuration.sum(sessions.map { it.onlineTime }),
             totalDistanceKm = sessions.sumOf { it.distanceKm },
+            byPlatform = sessions
+                .groupBy { it.platform }
+                .mapValues { (_, list) -> Money.sum(list.map { it.revenue }) },
         )
     }
 }

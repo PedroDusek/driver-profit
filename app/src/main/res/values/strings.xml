@@ -152,6 +152,7 @@
     <string name="earnings_summary_distance">Distância</string>
     <string name="earnings_summary_per_hour">Por hora</string>
     <string name="earnings_summary_per_km">Por km</string>
+    <string name="earnings_summary_by_platform">Por plataforma</string>
 
     <!-- Formulário de ganhos -->
     <string name="earnings_form_add_title">Novo lançamento</string>
