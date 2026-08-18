@@ -12,11 +12,11 @@ import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.ArrowBack
+import androidx.compose.material.icons.filled.Build
 import androidx.compose.material3.AlertDialog
 import androidx.compose.material3.AssistChip
 import androidx.compose.material3.AssistChipDefaults
 import androidx.compose.material3.Card
-import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.HorizontalDivider
@@ -41,6 +41,7 @@ import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.lifecycle.viewmodel.compose.viewModel
 import com.driverpro.R
 import com.driverpro.core.ui.DriverProViewModelFactory
+import com.driverpro.core.ui.component.AlertCard
 import com.driverpro.core.ui.format.BrazilianFormatter
 import com.driverpro.core.ui.format.MaintenanceLabels
 import com.driverpro.domain.model.MaintenanceAlert
@@ -396,52 +397,38 @@ fun MaintenanceWarningCard(
     onOpen: () -> Unit,
     modifier: Modifier = Modifier,
 ) {
-    Card(
-        modifier = modifier
-            .fillMaxWidth()
-            .clickable(onClick = onOpen),
-        colors = CardDefaults.cardColors(
-            containerColor = MaterialTheme.colorScheme.errorContainer,
-        ),
+    AlertCard(
+        icon = Icons.Default.Build,
+        accentColor = MaterialTheme.colorScheme.error,
+        title = stringResource(R.string.maintenance_dashboard_title),
+        onClick = onOpen,
+        modifier = modifier,
     ) {
-        Column(
-            modifier = Modifier
-                .fillMaxWidth()
-                .padding(16.dp),
-            verticalArrangement = Arrangement.spacedBy(4.dp),
-        ) {
-            Text(
-                text = stringResource(R.string.maintenance_dashboard_title),
-                style = MaterialTheme.typography.titleSmall,
-                color = MaterialTheme.colorScheme.onErrorContainer,
-            )
-            // Manutenção conta quilometragem acumulada do carro, e não o
-            // período do seletor logo abaixo. Sem dizê-lo, o alvo parece uma
-            // informação do mês escolhido.
-            Text(
-                text = stringResource(R.string.maintenance_dashboard_note),
-                style = MaterialTheme.typography.bodySmall,
-                color = MaterialTheme.colorScheme.onErrorContainer,
-            )
-            warnings.forEach { vehicleMaintenance ->
-                vehicleMaintenance.needingAttention.forEach { alert ->
-                    // Item que pede atenção sempre tem alvo — só se chega a
-                    // "em atraso" havendo marco. Ainda assim o `let` decide
-                    // pela omissão em vez de imprimir um zero, porque um aviso
-                    // dizendo "próxima aos 0 km" queimaria a confiança que o
-                    // alvo existe para construir.
-                    alert.nextServiceKm?.let { target ->
-                        Text(
-                            text = stringResource(
-                                R.string.maintenance_dashboard_line,
-                                stringResource(MaintenanceLabels.item(alert.item)),
-                                stringResource(MaintenanceLabels.status(alert.status)),
-                                BrazilianFormatter.kilometers(target),
-                            ),
-                            style = MaterialTheme.typography.bodyMedium,
-                            color = MaterialTheme.colorScheme.onErrorContainer,
-                        )
-                    }
+        // Manutenção conta quilometragem acumulada do carro, e não o
+        // período do seletor logo abaixo. Sem dizê-lo, o alvo parece uma
+        // informação do mês escolhido.
+        Text(
+            text = stringResource(R.string.maintenance_dashboard_note),
+            style = MaterialTheme.typography.bodySmall,
+            color = MaterialTheme.colorScheme.onSurfaceVariant,
+        )
+        warnings.forEach { vehicleMaintenance ->
+            vehicleMaintenance.needingAttention.forEach { alert ->
+                // Item que pede atenção sempre tem alvo — só se chega a
+                // "em atraso" havendo marco. Ainda assim o `let` decide
+                // pela omissão em vez de imprimir um zero, porque um aviso
+                // dizendo "próxima aos 0 km" queimaria a confiança que o
+                // alvo existe para construir.
+                alert.nextServiceKm?.let { target ->
+                    Text(
+                        text = stringResource(
+                            R.string.maintenance_dashboard_line,
+                            stringResource(MaintenanceLabels.item(alert.item)),
+                            stringResource(MaintenanceLabels.status(alert.status)),
+                            BrazilianFormatter.kilometers(target),
+                        ),
+                        style = MaterialTheme.typography.bodyMedium,
+                    )
                 }
             }
         }

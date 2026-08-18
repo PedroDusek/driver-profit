@@ -20,6 +20,7 @@ import androidx.compose.material.icons.filled.DateRange
 import androidx.compose.material.icons.filled.DirectionsCar
 import androidx.compose.material.icons.filled.MoreHoriz
 import androidx.compose.material.icons.filled.Payments
+import androidx.compose.material.icons.filled.Warning
 import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.CircularProgressIndicator
@@ -54,6 +55,7 @@ import com.driverpro.R
 import com.driverpro.core.common.Money
 import com.driverpro.core.common.WorkDuration
 import com.driverpro.core.ui.DriverProViewModelFactory
+import com.driverpro.core.ui.component.AlertCard
 import com.driverpro.core.ui.component.CategoryLegendRow
 import com.driverpro.core.ui.component.DonutChart
 import com.driverpro.core.ui.component.DonutSlice
@@ -575,60 +577,44 @@ private fun OdometerGapCard(
     divergences: List<VehicleReconciliation>,
     onResolve: () -> Unit,
 ) {
-    Card(
-        modifier = Modifier
-            .fillMaxWidth()
-            .clickable(onClick = onResolve),
-        colors = CardDefaults.cardColors(
-            containerColor = MaterialTheme.colorScheme.tertiaryContainer,
-        ),
+    AlertCard(
+        icon = Icons.Default.Warning,
+        accentColor = MaterialTheme.colorScheme.tertiary,
+        title = stringResource(R.string.dashboard_odometer_gap_title),
+        onClick = onResolve,
     ) {
-        Column(
-            modifier = Modifier
-                .fillMaxWidth()
-                .padding(16.dp),
-            verticalArrangement = Arrangement.spacedBy(4.dp),
-        ) {
+        divergences.forEach { item ->
+            val gap = item.reconciliation.unexplainedKilometers ?: 0L
             Text(
-                text = stringResource(R.string.dashboard_odometer_gap_title),
-                style = MaterialTheme.typography.titleSmall,
-                color = MaterialTheme.colorScheme.onTertiaryContainer,
+                text = stringResource(
+                    R.string.dashboard_odometer_gap_line,
+                    // Valor absoluto: a divergência negativa é lançamento a
+                    // mais, e o diálogo é que explica de que lado ela está.
+                    BrazilianFormatter.kilometers(kotlin.math.abs(gap)),
+                ),
+                style = MaterialTheme.typography.bodyMedium,
             )
-            divergences.forEach { item ->
-                val gap = item.reconciliation.unexplainedKilometers ?: 0L
-                Text(
-                    text = stringResource(
-                        R.string.dashboard_odometer_gap_line,
-                        // Valor absoluto: a divergência negativa é lançamento a
-                        // mais, e o diálogo é que explica de que lado ela está.
-                        BrazilianFormatter.kilometers(kotlin.math.abs(gap)),
-                    ),
-                    style = MaterialTheme.typography.bodyMedium,
-                    color = MaterialTheme.colorScheme.onTertiaryContainer,
-                )
-                // O intervalo é de outra natureza que o período selecionado
-                // acima: ele vai de uma leitura de odômetro à seguinte. Sem
-                // dizê-lo, o número parece pertencer ao filtro escolhido — e
-                // com duas janelas pendentes, as duas linhas ficariam
-                // indistinguíveis.
-                Text(
-                    text = stringResource(
-                        R.string.dashboard_odometer_gap_window,
-                        item.vehicle.name,
-                        BrazilianFormatter.date(item.reconciliation.period.start),
-                        BrazilianFormatter.date(item.reconciliation.period.end),
-                    ),
-                    style = MaterialTheme.typography.bodySmall,
-                    color = MaterialTheme.colorScheme.onTertiaryContainer,
-                    modifier = Modifier.padding(bottom = 4.dp),
-                )
-            }
+            // O intervalo é de outra natureza que o período selecionado
+            // acima: ele vai de uma leitura de odômetro à seguinte. Sem
+            // dizê-lo, o número parece pertencer ao filtro escolhido — e
+            // com duas janelas pendentes, as duas linhas ficariam
+            // indistinguíveis.
             Text(
-                text = stringResource(R.string.dashboard_odometer_gap_action),
-                style = MaterialTheme.typography.labelMedium,
-                color = MaterialTheme.colorScheme.onTertiaryContainer,
+                text = stringResource(
+                    R.string.dashboard_odometer_gap_window,
+                    item.vehicle.name,
+                    BrazilianFormatter.date(item.reconciliation.period.start),
+                    BrazilianFormatter.date(item.reconciliation.period.end),
+                ),
+                style = MaterialTheme.typography.bodySmall,
+                color = MaterialTheme.colorScheme.onSurfaceVariant,
             )
         }
+        Text(
+            text = stringResource(R.string.dashboard_odometer_gap_action),
+            style = MaterialTheme.typography.labelMedium,
+            color = MaterialTheme.colorScheme.onSurfaceVariant,
+        )
     }
 }
 

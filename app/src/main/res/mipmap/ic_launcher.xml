@@ -2,9 +2,20 @@
 <!--
     Ícone adaptativo. Não há PNGs por densidade porque o minSdk é 26, e a
     partir dessa API todo launcher entende adaptive-icon.
+
+    O foreground é a logo real fornecida pelo Pedro (IMAGENS/Logo
+    Aplicativo.jpeg — v0.14.1), não um vetor redesenhado à mão: a tentativa
+    anterior de recriar a arte em vetor não batia com a referência.
+    `ic_launcher_photo.png` já é a logo composta com transparência ao redor,
+    ocupando a "zona segura" central (~72dp dos 108dp do canvas) — um
+    foreground que preenche o quadrado inteiro reprova o lint
+    (`IconLauncherShape`) e recorta de formas diferentes em cada launcher. O
+    monochrome (tema de ícone do Android 13+, que só lê o canal alfa) continua
+    vetorial, porque a foto não tem detalhe suficiente de transparência para
+    servir de máscara de silhueta.
 -->
 <adaptive-icon xmlns:android="http://schemas.android.com/apk/res/android">
     <background android:drawable="@drawable/ic_launcher_background" />
-    <foreground android:drawable="@drawable/ic_launcher_foreground" />
-    <monochrome android:drawable="@drawable/ic_launcher_foreground" />
+    <foreground android:drawable="@drawable/ic_launcher_photo" />
+    <monochrome android:drawable="@drawable/ic_launcher_monochrome" />
 </adaptive-icon>
