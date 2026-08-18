@@ -159,9 +159,7 @@ fun EarningsListScreen(
 private fun SummaryCard(summary: EarningsSummary) {
     Card(
         modifier = Modifier.fillMaxWidth(),
-        colors = CardDefaults.cardColors(
-            containerColor = MaterialTheme.colorScheme.primaryContainer,
-        ),
+        elevation = CardDefaults.cardElevation(defaultElevation = 3.dp),
     ) {
         Column(
             modifier = Modifier
@@ -172,10 +170,12 @@ private fun SummaryCard(summary: EarningsSummary) {
             Text(
                 text = stringResource(R.string.earnings_summary_title),
                 style = MaterialTheme.typography.labelMedium,
+                color = MaterialTheme.colorScheme.onSurfaceVariant,
             )
             Text(
                 text = BrazilianFormatter.money(summary.totalRevenue),
                 style = MaterialTheme.typography.displaySmall.copy(fontFeatureSettings = TabularFigures),
+                color = MaterialTheme.colorScheme.primary,
             )
 
             HorizontalDivider()

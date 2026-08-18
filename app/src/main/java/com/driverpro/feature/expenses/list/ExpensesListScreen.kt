@@ -209,9 +209,7 @@ private fun filterLabel(filter: ExpenseFilter): Int = when (filter) {
 private fun SummaryCard(summary: ExpensesSummary) {
     Card(
         modifier = Modifier.fillMaxWidth(),
-        colors = CardDefaults.cardColors(
-            containerColor = MaterialTheme.colorScheme.surfaceContainerLow,
-        ),
+        elevation = CardDefaults.cardElevation(defaultElevation = 3.dp),
     ) {
         Column(
             modifier = Modifier
@@ -222,6 +220,7 @@ private fun SummaryCard(summary: ExpensesSummary) {
             Text(
                 text = stringResource(R.string.expenses_summary_title),
                 style = MaterialTheme.typography.labelMedium,
+                color = MaterialTheme.colorScheme.onSurfaceVariant,
             )
             Text(
                 text = BrazilianFormatter.money(summary.total),

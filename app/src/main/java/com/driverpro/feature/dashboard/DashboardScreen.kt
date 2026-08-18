@@ -29,7 +29,6 @@ import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.FilterChip
 import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.Icon
-import androidx.compose.material3.LocalContentColor
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.NavigationBar
 import androidx.compose.material3.NavigationBarItem
@@ -66,8 +65,7 @@ import com.driverpro.core.ui.format.ExpenseLabels
 import com.driverpro.core.ui.theme.DriverProTheme
 import com.driverpro.core.ui.theme.ProfitColors
 import com.driverpro.core.ui.theme.TabularFigures
-import com.driverpro.core.ui.theme.container
-import com.driverpro.core.ui.theme.onContainer
+import com.driverpro.core.ui.theme.content
 import com.driverpro.domain.model.DashboardMetrics
 import com.driverpro.domain.model.DashboardPeriod
 import com.driverpro.domain.model.DateRange
@@ -340,10 +338,7 @@ private fun ResultCard(metrics: DashboardMetrics) {
     val positive = !profit.isNegative
     Card(
         modifier = Modifier.fillMaxWidth(),
-        colors = CardDefaults.cardColors(
-            containerColor = ProfitColors.container(positive),
-            contentColor = ProfitColors.onContainer(positive),
-        ),
+        elevation = CardDefaults.cardElevation(defaultElevation = 3.dp),
     ) {
         Column(
             modifier = Modifier
@@ -354,12 +349,14 @@ private fun ResultCard(metrics: DashboardMetrics) {
             Text(
                 text = stringResource(R.string.dashboard_profit),
                 style = MaterialTheme.typography.labelMedium,
+                color = MaterialTheme.colorScheme.onSurfaceVariant,
             )
             Text(
                 text = BrazilianFormatter.money(profit),
                 style = MaterialTheme.typography.displaySmall.copy(fontFeatureSettings = TabularFigures),
+                color = ProfitColors.content(positive),
             )
-            HorizontalDivider(color = LocalContentColor.current.copy(alpha = 0.24f))
+            HorizontalDivider()
             MetricRow(
                 label = stringResource(R.string.dashboard_revenue),
                 value = BrazilianFormatter.money(metrics.totalRevenue),
@@ -639,9 +636,7 @@ private fun OdometerGapCard(
 private fun MetricsCard(title: String, content: @Composable () -> Unit) {
     Card(
         modifier = Modifier.fillMaxWidth(),
-        colors = CardDefaults.cardColors(
-            containerColor = MaterialTheme.colorScheme.surfaceContainerLow,
-        ),
+        elevation = CardDefaults.cardElevation(defaultElevation = 2.dp),
     ) {
         Column(
             modifier = Modifier
