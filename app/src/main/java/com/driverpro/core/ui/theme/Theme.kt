@@ -12,42 +12,42 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalContext
 
 private val LightColors = lightColorScheme(
-    primary = BrandIndigo40,
-    onPrimary = Neutral99,
-    primaryContainer = BrandIndigo90,
-    onPrimaryContainer = BrandIndigo10,
+    primary = BrandGreen40,
+    onPrimary = Color(0xFFFFFFFF),
+    primaryContainer = BrandGreen90,
+    onPrimaryContainer = BrandGreen10,
     secondary = Slate40,
-    onSecondary = Neutral99,
+    onSecondary = Color(0xFFFFFFFF),
     secondaryContainer = Slate90,
     onSecondaryContainer = Slate10,
     tertiary = Amber40,
-    onTertiary = Neutral99,
+    onTertiary = Color(0xFFFFFFFF),
     tertiaryContainer = Amber90,
     onTertiaryContainer = Amber10,
     error = Red40,
-    onError = Neutral99,
+    onError = Color(0xFFFFFFFF),
     errorContainer = Red90,
     onErrorContainer = Red10,
-    background = Neutral99,
-    onBackground = Neutral20,
-    surface = Neutral99,
-    onSurface = Neutral20,
-    surfaceVariant = Neutral87,
-    onSurfaceVariant = NeutralVariant30,
-    outline = Neutral60,
-    outlineVariant = Neutral80,
+    background = LightBackground,
+    onBackground = LightOnSurface,
+    surface = LightSurface,
+    onSurface = LightOnSurface,
+    surfaceVariant = LightSurfaceVariant,
+    onSurfaceVariant = LightOnSurfaceVariant,
+    outline = LightOutline,
+    outlineVariant = LightOutlineVariant,
     surfaceContainerLowest = Color(0xFFFFFFFF),
-    surfaceContainerLow = Neutral95,
-    surfaceContainer = Neutral92,
-    surfaceContainerHigh = Neutral90,
-    surfaceContainerHighest = Neutral87,
+    surfaceContainerLow = LightSurfaceContainerLow,
+    surfaceContainer = LightSurfaceContainer,
+    surfaceContainerHigh = LightSurfaceContainerHigh,
+    surfaceContainerHighest = LightSurfaceContainerHighest,
 )
 
 private val DarkColors = darkColorScheme(
-    primary = BrandIndigo80,
-    onPrimary = BrandIndigo20,
-    primaryContainer = BrandIndigo30,
-    onPrimaryContainer = BrandIndigo90,
+    primary = BrandGreen80,
+    onPrimary = BrandGreen20,
+    primaryContainer = BrandGreen30,
+    onPrimaryContainer = BrandGreen90,
     secondary = Slate80,
     onSecondary = Slate20,
     secondaryContainer = Slate30,
@@ -60,29 +60,28 @@ private val DarkColors = darkColorScheme(
     onError = Red20,
     errorContainer = Red30,
     onErrorContainer = Red90,
-    background = Neutral10,
-    onBackground = Neutral90Text,
-    surface = Neutral10,
-    onSurface = Neutral90Text,
-    surfaceVariant = NeutralVariant30,
-    onSurfaceVariant = Neutral80,
-    outline = Neutral50,
-    outlineVariant = NeutralVariant30,
-    surfaceContainerLowest = Neutral6,
-    surfaceContainerLow = Neutral17,
-    surfaceContainer = Neutral22,
-    surfaceContainerHigh = Neutral30,
-    surfaceContainerHighest = Neutral38,
+    background = DarkBackground,
+    onBackground = DarkOnSurface,
+    surface = DarkSurface,
+    onSurface = DarkOnSurface,
+    surfaceVariant = DarkSurfaceVariant,
+    onSurfaceVariant = DarkOnSurfaceVariant,
+    outline = DarkOutline,
+    outlineVariant = DarkOutlineVariant,
+    surfaceContainerLowest = DarkSurfaceContainerLowest,
+    surfaceContainerLow = DarkSurfaceContainerLow,
+    surfaceContainer = DarkSurfaceContainer,
+    surfaceContainerHigh = DarkSurfaceContainerHigh,
+    surfaceContainerHighest = DarkSurfaceContainerHighest,
 )
 
 /**
  * Tema do aplicativo.
  *
- * `dynamicColor` (Material You) desligado por padrão a partir da v0.14.0: um
- * app que acabou de fixar identidade visual própria não deveria trocar de cor
- * conforme o papel de parede do aparelho — isso é o oposto de "visual
- * profissional consistente". O parâmetro continua existindo para quem quiser
- * ligar, e para testes/previews pedirem um resultado determinístico.
+ * `dynamicColor` (Material You) desligado por padrão: um app com identidade
+ * visual própria não deveria trocar de cor conforme o papel de parede do
+ * aparelho. O parâmetro continua existindo para quem quiser ligar, e para
+ * testes/previews pedirem um resultado determinístico.
  */
 @Composable
 fun DriverProTheme(

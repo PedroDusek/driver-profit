@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
-    <!-- Neutral10 (core/ui/theme/Color.kt), o mesmo `background` do tema escuro. -->
-    <color name="window_background">#131318</color>
+    <!-- DarkBackground (core/ui/theme/Color.kt), o mesmo `background` do tema escuro. -->
+    <color name="window_background">#0A0F1C</color>
 </resources>
