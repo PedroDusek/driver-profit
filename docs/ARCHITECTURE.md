@@ -406,6 +406,46 @@ saíram da TopAppBar e viraram entradas em `feature/more/MoreScreen.kt`, novo
 destino (`DriverProDestination.MORE`) que não existia antes; nenhuma tela de
 destino mudou de comportamento, só como se chega até ela.
 
+### Revisão da identidade visual (ainda na v0.14.0, antes de mergear)
+
+O Pedro trouxe uma logo e uma referência visual próprias (`IMAGENS/`) durante
+a mesma branch da v0.14.0, antes de qualquer tag ou merge. Parte do que a
+primeira passada decidiu foi revertido para seguir essa referência —
+registrado aqui, e não apagado do histórico acima, porque o raciocínio de
+separar marca de sinal financeiro continua correto **em tese**; só perdeu
+para uma referência visual concreta que faz diferente.
+
+- **Marca voltou a ser verde.** `BrandIndigo*` virou `BrandGreen*`
+  (`core/ui/theme/Color.kt`), e `ProfitColors.positive*` agora usa
+  intencionalmente os mesmos tons — a logo e a referência usam **um verde só**
+  para marca e resultado positivo ("verde = seu lucro crescendo"). Os
+  extensions `ProfitColors.container()/onContainer()` do parágrafo acima não
+  existem mais: o card de lucro do Dashboard voltou a ser branco/neutro, com
+  o **texto** do valor colorido (`ProfitColors.content()`, nova função) — a
+  referência não pinta o card inteiro, só o número.
+- **Tema escuro é navy, não neutro indigo-tintado.** `DarkBackground`/
+  `DarkSurface` (`#0A0F1C`/`#121B2E`) seguem a cor de fundo da própria logo.
+- **Página cinza-clara, cards brancos com elevação visível.** `background`
+  (`#F4F6F4`) e `surface`/`surfaceContainerLowest` (branco) são tokens
+  distintos agora — antes eram quase a mesma cor, e o card tonal
+  (`surfaceContainerLow`) que os componentes usavam explicitamente somava a
+  isso para o card "sumir" no fundo. `StatTile`, `ListItemCard` e os cards de
+  resumo usam o branco padrão do `Card` mais `CardDefaults.cardElevation()`
+  explícito (2–3dp) em vez de um preenchimento tonal.
+- **`CategoryBarRow` foi substituído por `DonutChart` + `CategoryLegendRow`.**
+  A referência usa gráfico de rosca no breakdown de despesas por categoria —
+  primeiro gráfico de verdade do app (`Canvas` puro, sem biblioteca nova, PRD
+  §55) — com uma legenda simples (bolinha colorida + rótulo + valor +
+  percentual) embaixo; a barra proporcional ficou redundante com a rosca já
+  mostrando a proporção.
+- **Novo: breakdown de ganhos por plataforma.** `EarningsSummary.byPlatform`
+  (`EarningsListViewModel.kt`) espelha exatamente `ExpensesSummary.byCategory`
+  — soma agrupada da lista já carregada, mesmo padrão, nenhum use case novo.
+  Exibido com crachá quadrado colorido (iniciais) em vez de bolinha, para não
+  confundir com a legenda de categoria de despesa na mesma tela do app.
+- **Ícone redesenhado de novo**, agora com gradiente azul→verde reproduzindo a
+  logo (`ic_launcher_foreground.xml`), sobre fundo navy sólido.
+
 ## Regras de dependência
 
 Antes de adicionar uma biblioteca (PRD §55):

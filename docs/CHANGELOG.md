@@ -11,22 +11,25 @@ Versionamento conforme [Semantic Versioning](https://semver.org/lang/pt-BR/).
   todo o projeto — pacote Kotlin, `applicationId`, banco (`driverpro.db`),
   ícone e documentação. Seguro agora porque nenhuma instalação de terceiro
   aconteceu ainda (PRD §48)
-- **Redesign visual completo.** Cor de marca separada da cor semântica de
-  lucro/prejuízo (antes o verde de resultado fazia as duas coisas); nova
-  paleta índigo, raio de canto maior, algarismos tabulares nos números
-  grandes, Material You desligado por padrão para manter identidade
-  consistente entre aparelhos
+- **Redesign visual completo, seguindo logo e referência próprias do Pedro**
+  (`IMAGENS/`). Marca verde (a mesma cor do lucro positivo, de propósito —
+  "verde = seu lucro crescendo"), tema escuro navy, página cinza-clara com
+  cards brancos e elevação visível, raio de canto maior, algarismos tabulares
+  nos números grandes, Material You desligado por padrão
 - **Navegação: barra inferior no lugar de seis ícones na TopAppBar.**
   Dashboard, Ganhos, Despesas, Veículos e "Mais" (uso pessoal, manutenção e
   backup, antes soltos na barra superior)
-- Ícone do launcher redesenhado na cor de marca nova — o anterior já se
-  declarava provisório no próprio comentário do arquivo
+- Ícone do launcher redesenhado com gradiente azul→verde sobre fundo navy,
+  reproduzindo a logo — o anterior já se declarava provisório no próprio
+  comentário do arquivo
 
 ### Adicionado
 
 - Componentes reutilizáveis (`core/ui/component`): `IconChip`, `StatTile`,
-  `CategoryBarRow` (primeira visualização de dado do app além de texto) e
-  `ListItemCard`, substituindo padrões repetidos em cada tela de lista
+  `ListItemCard`, `DonutChart` (primeiro gráfico de verdade do app) e
+  `CategoryLegendRow`, substituindo padrões repetidos em cada tela de lista
+- Breakdown de ganhos por plataforma (`EarningsSummary.byPlatform`), mesmo
+  padrão que o breakdown de despesas por categoria já tinha
 
 ## [0.13.0] — Exportar e importar arquivo
 
