@@ -16,7 +16,7 @@ import androidx.compose.ui.graphics.vector.ImageVector
 import com.driverpro.core.ui.theme.CategoryAccentColors
 import com.driverpro.domain.model.ExpenseCategory
 
-/** Ícone e cor de destaque fixos por categoria, para [IconChip] e [CategoryBarRow]. */
+/** Ícone e cor de destaque fixos por categoria, para [IconChip], [DonutChart] e [CategoryLegendRow]. */
 data class CategoryVisual(val icon: ImageVector, val color: Color)
 
 fun ExpenseCategory.visual(): CategoryVisual = when (this) {

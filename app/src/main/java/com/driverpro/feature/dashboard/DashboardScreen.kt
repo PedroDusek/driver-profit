@@ -10,6 +10,7 @@ import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.material.icons.Icons
@@ -54,7 +55,9 @@ import com.driverpro.R
 import com.driverpro.core.common.Money
 import com.driverpro.core.common.WorkDuration
 import com.driverpro.core.ui.DriverProViewModelFactory
-import com.driverpro.core.ui.component.CategoryBarRow
+import com.driverpro.core.ui.component.CategoryLegendRow
+import com.driverpro.core.ui.component.DonutChart
+import com.driverpro.core.ui.component.DonutSlice
 import com.driverpro.core.ui.component.StatTile
 import com.driverpro.core.ui.component.visual
 import com.driverpro.core.ui.format.BrazilianFormatter
@@ -518,25 +521,46 @@ private fun CostRatiosCard(metrics: DashboardMetrics) {
 }
 
 /**
- * Breakdown de despesas por categoria com barra proporcional (v0.14.0) — a
- * primeira visualização de dado do app além de texto. Cor e ícone vêm de
+ * Breakdown de despesas por categoria com gráfico de rosca (v0.14.1) —
+ * seguindo a referência visual em `IMAGENS/`. Cor e ícone vêm de
  * [ExpenseCategory.visual], a mesma paleta usada nas linhas de
  * `ExpensesListScreen`.
  */
 @Composable
 private fun ExpensesByCategoryCard(metrics: DashboardMetrics) {
     val total = metrics.expensesByCategory.values.sumOf { it.cents }.coerceAtLeast(1)
+    val entries = metrics.expensesByCategory.entries.sortedByDescending { it.value.cents }
     MetricsCard(title = stringResource(R.string.dashboard_section_expenses)) {
-        metrics.expensesByCategory.entries
-            .sortedByDescending { it.value.cents }
-            .forEach { (category, amount) ->
-                CategoryBarRow(
-                    label = stringResource(ExpenseLabels.category(category)),
-                    value = BrazilianFormatter.money(amount),
-                    fraction = amount.cents.toFloat() / total.toFloat(),
-                    color = category.visual().color,
+        Row(
+            modifier = Modifier.fillMaxWidth(),
+            horizontalArrangement = Arrangement.Center,
+        ) {
+            DonutChart(
+                slices = entries.map { (category, amount) ->
+                    DonutSlice(
+                        fraction = amount.cents.toFloat() / total.toFloat(),
+                        color = category.visual().color,
+                    )
+                },
+                modifier = Modifier
+                    .size(140.dp)
+                    .padding(vertical = 8.dp),
+            ) {
+                Text(
+                    text = BrazilianFormatter.money(metrics.totalExpenses),
+                    style = MaterialTheme.typography.titleMedium.copy(fontFeatureSettings = TabularFigures),
+                    textAlign = TextAlign.Center,
                 )
             }
+        }
+        entries.forEach { (category, amount) ->
+            CategoryLegendRow(
+                label = stringResource(ExpenseLabels.category(category)),
+                value = BrazilianFormatter.money(amount),
+                fraction = amount.cents.toFloat() / total.toFloat(),
+                color = category.visual().color,
+            )
+        }
     }
 }
 

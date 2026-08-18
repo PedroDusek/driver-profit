@@ -8,6 +8,7 @@ import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.rememberScrollState
@@ -45,7 +46,9 @@ import com.driverpro.R
 import com.driverpro.core.common.Money
 import com.driverpro.core.common.Quantity
 import com.driverpro.core.ui.DriverProViewModelFactory
-import com.driverpro.core.ui.component.CategoryBarRow
+import com.driverpro.core.ui.component.CategoryLegendRow
+import com.driverpro.core.ui.component.DonutChart
+import com.driverpro.core.ui.component.DonutSlice
 import com.driverpro.core.ui.component.IconChip
 import com.driverpro.core.ui.component.ListItemCard
 import com.driverpro.core.ui.component.visual
@@ -228,16 +231,31 @@ private fun SummaryCard(summary: ExpensesSummary) {
             if (summary.byCategory.size > 1) {
                 HorizontalDivider()
                 val total = summary.byCategory.values.sumOf { it.cents }.coerceAtLeast(1)
-                summary.byCategory.entries
-                    .sortedByDescending { it.value.cents }
-                    .forEach { (category, amount) ->
-                        CategoryBarRow(
-                            label = stringResource(ExpenseLabels.category(category)),
-                            value = BrazilianFormatter.money(amount),
-                            fraction = amount.cents.toFloat() / total.toFloat(),
-                            color = category.visual().color,
-                        )
-                    }
+                val entries = summary.byCategory.entries.sortedByDescending { it.value.cents }
+                Row(
+                    modifier = Modifier.fillMaxWidth(),
+                    horizontalArrangement = Arrangement.Center,
+                ) {
+                    DonutChart(
+                        slices = entries.map { (category, amount) ->
+                            DonutSlice(
+                                fraction = amount.cents.toFloat() / total.toFloat(),
+                                color = category.visual().color,
+                            )
+                        },
+                        modifier = Modifier
+                            .size(120.dp)
+                            .padding(vertical = 4.dp),
+                    )
+                }
+                entries.forEach { (category, amount) ->
+                    CategoryLegendRow(
+                        label = stringResource(ExpenseLabels.category(category)),
+                        value = BrazilianFormatter.money(amount),
+                        fraction = amount.cents.toFloat() / total.toFloat(),
+                        color = category.visual().color,
+                    )
+                }
             }
         }
     }
