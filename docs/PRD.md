@@ -1,4 +1,4 @@
-# PRD — Driver Profit
+# PRD — DriverPro
 
 **Documento:** Product Requirements
 **Plataforma inicial:** Android
@@ -759,13 +759,17 @@ tudo é reversível de graça:
 2. **Trocar o `applicationId` apaga os dados dos testadores**, porque o banco
    vive no armazenamento privado do pacote.
 3. **Assinatura de debug e de release não se atualizam entre si.** Hoje a
-   release publica um APK de debug (`com.driverprofit.debug`); um build de
+   release publica um APK de debug (`com.driverpro.debug`); um build de
    release assinado seria outro pacote, sem herdar nada.
 
 Se o grupo for usar o app para valer, entregar **build de release assinado**
 desde o primeiro dia — o que exige keystore, `signingConfig` e o segredo no CI
-(§56). E o nome do produto, hoje um placeholder, precisa estar decidido antes
-disso.
+(§56).
+
+> **Decisão de produto registrada (v0.14.0).** O nome deixou de ser
+> placeholder: o produto é **DriverPro**, `com.driverpro`. Trocado antes de
+> qualquer instalação de terceiro, então nenhuma das três armadilhas acima foi
+> disparada. Ver `HANDOFF.md §0` para o registro completo da decisão.
 
 ## 49–53. Regras de trabalho
 

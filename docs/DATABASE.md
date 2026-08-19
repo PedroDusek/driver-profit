@@ -1,12 +1,20 @@
 # Banco de dados
 
-Room sobre SQLite, local ao aparelho. Nome do arquivo: `driver_profit.db`.
+Room sobre SQLite, local ao aparelho. Nome do arquivo: `driverpro.db`.
 
 **Versão atual do schema: 10**
 
 O JSON do schema é exportado em `app/schemas/` e **é versionado no Git**. Ele é
 o que torna possível escrever testes de migração de verdade. Os schemas
 antigos são mantidos: sem o `1.json`, não há como testar a migração 1→2.
+
+> **v0.14.0:** a pasta de schemas mudou de nome — de
+> `com.driverprofit.data.local.database.DriverProfitDatabase` para
+> `com.driverpro.data.local.database.DriverProDatabase` — porque o
+> `MigrationTestHelper` localiza os arquivos pelo FQCN da classe do banco, e o
+> rename do pacote/produto (`HANDOFF.md §0`) trocou os dois. Os dez arquivos
+> (`1.json` a `10.json`) foram movidos, não alterados — nenhum schema mudou,
+> só o caminho onde ele mora.
 
 ## Entidades
 
@@ -301,7 +309,7 @@ builder em `core/di/AppContainer.kt`.
 Toda alteração de schema exige, no mesmo PR:
 
 1. Alterar a `@Entity`
-2. Incrementar `DriverProfitDatabase.VERSION`
+2. Incrementar `DriverProDatabase.VERSION`
 3. Escrever a `Migration(n, n+1)` e adicioná-la a `Migrations.ALL`
 4. Escrever o teste da migração em `app/src/androidTest/.../MigrationTest.kt`
 5. Atualizar este documento

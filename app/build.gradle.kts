@@ -10,17 +10,17 @@ plugins {
 }
 
 android {
-    namespace = "com.driverprofit"
+    namespace = "com.driverpro"
     compileSdk = libs.versions.compileSdk.get().toInt()
 
     defaultConfig {
-        applicationId = "com.driverprofit"
+        applicationId = "com.driverpro"
         minSdk = libs.versions.minSdk.get().toInt()
         targetSdk = libs.versions.targetSdk.get().toInt()
 
         // versionName segue o Semantic Versioning do projeto (PRD §40).
-        versionCode = 22
-        versionName = "0.13.0"
+        versionCode = 23
+        versionName = "0.14.0"
 
         testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
         vectorDrawables { useSupportLibrary = true }
@@ -82,7 +82,11 @@ android {
         // checkout de uma tag antiga e reproduzir aquele estado.
         //
         // Atualização de dependência é decisão consciente, feita em um PR
-        // próprio (PRD §55), não um erro de build.
+        // próprio (PRD §55), não um erro de build. `AndroidGradlePluginVersion`
+        // é a mesma categoria de checagem, só que para o wrapper do Gradle: a
+        // tag v0.14.0 quebrou no CI porque o Gradle 9.7.1 saiu entre o commit e
+        // o release, sem nenhuma mudança de código — a prova de que essa
+        // checagem específica não pode travar o gate.
         //
         // "Typos" compara cada palavra dos textos com um dicionário **inglês**.
         // Este app é inteiramente em português: a checagem acusa "eles" como
@@ -90,7 +94,12 @@ android {
         // qualquer frase nova da interface em falha de build. Nenhum acerto
         // possível, só falso positivo. `tools:locale="pt-BR"` em strings.xml
         // não desarma a checagem nesta versão do lint.
-        disable += setOf("GradleDependency", "NewerVersionAvailable", "Typos")
+        disable += setOf(
+            "GradleDependency",
+            "NewerVersionAvailable",
+            "AndroidGradlePluginVersion",
+            "Typos",
+        )
     }
 }
 

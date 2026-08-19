@@ -1,9 +1,9 @@
-# Driver Profit
+# DriverPro
 
 Aplicativo Android que mede a **rentabilidade operacional real** de motoristas
 de aplicativo.
 
-> ⚠️ O nome do produto ainda não é definitivo. `Driver Profit` / `com.driverprofit`
+> ⚠️ O nome do produto ainda não é definitivo. `DriverPro` / `com.driverpro`
 > são placeholders usados até a definição do branding.
 
 ## O que é
@@ -64,8 +64,8 @@ Versões exatas: [`gradle/libs.versions.toml`](gradle/libs.versions.toml).
 ## Como executar
 
 ```bash
-git clone https://github.com/PedroDusek/driver-profit.git
-cd driver-profit
+git clone https://github.com/PedroDusek/driverpro.git
+cd driverpro
 ./gradlew assembleDebug
 ```
 
@@ -107,7 +107,7 @@ Gate completo, o mesmo que roda no CI:
 ## Estrutura
 
 ```
-app/src/main/java/com/driverprofit/
+app/src/main/java/com/driverpro/
 ├── core/          # Infra transversal: DI, navegação, tema, tipos base
 │   ├── common/    # Money (centavos), WorkDuration (minutos)
 │   ├── di/        # AppContainer

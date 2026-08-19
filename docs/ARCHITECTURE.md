@@ -50,8 +50,8 @@ de rentabilidade com JUnit, sem emulador.
 ## Estrutura de pacotes
 
 ```
-com.driverprofit/
-├── DriverProfitApplication.kt   # cria o AppContainer
+com.driverpro/
+├── DriverProApplication.kt   # cria o AppContainer
 ├── MainActivity.kt              # única Activity
 ├── core/
 │   ├── common/                  # Money, WorkDuration — tipos base do domínio
@@ -329,7 +329,7 @@ Ver [DATABASE.md](DATABASE.md).
 
 `data/backup/ExportBackupUseCase.kt` e `ImportBackupUseCase.kt` (v0.13.0)
 vivem em `data/`, não em `domain/usecase/`, e recebem `Context` e
-`DriverProfitDatabase` diretamente — desvio deliberado da regra "domínio não
+`DriverProDatabase` diretamente — desvio deliberado da regra "domínio não
 conhece Android" que vale para o resto do projeto.
 
 Motivo: a funcionalidade inteira **é** infraestrutura. Exportar é um
@@ -337,7 +337,7 @@ checkpoint de WAL (`PRAGMA wal_checkpoint(FULL)`, mesmo motivo do
 `backup_rules.xml`) seguido de copiar bytes de um arquivo para um `Uri` do
 Storage Access Framework. Importar é o inverso, com uma validação antes:
 copia para um arquivo temporário, abre só leitura, confere
-`PRAGMA user_version` contra `DriverProfitDatabase.VERSION` e a presença da
+`PRAGMA user_version` contra `DriverProDatabase.VERSION` e a presença da
 tabela `vehicles`. Não há regra de negócio para isolar em domínio puro — só
 haveria uma camada de indireção sem função.
 
@@ -359,6 +359,92 @@ antiga). Reiniciar o processo automaticamente (`AlarmManager` + `killProcess`)
 entre fabricantes — a mesma categoria de instabilidade que o MIUI já causou
 neste projeto (`docs/HANDOFF.md`) — e não vale o risco para uma tela que o
 motorista abre uma vez a cada troca de aparelho.
+
+### Identidade visual (v0.14.0)
+
+O app tinha Material 3 "de fábrica": cor primária = verde de resultado
+financeiro, cards sem hierarquia, zero visualização de dado além de texto,
+seis ícones sem rótulo na TopAppBar do Dashboard como navegação. A v0.14.0
+resolveu isso junto com o nome do produto (`HANDOFF.md §0`), porque as duas
+coisas — nome e identidade visual — precisavam existir de propósito antes da
+primeira instalação de terceiro, não só o nome.
+
+**Cor de marca separada da cor semântica de resultado.** `core/ui/theme/
+Color.kt` define `BrandIndigo*` (primária — botão, FAB, chip selecionado,
+navegação) e `ProfitColors` (verde/vermelho — só onde o número exibido é
+lucro ou prejuízo em si). Antes, a primária **era** o verde de `ProfitColors`,
+o que misturava as duas coisas: qualquer botão comum "parecia" um resultado
+positivo. `ProfitColors` ganhou pares contêiner/on-contêiner por tema
+(`Theme.kt: ProfitColors.container()/onContainer()`) para o card de lucro do
+Dashboard usar a cor de fundo em si como sinal, não só o texto.
+
+**Material You (`dynamicColor`) desligado por padrão.** Um app que acabou de
+fixar identidade visual própria não deveria trocar de cor conforme o papel de
+parede do aparelho. O parâmetro continua existindo em `DriverProTheme` para
+quem quiser ligar, e para preview/teste pedirem resultado determinístico.
+
+**Forma e tipografia.** `core/ui/theme/Shape.kt` define um raio de canto maior
+que o padrão M3 (20–24dp contra ~12dp) — a assinatura visual que diferencia o
+app do Material 3 puro. A fonte do sistema continua (ver acima, "Cadastro de
+veículo mínimo" não mexe nisso) — o que mudou foi passar a usar algarismo
+tabular (`fontFeatureSettings = "tnum"`, `core/ui/theme/Type.kt`) nos números
+financeiros grandes, para os dígitos não mudarem de largura ao recompor.
+
+**Componentes novos em `core/ui/component/`** substituem padrões que estavam
+duplicados tela a tela: `IconChip` (círculo tonal colorido, deriva o fundo de
+uma cor semente por composição em vez de guardar um par claro/escuro por
+categoria — ver `ExpenseCategoryVisuals.kt`), `StatTile` (grade de
+indicadores 2 colunas), `CategoryBarRow` (barra proporcional — primeira
+visualização de dado do app além de texto) e `ListItemCard` (padroniza
+ícone-chip + conteúdo + ação, usado pelas quatro telas de lista).
+
+**Navegação: barra inferior substitui a fileira de ícones.** `DashboardScreen`
+ganhou `bottomBar` com `NavigationBar` (Dashboard, Ganhos, Despesas, Veículos,
+Mais). Mudança só de apresentação — cada item chama exatamente o
+`navController.navigate(...)` que já existia. Uso pessoal, manutenção e backup
+saíram da TopAppBar e viraram entradas em `feature/more/MoreScreen.kt`, novo
+destino (`DriverProDestination.MORE`) que não existia antes; nenhuma tela de
+destino mudou de comportamento, só como se chega até ela.
+
+### Revisão da identidade visual (ainda na v0.14.0, antes de mergear)
+
+O Pedro trouxe uma logo e uma referência visual próprias (`IMAGENS/`) durante
+a mesma branch da v0.14.0, antes de qualquer tag ou merge. Parte do que a
+primeira passada decidiu foi revertido para seguir essa referência —
+registrado aqui, e não apagado do histórico acima, porque o raciocínio de
+separar marca de sinal financeiro continua correto **em tese**; só perdeu
+para uma referência visual concreta que faz diferente.
+
+- **Marca voltou a ser verde.** `BrandIndigo*` virou `BrandGreen*`
+  (`core/ui/theme/Color.kt`), e `ProfitColors.positive*` agora usa
+  intencionalmente os mesmos tons — a logo e a referência usam **um verde só**
+  para marca e resultado positivo ("verde = seu lucro crescendo"). Os
+  extensions `ProfitColors.container()/onContainer()` do parágrafo acima não
+  existem mais: o card de lucro do Dashboard voltou a ser branco/neutro, com
+  o **texto** do valor colorido (`ProfitColors.content()`, nova função) — a
+  referência não pinta o card inteiro, só o número.
+- **Tema escuro é navy, não neutro indigo-tintado.** `DarkBackground`/
+  `DarkSurface` (`#0A0F1C`/`#121B2E`) seguem a cor de fundo da própria logo.
+- **Página cinza-clara, cards brancos com elevação visível.** `background`
+  (`#F4F6F4`) e `surface`/`surfaceContainerLowest` (branco) são tokens
+  distintos agora — antes eram quase a mesma cor, e o card tonal
+  (`surfaceContainerLow`) que os componentes usavam explicitamente somava a
+  isso para o card "sumir" no fundo. `StatTile`, `ListItemCard` e os cards de
+  resumo usam o branco padrão do `Card` mais `CardDefaults.cardElevation()`
+  explícito (2–3dp) em vez de um preenchimento tonal.
+- **`CategoryBarRow` foi substituído por `DonutChart` + `CategoryLegendRow`.**
+  A referência usa gráfico de rosca no breakdown de despesas por categoria —
+  primeiro gráfico de verdade do app (`Canvas` puro, sem biblioteca nova, PRD
+  §55) — com uma legenda simples (bolinha colorida + rótulo + valor +
+  percentual) embaixo; a barra proporcional ficou redundante com a rosca já
+  mostrando a proporção.
+- **Novo: breakdown de ganhos por plataforma.** `EarningsSummary.byPlatform`
+  (`EarningsListViewModel.kt`) espelha exatamente `ExpensesSummary.byCategory`
+  — soma agrupada da lista já carregada, mesmo padrão, nenhum use case novo.
+  Exibido com crachá quadrado colorido (iniciais) em vez de bolinha, para não
+  confundir com a legenda de categoria de despesa na mesma tela do app.
+- **Ícone redesenhado de novo**, agora com gradiente azul→verde reproduzindo a
+  logo (`ic_launcher_foreground.xml`), sobre fundo navy sólido.
 
 ## Regras de dependência
 

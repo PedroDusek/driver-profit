@@ -1,0 +1,26 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!--
+    Silhueta para o tema de ícone do Android 13+ (monochrome), que só lê o
+    canal alfa e tinge tudo com uma cor só — por isso é vetor, e não a foto em
+    ic_launcher_photo.jpg (sem transparência para servir de máscara). Traço
+    simples do gesto da estrada/seta de `IMAGENS/Logo Aplicativo.jpeg`: o
+    modo monochrome não mostra gradiente, tracejado nem o gráfico de barras
+    ao fundo de qualquer forma, então a silhueta não tenta reproduzi-los.
+-->
+<vector xmlns:android="http://schemas.android.com/apk/res/android"
+    android:width="108dp"
+    android:height="108dp"
+    android:viewportWidth="108"
+    android:viewportHeight="108">
+
+    <path
+        android:strokeColor="#FFFFFF"
+        android:strokeWidth="12"
+        android:strokeLineCap="round"
+        android:strokeLineJoin="round"
+        android:pathData="M22,80 C18,60 30,46 44,52 C54,57 46,66 38,60 C32,55 40,44 54,46 C66,48 72,60 80,50 L90,28" />
+
+    <path
+        android:fillColor="#FFFFFF"
+        android:pathData="M97,15 L91,35 L83,26 L75,20 Z" />
+</vector>
