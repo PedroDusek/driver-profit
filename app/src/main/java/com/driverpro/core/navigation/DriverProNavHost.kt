@@ -2,6 +2,7 @@ package com.driverpro.core.navigation
 
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
+import androidx.navigation.NavGraph.Companion.findStartDestination
 import androidx.navigation.NavHostController
 import androidx.navigation.NavType
 import androidx.navigation.compose.NavHost
@@ -34,23 +35,39 @@ fun DriverProNavHost(
     modifier: Modifier = Modifier,
     navController: NavHostController = rememberNavController(),
 ) {
+    /**
+     * Troca de aba, com a semântica que separa aba de tela empilhada.
+     *
+     * `popUpTo(start) { saveState = true }` impede a pilha de crescer a cada
+     * toque: sem ele, ir Ganhos → Gastos → Veículos deixaria três telas
+     * empilhadas, e o botão voltar do Android faria o motorista desfazer o
+     * caminho tela a tela em vez de sair do app. Com ele, voltar de qualquer
+     * aba leva ao dashboard, que é o destino inicial.
+     *
+     * `saveState`/`restoreState` preservam o que cada aba tinha: a rolagem do
+     * histórico de despesas e o filtro escolhido continuam lá ao voltar para
+     * ela. `launchSingleTop` evita duas cópias da mesma aba no topo.
+     */
+    val onSelectTab: (DriverProTab) -> Unit = { tab ->
+        navController.navigate(tab.route) {
+            popUpTo(navController.graph.findStartDestination().id) { saveState = true }
+            launchSingleTop = true
+            restoreState = true
+        }
+    }
+
     NavHost(
         navController = navController,
         startDestination = DriverProDestination.START,
         modifier = modifier,
     ) {
         composable(route = DriverProDestination.DASHBOARD) {
-            DashboardScreen(
-                onOpenVehicles = { navController.navigate(DriverProDestination.VEHICLE_LIST) },
-                onOpenEarnings = { navController.navigate(DriverProDestination.EARNINGS_LIST) },
-                onOpenExpenses = { navController.navigate(DriverProDestination.EXPENSES_LIST) },
-                onOpenMore = { navController.navigate(DriverProDestination.MORE) },
-            )
+            DashboardScreen(onSelectTab = onSelectTab)
         }
 
         composable(route = DriverProDestination.MORE) {
             MoreScreen(
-                onBack = navController::popBackStack,
+                onSelectTab = onSelectTab,
                 onOpenPersonalUsage = {
                     navController.navigate(DriverProDestination.PERSONAL_USAGE_LIST)
                 },
@@ -73,7 +90,7 @@ fun DriverProNavHost(
 
         composable(route = DriverProDestination.VEHICLE_LIST) {
             VehicleListScreen(
-                onBack = navController::popBackStack,
+                onSelectTab = onSelectTab,
                 onAddVehicle = {
                     navController.navigate(DriverProDestination.vehicleForm())
                 },
@@ -101,7 +118,7 @@ fun DriverProNavHost(
 
         composable(route = DriverProDestination.EARNINGS_LIST) {
             EarningsListScreen(
-                onBack = navController::popBackStack,
+                onSelectTab = onSelectTab,
                 onAddSession = {
                     navController.navigate(DriverProDestination.earningsForm())
                 },
@@ -129,7 +146,7 @@ fun DriverProNavHost(
 
         composable(route = DriverProDestination.EXPENSES_LIST) {
             ExpensesListScreen(
-                onBack = navController::popBackStack,
+                onSelectTab = onSelectTab,
                 onAddExpense = {
                     navController.navigate(DriverProDestination.expenseForm())
                 },

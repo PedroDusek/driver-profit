@@ -7,7 +7,6 @@ import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.automirrored.filled.ArrowBack
 import androidx.compose.material.icons.automirrored.filled.KeyboardArrowRight
 import androidx.compose.material.icons.filled.Build
 import androidx.compose.material.icons.filled.SettingsBackupRestore
@@ -25,6 +24,8 @@ import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
 import com.driverpro.R
+import com.driverpro.core.navigation.DriverProBottomBar
+import com.driverpro.core.navigation.DriverProTab
 import com.driverpro.core.ui.component.IconChip
 import com.driverpro.core.ui.component.ListItemCard
 import com.driverpro.core.ui.theme.driverProTopAppBarColors
@@ -37,7 +38,7 @@ import com.driverpro.core.ui.theme.driverProTopAppBarColors
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun MoreScreen(
-    onBack: () -> Unit,
+    onSelectTab: (DriverProTab) -> Unit,
     onOpenPersonalUsage: () -> Unit,
     onOpenMaintenance: () -> Unit,
     onOpenBackup: () -> Unit,
@@ -48,15 +49,15 @@ fun MoreScreen(
         topBar = {
             TopAppBar(
                 colors = driverProTopAppBarColors(),
+                // Sem seta de voltar: isto é uma aba, não uma tela empilhada.
+                // A barra inferior é o caminho de saída.
                 title = { Text(stringResource(R.string.nav_more)) },
-                navigationIcon = {
-                    IconButton(onClick = onBack) {
-                        Icon(
-                            imageVector = Icons.AutoMirrored.Filled.ArrowBack,
-                            contentDescription = stringResource(R.string.action_back),
-                        )
-                    }
-                },
+            )
+        },
+        bottomBar = {
+            DriverProBottomBar(
+                selected = DriverProTab.MORE,
+                onSelect = onSelectTab,
             )
         },
     ) { innerPadding ->

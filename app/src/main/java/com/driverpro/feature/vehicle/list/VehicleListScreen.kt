@@ -8,7 +8,6 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
 import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.automirrored.filled.ArrowBack
 import androidx.compose.material.icons.filled.Add
 import androidx.compose.material.icons.filled.Delete
 import androidx.compose.material.icons.filled.DirectionsCar
@@ -37,6 +36,8 @@ import androidx.compose.ui.unit.dp
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.lifecycle.viewmodel.compose.viewModel
 import com.driverpro.R
+import com.driverpro.core.navigation.DriverProBottomBar
+import com.driverpro.core.navigation.DriverProTab
 import com.driverpro.core.ui.DriverProViewModelFactory
 import com.driverpro.core.ui.component.IconChip
 import com.driverpro.core.ui.component.ListItemCard
@@ -52,7 +53,7 @@ import java.time.Instant
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun VehicleListScreen(
-    onBack: () -> Unit,
+    onSelectTab: (DriverProTab) -> Unit,
     onAddVehicle: () -> Unit,
     onEditVehicle: (Long) -> Unit,
     modifier: Modifier = Modifier,
@@ -66,15 +67,15 @@ fun VehicleListScreen(
         topBar = {
             TopAppBar(
                 colors = driverProTopAppBarColors(),
+                // Sem seta de voltar: isto é uma aba, não uma tela empilhada.
+                // A barra inferior é o caminho de saída.
                 title = { Text(stringResource(R.string.vehicle_list_title)) },
-                navigationIcon = {
-                    IconButton(onClick = onBack) {
-                        Icon(
-                            imageVector = Icons.AutoMirrored.Filled.ArrowBack,
-                            contentDescription = stringResource(R.string.action_back),
-                        )
-                    }
-                },
+            )
+        },
+        bottomBar = {
+            DriverProBottomBar(
+                selected = DriverProTab.VEHICLES,
+                onSelect = onSelectTab,
             )
         },
         floatingActionButton = {

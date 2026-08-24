@@ -59,6 +59,8 @@ import androidx.lifecycle.viewmodel.compose.viewModel
 import com.driverpro.R
 import com.driverpro.core.common.Money
 import com.driverpro.core.common.WorkDuration
+import com.driverpro.core.navigation.DriverProBottomBar
+import com.driverpro.core.navigation.DriverProTab
 import com.driverpro.core.ui.DriverProViewModelFactory
 import com.driverpro.core.ui.component.AlertCard
 import com.driverpro.core.ui.component.CategoryLegendRow
@@ -103,13 +105,13 @@ import java.time.ZoneOffset
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun DashboardScreen(
-    onOpenVehicles: () -> Unit,
-    onOpenEarnings: () -> Unit,
-    onOpenExpenses: () -> Unit,
-    onOpenMore: () -> Unit,
+    onSelectTab: (DriverProTab) -> Unit,
     modifier: Modifier = Modifier,
     viewModel: DashboardViewModel = viewModel(factory = DriverProViewModelFactory.Factory),
 ) {
+    // Os avisos do topo levam para "Mais", onde moram uso pessoal e
+    // manutenção — as duas telas que resolvem o que eles apontam.
+    val onOpenMore = { onSelectTab(DriverProTab.MORE) }
     val uiState by viewModel.uiState.collectAsStateWithLifecycle()
     val maintenanceWarnings by viewModel.maintenanceWarnings.collectAsStateWithLifecycle()
     val divergences by viewModel.odometerDivergences.collectAsStateWithLifecycle()
@@ -124,11 +126,9 @@ fun DashboardScreen(
             )
         },
         bottomBar = {
-            DashboardNavigationBar(
-                onOpenEarnings = onOpenEarnings,
-                onOpenExpenses = onOpenExpenses,
-                onOpenVehicles = onOpenVehicles,
-                onOpenMore = onOpenMore,
+            DriverProBottomBar(
+                selected = DriverProTab.DASHBOARD,
+                onSelect = onSelectTab,
             )
         },
     ) { innerPadding ->
@@ -211,101 +211,6 @@ fun DashboardScreen(
             },
         )
     }
-}
-
-/**
- * Barra inferior com as três seções mais usadas + "Mais" (v0.14.0).
- *
- * Substitui a fileira de seis ícones sem rótulo que ocupava a TopAppBar.
- * "Dashboard" fica sempre selecionado e sem ação: é a própria tela.
- */
-@Composable
-private fun DashboardNavigationBar(
-    onOpenEarnings: () -> Unit,
-    onOpenExpenses: () -> Unit,
-    onOpenVehicles: () -> Unit,
-    onOpenMore: () -> Unit,
-) {
-    Column {
-        // Fio separando a barra do conteúdo. Na referência é o único limite
-        // entre os dois: a barra tem a mesma cor do fundo da página, então
-        // sem essa linha ela simplesmente não existe como região.
-        HorizontalDivider(
-            thickness = Dp.Hairline,
-            color = MaterialTheme.colorScheme.outlineVariant,
-        )
-        NavigationBar(
-            containerColor = MaterialTheme.colorScheme.background,
-            tonalElevation = 0.dp,
-        ) {
-            DashboardNavItem(
-                selected = true,
-                onClick = {},
-                icon = Icons.Default.Dashboard,
-                label = stringResource(R.string.nav_dashboard),
-            )
-            DashboardNavItem(
-                selected = false,
-                onClick = onOpenEarnings,
-                icon = Icons.Default.Payments,
-                label = stringResource(R.string.earnings_list_title),
-            )
-            DashboardNavItem(
-                selected = false,
-                onClick = onOpenExpenses,
-                icon = Icons.AutoMirrored.Filled.ReceiptLong,
-                label = stringResource(R.string.expenses_list_title),
-            )
-            DashboardNavItem(
-                selected = false,
-                onClick = onOpenVehicles,
-                icon = Icons.Default.DirectionsCar,
-                label = stringResource(R.string.vehicle_list_title),
-            )
-            DashboardNavItem(
-                selected = false,
-                onClick = onOpenMore,
-                icon = Icons.Default.MoreHoriz,
-                label = stringResource(R.string.nav_more),
-            )
-        }
-    }
-}
-
-/**
- * Item da barra inferior no estilo da referência: **verde quando ativo,
- * cinza quando não**, e nada mais.
- *
- * O `NavigationBarItem` do Material 3 desenha, por padrão, uma pílula
- * colorida (`secondaryContainer`) atrás do ícone selecionado — é a assinatura
- * do M3, e é justamente o que a referência não tem. Zerar o `indicatorColor`
- * apaga a pílula e deixa a cor do próprio ícone e do rótulo carregarem o
- * estado, que é como o design comunica seleção.
- *
- * Cor não é o único sinal: o item ativo também recebe
- * `selected = true`, que o TalkBack anuncia. Quem não distingue verde de
- * cinza continua sabendo onde está.
- */
-@Composable
-private fun RowScope.DashboardNavItem(
-    selected: Boolean,
-    onClick: () -> Unit,
-    icon: ImageVector,
-    label: String,
-) {
-    NavigationBarItem(
-        selected = selected,
-        onClick = onClick,
-        icon = { Icon(icon, contentDescription = null) },
-        label = { Text(label) },
-        colors = NavigationBarItemDefaults.colors(
-            indicatorColor = Color.Transparent,
-            selectedIconColor = MaterialTheme.colorScheme.primary,
-            selectedTextColor = MaterialTheme.colorScheme.primary,
-            unselectedIconColor = DarkNavUnselected,
-            unselectedTextColor = DarkNavUnselected,
-        ),
-    )
 }
 
 @Composable
