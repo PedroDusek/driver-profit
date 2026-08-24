@@ -5,7 +5,47 @@ Versionamento conforme [Semantic Versioning](https://semver.org/lang/pt-BR/).
 
 ## [Não publicado]
 
+## [0.15.0] — Identidade visual DriverPro
+
+Reúne o rebrand que estava preparado como v0.14.0 — pronto numa branch, mas
+nunca publicado — e a adaptação ao design de referência do Figma. Sai como uma
+versão só porque as duas coisas nunca existiram separadamente num release:
+a v0.14.0 não chegou a ser tagueada.
+
+**Banco na versão 10, sem migração.** Nada nesta versão toca schema, entidade
+ou cálculo.
+
 ### Alterado
+
+- **Barra inferior: aba ativa em verde, inativas em cinza.** O
+  `NavigationBarItem` do Material 3 desenha por padrão uma pílula colorida
+  atrás do ícone selecionado; a referência não tem essa cápsula, e zerar o
+  `indicatorColor` deixa a cor do ícone e do rótulo carregarem o estado
+  sozinhas. O item ativo mantém `selected = true`, então o TalkBack continua
+  anunciando a posição para quem não distingue verde de cinza
+- **Verde de assinatura `#22C55E`**, no lugar do menta pálido `#6FE3B4`. A
+  rampa tonal do Material 3 escolheria aquele tom para o tema escuro; a
+  referência usa um esmeralda saturado, e é ele que carrega a leitura "isto é
+  dinheiro seu"
+- **Tema fixado em escuro.** A identidade é o navy com verde; seguir o
+  claro/escuro do aparelho faria a maioria dos motoristas nunca ver o app
+  desenhado. `LightColors` continua íntegro no código e o parâmetro
+  `darkTheme` continua existindo — reverter é trocar um valor
+- **`TopAppBar` das doze telas** passa a usar `background` em vez do `surface`
+  padrão, que no tema escuro é a cor dos cards e criava uma faixa mais clara no
+  topo. A configuração vive em `driverProTopAppBarColors()`, não repetida tela
+  a tela
+
+### Corrigido
+
+- **`ProfitColors.content` consultava o tema do aparelho, não o do app.** Usava
+  `isSystemInDarkTheme()`, que responde por `Configuration.uiMode`; com o tema
+  fixado em escuro e o celular no claro, o número do lucro sairia com a cor
+  clara sobre fundo escuro. Passa a ler `LocalIsDarkTheme`, provido pelo
+  próprio tema. Era um defeito latente: só ficou alcançável quando o app
+  deixou de acompanhar o sistema
+
+### Alterado (rebrand, preparado como v0.14.0)
 
 - **Nome do produto: DriverPro.** `com.driverprofit` virou `com.driverpro` em
   todo o projeto — pacote Kotlin, `applicationId`, banco (`driverpro.db`),
