@@ -76,18 +76,36 @@ internal val LightSurfaceContainerHighest = Color(0xFFE2E5E1)
 
 // Neutros escuros com matiz navy — a cor de fundo da logo, não um cinza
 // neutro genérico.
-internal val DarkBackground = Color(0xFF0A0F1C)
-internal val DarkSurface = Color(0xFF121B2E)
+//
+// **O card precisa se separar do fundo sozinho.** A rampa anterior punha a
+// página em `#0A0F1C` e o card em `#101A2D`: seis pontos de luminosidade de
+// diferença, que no aparelho lê como uma superfície só. A referência do Figma
+// levanta o card de forma inequívoca, e é isso que dá relevo à tela — sem
+// sombra nenhuma, que em fundo escuro é invisível de qualquer jeito.
+internal val DarkBackground = Color(0xFF0A101C)
+internal val DarkSurface = Color(0xFF18222F)
 internal val DarkSurfaceVariant = Color(0xFF2A3444)
-internal val DarkOnSurfaceVariant = Color(0xFFB7C2D6)
+internal val DarkOnSurfaceVariant = Color(0xFF9AA7BC)
 internal val DarkOnSurface = Color(0xFFE7EAF0)
 internal val DarkOutline = Color(0xFF7C8AA0)
-internal val DarkOutlineVariant = Color(0xFF2A3444)
-internal val DarkSurfaceContainerLowest = Color(0xFF070B14)
-internal val DarkSurfaceContainerLow = Color(0xFF101A2D)
-internal val DarkSurfaceContainer = Color(0xFF141F35)
-internal val DarkSurfaceContainerHigh = Color(0xFF1A263D)
-internal val DarkSurfaceContainerHighest = Color(0xFF212E48)
+
+/**
+ * Contorno dos cards e das linhas divisórias internas.
+ *
+ * A referência desenha o card com um fio pouco mais claro que o próprio
+ * preenchimento. Ele faz o trabalho que a sombra faria num tema claro:
+ * delimitar a borda sem depender de luz, que fundo escuro não propaga.
+ */
+internal val DarkOutlineVariant = Color(0xFF29344A)
+
+internal val DarkSurfaceContainerLowest = Color(0xFF070C16)
+
+/** Preenchimento do card — é o que o `Card` do Material 3 usa por padrão. */
+internal val DarkSurfaceContainerLow = Color(0xFF18222F)
+
+internal val DarkSurfaceContainer = Color(0xFF1C2634)
+internal val DarkSurfaceContainerHigh = Color(0xFF212C3C)
+internal val DarkSurfaceContainerHighest = Color(0xFF26313F)
 
 /**
  * Cor semântica de resultado financeiro — lucro/prejuízo.

@@ -12,8 +12,6 @@ import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.ArrowBack
 import androidx.compose.material3.AlertDialog
 import androidx.compose.material3.Button
-import androidx.compose.material3.Card
-import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
@@ -34,6 +32,7 @@ import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.lifecycle.viewmodel.compose.viewModel
 import com.driverpro.R
 import com.driverpro.core.ui.DriverProViewModelFactory
+import com.driverpro.core.ui.component.DriverProCard
 import com.driverpro.core.ui.format.BackupLabels
 import com.driverpro.core.ui.theme.driverProTopAppBarColors
 import java.time.LocalDate
@@ -89,9 +88,7 @@ fun BackupScreen(
                 .padding(horizontal = 16.dp, vertical = 8.dp),
             verticalArrangement = Arrangement.spacedBy(16.dp),
         ) {
-            Card(
-                elevation = CardDefaults.cardElevation(defaultElevation = 2.dp),
-            ) {
+            DriverProCard {
                 Column(
                     modifier = Modifier.padding(16.dp),
                     verticalArrangement = Arrangement.spacedBy(12.dp),
@@ -111,9 +108,7 @@ fun BackupScreen(
                 }
             }
 
-            Card(
-                elevation = CardDefaults.cardElevation(defaultElevation = 2.dp),
-            ) {
+            DriverProCard {
                 Column(
                     modifier = Modifier.padding(16.dp),
                     verticalArrangement = Arrangement.spacedBy(12.dp),

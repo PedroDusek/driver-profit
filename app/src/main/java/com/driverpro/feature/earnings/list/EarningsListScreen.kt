@@ -19,8 +19,6 @@ import androidx.compose.material.icons.filled.Delete
 import androidx.compose.material.icons.filled.Edit
 import androidx.compose.material.icons.filled.LocalTaxi
 import androidx.compose.material3.AlertDialog
-import androidx.compose.material3.Card
-import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.ExtendedFloatingActionButton
@@ -50,6 +48,7 @@ import com.driverpro.core.common.WorkDuration
 import com.driverpro.core.navigation.DriverProBottomBar
 import com.driverpro.core.navigation.DriverProTab
 import com.driverpro.core.ui.DriverProViewModelFactory
+import com.driverpro.core.ui.component.DriverProCard
 import com.driverpro.core.ui.component.IconChip
 import com.driverpro.core.ui.component.ListItemCard
 import com.driverpro.core.ui.format.BrazilianFormatter
@@ -160,10 +159,7 @@ fun EarningsListScreen(
 
 @Composable
 private fun SummaryCard(summary: EarningsSummary) {
-    Card(
-        modifier = Modifier.fillMaxWidth(),
-        elevation = CardDefaults.cardElevation(defaultElevation = 3.dp),
-    ) {
+    DriverProCard {
         Column(
             modifier = Modifier
                 .fillMaxWidth()

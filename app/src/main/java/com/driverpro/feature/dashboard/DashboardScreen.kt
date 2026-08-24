@@ -22,8 +22,6 @@ import androidx.compose.material.icons.filled.DirectionsCar
 import androidx.compose.material.icons.filled.MoreHoriz
 import androidx.compose.material.icons.filled.Payments
 import androidx.compose.material.icons.filled.Warning
-import androidx.compose.material3.Card
-import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.DateRangePicker
 import androidx.compose.material3.DatePickerDialog
@@ -62,6 +60,7 @@ import com.driverpro.core.common.WorkDuration
 import com.driverpro.core.navigation.DriverProBottomBar
 import com.driverpro.core.navigation.DriverProTab
 import com.driverpro.core.ui.DriverProViewModelFactory
+import com.driverpro.core.ui.component.DriverProCard
 import com.driverpro.core.ui.component.AlertCard
 import com.driverpro.core.ui.component.CategoryLegendRow
 import com.driverpro.core.ui.component.DonutChart
@@ -301,10 +300,7 @@ private fun EmptyPeriod() {
 private fun ResultCard(metrics: DashboardMetrics) {
     val profit = metrics.netProfit
     val positive = !profit.isNegative
-    Card(
-        modifier = Modifier.fillMaxWidth(),
-        elevation = CardDefaults.cardElevation(defaultElevation = 3.dp),
-    ) {
+    DriverProCard {
         Column(
             modifier = Modifier
                 .fillMaxWidth()
@@ -583,10 +579,7 @@ private fun OdometerGapCard(
 
 @Composable
 private fun MetricsCard(title: String, content: @Composable () -> Unit) {
-    Card(
-        modifier = Modifier.fillMaxWidth(),
-        elevation = CardDefaults.cardElevation(defaultElevation = 2.dp),
-    ) {
+    DriverProCard {
         Column(
             modifier = Modifier
                 .fillMaxWidth()
