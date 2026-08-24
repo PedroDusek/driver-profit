@@ -6,7 +6,7 @@ import com.driverpro.domain.model.MaintenanceSchedule
 import com.driverpro.domain.model.VehicleMaintenance
 import com.driverpro.domain.repository.ExpenseRepository
 import com.driverpro.domain.repository.MaintenanceScheduleRepository
-import com.driverpro.domain.repository.VehicleRepository
+import com.driverpro.vehicle.domain.VehicleRepository
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.combine
 import java.time.Clock

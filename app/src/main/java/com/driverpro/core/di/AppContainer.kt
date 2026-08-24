@@ -10,20 +10,20 @@ import com.driverpro.data.repository.OfflineExpenseRepository
 import com.driverpro.data.repository.OfflineMaintenanceScheduleRepository
 import com.driverpro.data.repository.OfflinePersonalUsageRepository
 import com.driverpro.data.repository.OfflineReconciliationDismissalRepository
-import com.driverpro.data.repository.OfflineVehicleRepository
+import com.driverpro.vehicle.data.OfflineVehicleRepository
 import com.driverpro.data.repository.OfflineWorkSessionRepository
 import com.driverpro.domain.repository.ExpenseRepository
 import com.driverpro.domain.repository.MaintenanceScheduleRepository
 import com.driverpro.domain.repository.PersonalUsageRepository
 import com.driverpro.domain.repository.ReconciliationDismissalRepository
-import com.driverpro.domain.repository.VehicleRepository
+import com.driverpro.vehicle.domain.VehicleRepository
 import com.driverpro.domain.repository.WorkSessionRepository
 import com.driverpro.domain.usecase.DeleteExpenseUseCase
-import com.driverpro.domain.usecase.DeleteVehicleUseCase
+import com.driverpro.vehicle.domain.DeleteVehicleUseCase
 import com.driverpro.domain.usecase.DeleteWorkSessionUseCase
 import com.driverpro.domain.usecase.ExpenseValidator
 import com.driverpro.domain.usecase.GetExpenseUseCase
-import com.driverpro.domain.usecase.GetVehicleUseCase
+import com.driverpro.vehicle.domain.GetVehicleUseCase
 import com.driverpro.domain.usecase.GetWorkSessionUseCase
 import com.driverpro.domain.usecase.ObserveAccruedExpensesUseCase
 import com.driverpro.domain.usecase.ObserveDashboardUseCase
@@ -43,14 +43,14 @@ import com.driverpro.domain.usecase.SavePersonalUsageUseCase
 import com.driverpro.domain.usecase.SaveReconciledPersonalUsageUseCase
 import com.driverpro.domain.usecase.ObserveVehicleOdometerUseCase
 import com.driverpro.domain.usecase.ObserveVehicleOdometersUseCase
-import com.driverpro.domain.usecase.ObserveVehiclesUseCase
+import com.driverpro.vehicle.domain.ObserveVehiclesUseCase
 import com.driverpro.domain.usecase.ObserveWorkSessionsBetweenUseCase
 import com.driverpro.domain.usecase.ObserveWorkSessionsUseCase
 import com.driverpro.domain.usecase.SaveExpenseUseCase
-import com.driverpro.domain.usecase.SaveVehicleUseCase
+import com.driverpro.vehicle.domain.SaveVehicleUseCase
 import com.driverpro.domain.usecase.SaveWorkSessionUseCase
-import com.driverpro.domain.usecase.SetCurrentVehicleUseCase
-import com.driverpro.domain.usecase.VehicleValidator
+import com.driverpro.vehicle.domain.SetCurrentVehicleUseCase
+import com.driverpro.vehicle.domain.VehicleValidator
 import com.driverpro.domain.usecase.WorkSessionValidator
 
 /**

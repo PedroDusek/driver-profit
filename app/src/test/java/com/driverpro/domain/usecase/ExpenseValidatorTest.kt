@@ -12,8 +12,8 @@ import com.driverpro.domain.model.ExpenseFieldError
 import com.driverpro.domain.model.ExpenseValidationError
 import com.driverpro.core.domain.FuelType
 import com.driverpro.domain.model.MaintenanceCategory
-import com.driverpro.domain.model.Vehicle
-import com.driverpro.domain.model.VehicleFuel
+import com.driverpro.vehicle.domain.Vehicle
+import com.driverpro.vehicle.domain.VehicleFuel
 import org.junit.Assert.assertEquals
 import org.junit.Assert.assertNull
 import org.junit.Assert.assertTrue

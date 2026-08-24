@@ -4,12 +4,12 @@ import androidx.room.Room
 import androidx.test.core.app.ApplicationProvider
 import androidx.test.ext.junit.runners.AndroidJUnit4
 import com.driverpro.data.local.dao.MaintenanceScheduleDao
-import com.driverpro.data.local.dao.VehicleDao
+import com.driverpro.vehicle.data.VehicleDao
 import com.driverpro.core.database.DriverProDatabase
 import com.driverpro.data.local.entity.MaintenanceScheduleEntity
-import com.driverpro.data.local.entity.VehicleEntity
+import com.driverpro.vehicle.data.VehicleEntity
 import com.driverpro.domain.model.MaintenanceItem
-import com.driverpro.domain.model.VehicleFuel
+import com.driverpro.vehicle.domain.VehicleFuel
 import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.test.runTest
 import org.junit.After

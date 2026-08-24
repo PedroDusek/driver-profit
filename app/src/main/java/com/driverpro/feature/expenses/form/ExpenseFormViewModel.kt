@@ -19,11 +19,11 @@ import com.driverpro.domain.model.ExpenseValidationError
 import com.driverpro.core.domain.FuelType
 import com.driverpro.domain.model.MaintenanceCategory
 import com.driverpro.core.domain.MeasurementUnit
-import com.driverpro.domain.model.Vehicle
+import com.driverpro.vehicle.domain.Vehicle
 import com.driverpro.domain.model.toDraft
 import com.driverpro.domain.usecase.GetExpenseUseCase
 import com.driverpro.domain.usecase.ObserveVehicleOdometersUseCase
-import com.driverpro.domain.usecase.ObserveVehiclesUseCase
+import com.driverpro.vehicle.domain.ObserveVehiclesUseCase
 import com.driverpro.domain.usecase.SaveExpenseResult
 import com.driverpro.domain.usecase.SaveExpenseUseCase
 import kotlinx.coroutines.flow.MutableStateFlow

@@ -8,7 +8,7 @@ import com.driverpro.domain.model.MaintenanceCategory
 import com.driverpro.domain.model.MaintenanceItem
 import com.driverpro.domain.model.PersonalUsageSource
 import com.driverpro.domain.model.Platform
-import com.driverpro.domain.model.VehicleFuel
+import com.driverpro.vehicle.domain.VehicleFuel
 import java.time.Instant
 import java.time.LocalDate
 

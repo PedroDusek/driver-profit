@@ -15,7 +15,7 @@ import com.driverpro.domain.model.WorkSessionFieldError
 import com.driverpro.domain.model.WorkSessionValidationError
 import com.driverpro.domain.model.toDraft
 import com.driverpro.domain.usecase.GetWorkSessionUseCase
-import com.driverpro.domain.usecase.ObserveVehiclesUseCase
+import com.driverpro.vehicle.domain.ObserveVehiclesUseCase
 import com.driverpro.domain.usecase.SaveWorkSessionResult
 import com.driverpro.domain.usecase.SaveWorkSessionUseCase
 import kotlinx.coroutines.flow.MutableStateFlow

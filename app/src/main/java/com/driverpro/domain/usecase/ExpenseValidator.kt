@@ -8,7 +8,7 @@ import com.driverpro.domain.model.ExpenseDraft
 import com.driverpro.domain.model.ExpenseField
 import com.driverpro.domain.model.ExpenseFieldError
 import com.driverpro.domain.model.ExpenseValidationError
-import com.driverpro.domain.model.Vehicle
+import com.driverpro.vehicle.domain.Vehicle
 import java.time.Clock
 import java.time.Instant
 import java.time.LocalDate

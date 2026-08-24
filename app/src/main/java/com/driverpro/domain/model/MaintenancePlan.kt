@@ -1,5 +1,7 @@
 package com.driverpro.domain.model
 
+import com.driverpro.vehicle.domain.Vehicle
+
 import java.time.Instant
 import java.time.LocalDate
 

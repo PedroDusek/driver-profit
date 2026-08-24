@@ -9,9 +9,9 @@ import com.driverpro.domain.model.PersonalUsageDraft
 import com.driverpro.domain.model.PersonalUsageField
 import com.driverpro.domain.model.PersonalUsageFieldError
 import com.driverpro.domain.model.PersonalUsageValidationError
-import com.driverpro.domain.model.Vehicle
+import com.driverpro.vehicle.domain.Vehicle
 import com.driverpro.domain.usecase.GetPersonalUsageUseCase
-import com.driverpro.domain.usecase.ObserveVehiclesUseCase
+import com.driverpro.vehicle.domain.ObserveVehiclesUseCase
 import com.driverpro.domain.usecase.SavePersonalUsageResult
 import com.driverpro.domain.usecase.SavePersonalUsageUseCase
 import kotlinx.coroutines.flow.MutableStateFlow

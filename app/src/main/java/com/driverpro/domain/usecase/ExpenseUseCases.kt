@@ -5,7 +5,7 @@ import com.driverpro.domain.model.Expense
 import com.driverpro.domain.model.ExpenseDraft
 import com.driverpro.domain.model.ExpenseFieldError
 import com.driverpro.domain.repository.ExpenseRepository
-import com.driverpro.domain.repository.VehicleRepository
+import com.driverpro.vehicle.domain.VehicleRepository
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.first
 import java.time.LocalDate

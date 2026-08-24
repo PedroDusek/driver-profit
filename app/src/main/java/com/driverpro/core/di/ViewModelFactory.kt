@@ -16,8 +16,8 @@ import com.driverpro.feature.expenses.list.ExpensesListViewModel
 import com.driverpro.feature.maintenance.MaintenanceViewModel
 import com.driverpro.feature.personal.form.PersonalUsageFormViewModel
 import com.driverpro.feature.personal.list.PersonalUsageListViewModel
-import com.driverpro.feature.vehicle.form.VehicleFormViewModel
-import com.driverpro.feature.vehicle.list.VehicleListViewModel
+import com.driverpro.vehicle.presentation.form.VehicleFormViewModel
+import com.driverpro.vehicle.presentation.list.VehicleListViewModel
 
 /**
  * Fábricas de ViewModel do aplicativo.

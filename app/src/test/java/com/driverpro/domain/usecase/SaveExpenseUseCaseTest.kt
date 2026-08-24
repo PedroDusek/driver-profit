@@ -7,10 +7,10 @@ import com.driverpro.domain.model.ExpenseCategory
 import com.driverpro.domain.model.ExpenseDraft
 import com.driverpro.domain.model.ExpenseField
 import com.driverpro.core.domain.FuelType
-import com.driverpro.domain.model.Vehicle
-import com.driverpro.domain.model.VehicleFuel
+import com.driverpro.vehicle.domain.Vehicle
+import com.driverpro.vehicle.domain.VehicleFuel
 import com.driverpro.testing.FakeExpenseRepository
-import com.driverpro.testing.FakeVehicleRepository
+import com.driverpro.vehicle.domain.FakeVehicleRepository
 import kotlinx.coroutines.test.runTest
 import org.junit.Assert.assertEquals
 import org.junit.Assert.assertTrue

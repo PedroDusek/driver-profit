@@ -1,5 +1,7 @@
 package com.driverpro.data.local.entity
 
+import com.driverpro.vehicle.data.VehicleEntity
+
 import androidx.room.ColumnInfo
 import androidx.room.Entity
 import androidx.room.ForeignKey

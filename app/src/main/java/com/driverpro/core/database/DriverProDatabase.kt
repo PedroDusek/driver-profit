@@ -7,13 +7,13 @@ import com.driverpro.data.local.dao.ExpenseDao
 import com.driverpro.data.local.dao.MaintenanceScheduleDao
 import com.driverpro.data.local.dao.PersonalUsageDao
 import com.driverpro.data.local.dao.ReconciliationDismissalDao
-import com.driverpro.data.local.dao.VehicleDao
+import com.driverpro.vehicle.data.VehicleDao
 import com.driverpro.data.local.dao.WorkSessionDao
 import com.driverpro.data.local.entity.ExpenseEntity
 import com.driverpro.data.local.entity.MaintenanceScheduleEntity
 import com.driverpro.data.local.entity.PersonalUsageEntity
 import com.driverpro.data.local.entity.ReconciliationDismissalEntity
-import com.driverpro.data.local.entity.VehicleEntity
+import com.driverpro.vehicle.data.VehicleEntity
 import com.driverpro.data.local.entity.WorkSessionEntity
 
 /**

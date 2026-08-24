@@ -10,7 +10,7 @@ import androidx.navigation.compose.rememberNavController
 import androidx.navigation.navArgument
 import com.driverpro.domain.model.Expense
 import com.driverpro.domain.model.PersonalUsage
-import com.driverpro.domain.model.Vehicle
+import com.driverpro.vehicle.domain.Vehicle
 import com.driverpro.domain.model.WorkSession
 import com.driverpro.feature.backup.BackupScreen
 import com.driverpro.feature.dashboard.DashboardScreen
@@ -22,8 +22,8 @@ import com.driverpro.feature.maintenance.MaintenanceScreen
 import com.driverpro.feature.more.MoreScreen
 import com.driverpro.feature.personal.form.PersonalUsageFormScreen
 import com.driverpro.feature.personal.list.PersonalUsageListScreen
-import com.driverpro.feature.vehicle.form.VehicleFormScreen
-import com.driverpro.feature.vehicle.list.VehicleListScreen
+import com.driverpro.vehicle.presentation.form.VehicleFormScreen
+import com.driverpro.vehicle.presentation.list.VehicleListScreen
 
 /**
  * Grafo de navegação único do aplicativo (Single Activity + Navigation

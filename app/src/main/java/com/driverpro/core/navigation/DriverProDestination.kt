@@ -2,7 +2,7 @@ package com.driverpro.core.navigation
 
 import com.driverpro.domain.model.Expense
 import com.driverpro.domain.model.PersonalUsage
-import com.driverpro.domain.model.Vehicle
+import com.driverpro.vehicle.domain.Vehicle
 import com.driverpro.domain.model.WorkSession
 
 /**

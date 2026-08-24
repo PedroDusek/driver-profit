@@ -3,9 +3,9 @@ package com.driverpro.core.ui.format
 import androidx.annotation.StringRes
 import com.driverpro.R
 import com.driverpro.core.domain.FuelType
-import com.driverpro.domain.model.VehicleField
-import com.driverpro.domain.model.VehicleFuel
-import com.driverpro.domain.model.VehicleValidationError
+import com.driverpro.vehicle.domain.VehicleField
+import com.driverpro.vehicle.domain.VehicleFuel
+import com.driverpro.vehicle.domain.VehicleValidationError
 
 /**
  * Tradução dos enums de domínio para textos da interface.

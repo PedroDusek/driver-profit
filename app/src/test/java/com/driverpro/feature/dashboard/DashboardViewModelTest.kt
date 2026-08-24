@@ -19,7 +19,7 @@ import com.driverpro.testing.FakeExpenseRepository
 import com.driverpro.testing.FakeMaintenanceScheduleRepository
 import com.driverpro.testing.FakePersonalUsageRepository
 import com.driverpro.testing.FakeReconciliationDismissalRepository
-import com.driverpro.testing.FakeVehicleRepository
+import com.driverpro.vehicle.domain.FakeVehicleRepository
 import com.driverpro.testing.FakeWorkSessionRepository
 import com.driverpro.testing.MainDispatcherRule
 import kotlinx.coroutines.ExperimentalCoroutinesApi
