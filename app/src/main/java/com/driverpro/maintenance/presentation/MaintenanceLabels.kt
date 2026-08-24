@@ -1,11 +1,11 @@
-package com.driverpro.core.ui.format
+package com.driverpro.maintenance.presentation
 
 import androidx.annotation.StringRes
 import com.driverpro.R
 import com.driverpro.expenses.presentation.ExpenseLabels
-import com.driverpro.domain.model.MaintenanceItem
-import com.driverpro.domain.model.MaintenanceStatus
-import com.driverpro.domain.usecase.MaintenanceValidationError
+import com.driverpro.maintenance.domain.MaintenanceItem
+import com.driverpro.maintenance.domain.MaintenanceStatus
+import com.driverpro.maintenance.domain.MaintenanceValidationError
 
 /** Tradução dos enums de manutenção preventiva para textos da interface. */
 object MaintenanceLabels {

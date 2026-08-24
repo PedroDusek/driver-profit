@@ -4,8 +4,8 @@ import androidx.room.TypeConverter
 import com.driverpro.expenses.domain.ChargingLocation
 import com.driverpro.expenses.domain.ExpenseCategory
 import com.driverpro.core.domain.FuelType
-import com.driverpro.expenses.domain.MaintenanceCategory
-import com.driverpro.domain.model.MaintenanceItem
+import com.driverpro.maintenance.domain.MaintenanceCategory
+import com.driverpro.maintenance.domain.MaintenanceItem
 import com.driverpro.domain.model.PersonalUsageSource
 import com.driverpro.earnings.domain.Platform
 import com.driverpro.vehicle.domain.VehicleFuel

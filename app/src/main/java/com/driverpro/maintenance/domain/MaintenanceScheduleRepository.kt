@@ -1,7 +1,7 @@
-package com.driverpro.domain.repository
+package com.driverpro.maintenance.domain
 
-import com.driverpro.domain.model.MaintenanceItem
-import com.driverpro.domain.model.MaintenanceSchedule
+import com.driverpro.maintenance.domain.MaintenanceItem
+import com.driverpro.maintenance.domain.MaintenanceSchedule
 import kotlinx.coroutines.flow.Flow
 
 /**

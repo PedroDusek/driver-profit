@@ -1,11 +1,11 @@
-package com.driverpro.data.repository
+package com.driverpro.maintenance.data
 
-import com.driverpro.data.local.dao.MaintenanceScheduleDao
+import com.driverpro.maintenance.data.MaintenanceScheduleDao
 import com.driverpro.data.local.entity.toDomain
 import com.driverpro.data.local.entity.toEntity
-import com.driverpro.domain.model.MaintenanceItem
-import com.driverpro.domain.model.MaintenanceSchedule
-import com.driverpro.domain.repository.MaintenanceScheduleRepository
+import com.driverpro.maintenance.domain.MaintenanceItem
+import com.driverpro.maintenance.domain.MaintenanceSchedule
+import com.driverpro.maintenance.domain.MaintenanceScheduleRepository
 import kotlinx.coroutines.CoroutineDispatcher
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.Flow

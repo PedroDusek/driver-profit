@@ -11,7 +11,7 @@ import com.driverpro.expenses.domain.ExpenseDetail
 import com.driverpro.expenses.domain.ExpenseDetailKind
 import com.driverpro.expenses.domain.ExpenseField
 import com.driverpro.core.domain.FuelType
-import com.driverpro.expenses.domain.MaintenanceCategory
+import com.driverpro.maintenance.domain.MaintenanceCategory
 import com.driverpro.core.domain.MeasurementUnit
 import com.driverpro.vehicle.domain.Vehicle
 import com.driverpro.vehicle.domain.VehicleFuel

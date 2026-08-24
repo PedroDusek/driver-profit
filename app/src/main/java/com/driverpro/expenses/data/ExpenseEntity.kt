@@ -16,7 +16,7 @@ import com.driverpro.expenses.domain.ExpenseCategory
 import com.driverpro.expenses.domain.ExpenseDetail
 import com.driverpro.expenses.domain.ExpenseDetailKind
 import com.driverpro.core.domain.FuelType
-import com.driverpro.expenses.domain.MaintenanceCategory
+import com.driverpro.maintenance.domain.MaintenanceCategory
 import java.time.Instant
 import java.time.LocalDate
 

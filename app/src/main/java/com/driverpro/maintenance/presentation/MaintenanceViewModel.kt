@@ -1,15 +1,15 @@
-package com.driverpro.feature.maintenance
+package com.driverpro.maintenance.presentation
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import com.driverpro.domain.model.MaintenanceAlert
-import com.driverpro.domain.model.MaintenanceItem
-import com.driverpro.domain.model.VehicleMaintenance
-import com.driverpro.domain.usecase.MaintenanceValidationError
-import com.driverpro.domain.usecase.ObserveMaintenanceUseCase
-import com.driverpro.domain.usecase.ResetMaintenanceIntervalUseCase
-import com.driverpro.domain.usecase.SaveMaintenanceIntervalResult
-import com.driverpro.domain.usecase.SaveMaintenanceIntervalUseCase
+import com.driverpro.maintenance.domain.MaintenanceAlert
+import com.driverpro.maintenance.domain.MaintenanceItem
+import com.driverpro.maintenance.domain.VehicleMaintenance
+import com.driverpro.maintenance.domain.MaintenanceValidationError
+import com.driverpro.maintenance.domain.ObserveMaintenanceUseCase
+import com.driverpro.maintenance.domain.ResetMaintenanceIntervalUseCase
+import com.driverpro.maintenance.domain.SaveMaintenanceIntervalResult
+import com.driverpro.maintenance.domain.SaveMaintenanceIntervalUseCase
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.StateFlow

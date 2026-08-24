@@ -5,9 +5,9 @@ import androidx.lifecycle.viewModelScope
 import com.driverpro.domain.model.DashboardMetrics
 import com.driverpro.domain.model.DashboardPeriod
 import com.driverpro.core.domain.DateRange
-import com.driverpro.domain.model.VehicleMaintenance
+import com.driverpro.maintenance.domain.VehicleMaintenance
 import com.driverpro.domain.usecase.ObserveDashboardUseCase
-import com.driverpro.domain.usecase.ObserveMaintenanceUseCase
+import com.driverpro.maintenance.domain.ObserveMaintenanceUseCase
 import com.driverpro.domain.usecase.ObserveOdometerReconciliationUseCase
 import com.driverpro.domain.usecase.VehicleReconciliation
 import kotlinx.coroutines.ExperimentalCoroutinesApi

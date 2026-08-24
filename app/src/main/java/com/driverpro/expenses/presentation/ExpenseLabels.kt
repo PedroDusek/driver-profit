@@ -6,7 +6,7 @@ import com.driverpro.expenses.domain.ChargingLocation
 import com.driverpro.expenses.domain.ExpenseCategory
 import com.driverpro.expenses.domain.ExpenseField
 import com.driverpro.expenses.domain.ExpenseValidationError
-import com.driverpro.expenses.domain.MaintenanceCategory
+import com.driverpro.maintenance.domain.MaintenanceCategory
 import com.driverpro.core.domain.MeasurementUnit
 
 /** Tradução dos enums de despesa para textos da interface. */

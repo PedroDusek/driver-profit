@@ -1,4 +1,4 @@
-package com.driverpro.domain.model
+package com.driverpro.maintenance.domain
 
 import com.driverpro.core.domain.FuelType
 import com.driverpro.expenses.domain.Consumption

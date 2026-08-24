@@ -17,7 +17,7 @@ import com.driverpro.expenses.domain.ExpenseField
 import com.driverpro.expenses.domain.ExpenseFieldError
 import com.driverpro.expenses.domain.ExpenseValidationError
 import com.driverpro.core.domain.FuelType
-import com.driverpro.expenses.domain.MaintenanceCategory
+import com.driverpro.maintenance.domain.MaintenanceCategory
 import com.driverpro.core.domain.MeasurementUnit
 import com.driverpro.vehicle.domain.Vehicle
 import com.driverpro.expenses.domain.toDraft

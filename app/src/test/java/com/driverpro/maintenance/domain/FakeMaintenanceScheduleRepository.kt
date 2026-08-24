@@ -1,8 +1,8 @@
-package com.driverpro.testing
+package com.driverpro.maintenance.domain
 
-import com.driverpro.domain.model.MaintenanceItem
-import com.driverpro.domain.model.MaintenanceSchedule
-import com.driverpro.domain.repository.MaintenanceScheduleRepository
+import com.driverpro.maintenance.domain.MaintenanceItem
+import com.driverpro.maintenance.domain.MaintenanceSchedule
+import com.driverpro.maintenance.domain.MaintenanceScheduleRepository
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.map

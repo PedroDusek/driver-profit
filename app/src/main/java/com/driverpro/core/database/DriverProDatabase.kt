@@ -4,13 +4,13 @@ import androidx.room.Database
 import androidx.room.RoomDatabase
 import androidx.room.TypeConverters
 import com.driverpro.expenses.data.ExpenseDao
-import com.driverpro.data.local.dao.MaintenanceScheduleDao
+import com.driverpro.maintenance.data.MaintenanceScheduleDao
 import com.driverpro.data.local.dao.PersonalUsageDao
 import com.driverpro.data.local.dao.ReconciliationDismissalDao
 import com.driverpro.vehicle.data.VehicleDao
 import com.driverpro.earnings.data.WorkSessionDao
 import com.driverpro.expenses.data.ExpenseEntity
-import com.driverpro.data.local.entity.MaintenanceScheduleEntity
+import com.driverpro.maintenance.data.MaintenanceScheduleEntity
 import com.driverpro.data.local.entity.PersonalUsageEntity
 import com.driverpro.data.local.entity.ReconciliationDismissalEntity
 import com.driverpro.vehicle.data.VehicleEntity

@@ -1,9 +1,9 @@
-package com.driverpro.domain.model
+package com.driverpro.maintenance.domain
 
 import com.driverpro.expenses.domain.Expense
 import com.driverpro.expenses.domain.ExpenseCategory
 import com.driverpro.expenses.domain.ExpenseDetail
-import com.driverpro.expenses.domain.MaintenanceCategory
+import com.driverpro.maintenance.domain.MaintenanceCategory
 
 import com.driverpro.core.domain.FuelType
 

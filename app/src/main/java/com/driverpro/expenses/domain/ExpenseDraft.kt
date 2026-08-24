@@ -3,6 +3,7 @@ package com.driverpro.expenses.domain
 import com.driverpro.core.domain.FuelType
 import com.driverpro.core.domain.Money
 import com.driverpro.core.domain.Quantity
+import com.driverpro.maintenance.domain.MaintenanceCategory
 import java.time.LocalDate
 
 /**

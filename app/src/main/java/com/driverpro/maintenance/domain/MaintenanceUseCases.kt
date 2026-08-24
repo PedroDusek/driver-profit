@@ -1,11 +1,11 @@
-package com.driverpro.domain.usecase
+package com.driverpro.maintenance.domain
 
-import com.driverpro.domain.model.MaintenanceItem
-import com.driverpro.domain.model.MaintenanceMonitor
-import com.driverpro.domain.model.MaintenanceSchedule
-import com.driverpro.domain.model.VehicleMaintenance
+import com.driverpro.maintenance.domain.MaintenanceItem
+import com.driverpro.maintenance.domain.MaintenanceMonitor
+import com.driverpro.maintenance.domain.MaintenanceSchedule
+import com.driverpro.maintenance.domain.VehicleMaintenance
 import com.driverpro.expenses.domain.ExpenseRepository
-import com.driverpro.domain.repository.MaintenanceScheduleRepository
+import com.driverpro.maintenance.domain.MaintenanceScheduleRepository
 import com.driverpro.vehicle.domain.VehicleRepository
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.combine

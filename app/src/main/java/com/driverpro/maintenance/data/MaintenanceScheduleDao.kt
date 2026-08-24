@@ -1,11 +1,11 @@
-package com.driverpro.data.local.dao
+package com.driverpro.maintenance.data
 
 import androidx.room.Dao
 import androidx.room.Insert
 import androidx.room.OnConflictStrategy
 import androidx.room.Query
-import com.driverpro.data.local.entity.MaintenanceScheduleEntity
-import com.driverpro.domain.model.MaintenanceItem
+import com.driverpro.maintenance.data.MaintenanceScheduleEntity
+import com.driverpro.maintenance.domain.MaintenanceItem
 import kotlinx.coroutines.flow.Flow
 
 /** Acesso aos intervalos de manutenção. Consumido apenas por repositories (PRD §25). */

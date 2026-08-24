@@ -18,7 +18,7 @@ import com.driverpro.earnings.presentation.form.EarningsFormScreen
 import com.driverpro.earnings.presentation.list.EarningsListScreen
 import com.driverpro.expenses.presentation.form.ExpenseFormScreen
 import com.driverpro.expenses.presentation.list.ExpensesListScreen
-import com.driverpro.feature.maintenance.MaintenanceScreen
+import com.driverpro.maintenance.presentation.MaintenanceScreen
 import com.driverpro.feature.more.MoreScreen
 import com.driverpro.feature.personal.form.PersonalUsageFormScreen
 import com.driverpro.feature.personal.list.PersonalUsageListScreen

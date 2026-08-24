@@ -1,14 +1,14 @@
-package com.driverpro.data.local
+package com.driverpro.maintenance.data
 
 import androidx.room.Room
 import androidx.test.core.app.ApplicationProvider
 import androidx.test.ext.junit.runners.AndroidJUnit4
-import com.driverpro.data.local.dao.MaintenanceScheduleDao
+import com.driverpro.maintenance.data.MaintenanceScheduleDao
 import com.driverpro.vehicle.data.VehicleDao
 import com.driverpro.core.database.DriverProDatabase
-import com.driverpro.data.local.entity.MaintenanceScheduleEntity
+import com.driverpro.maintenance.data.MaintenanceScheduleEntity
 import com.driverpro.vehicle.data.VehicleEntity
-import com.driverpro.domain.model.MaintenanceItem
+import com.driverpro.maintenance.domain.MaintenanceItem
 import com.driverpro.vehicle.domain.VehicleFuel
 import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.test.runTest

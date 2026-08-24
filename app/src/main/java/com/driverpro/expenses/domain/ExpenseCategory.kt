@@ -72,23 +72,6 @@ enum class ExpenseDetailKind {
     NONE,
 }
 
-/** Categorias de manutenção (PRD §18). */
-enum class MaintenanceCategory {
-    OIL,
-    FILTERS,
-    TIRES,
-    BRAKES,
-    SUSPENSION,
-    BATTERY,
-    BELT,
-    PARTS,
-    ELECTRICAL,
-    MECHANICAL,
-    BODYWORK,
-    INSPECTION,
-    OTHER,
-}
-
 /** Onde a recarga elétrica foi feita (PRD §11). */
 enum class ChargingLocation {
     RESIDENTIAL,

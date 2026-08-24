@@ -11,7 +11,7 @@ import com.driverpro.vehicle.data.VehicleEntity
 import com.driverpro.expenses.domain.ChargingLocation
 import com.driverpro.expenses.domain.ExpenseCategory
 import com.driverpro.core.domain.FuelType
-import com.driverpro.expenses.domain.MaintenanceCategory
+import com.driverpro.maintenance.domain.MaintenanceCategory
 import com.driverpro.vehicle.domain.VehicleFuel
 import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.test.runTest

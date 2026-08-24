@@ -1,4 +1,4 @@
-package com.driverpro.data.local.entity
+package com.driverpro.maintenance.data
 
 import com.driverpro.vehicle.data.VehicleEntity
 
@@ -7,8 +7,8 @@ import androidx.room.Entity
 import androidx.room.ForeignKey
 import androidx.room.Index
 import androidx.room.PrimaryKey
-import com.driverpro.domain.model.MaintenanceItem
-import com.driverpro.domain.model.MaintenanceSchedule
+import com.driverpro.maintenance.domain.MaintenanceItem
+import com.driverpro.maintenance.domain.MaintenanceSchedule
 import java.time.Instant
 
 /**

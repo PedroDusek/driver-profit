@@ -73,7 +73,7 @@ import com.driverpro.domain.model.DashboardPeriod
 import com.driverpro.core.domain.DateRange
 import com.driverpro.expenses.domain.ExpenseCategory
 import com.driverpro.domain.usecase.VehicleReconciliation
-import com.driverpro.feature.maintenance.MaintenanceWarningCard
+import com.driverpro.maintenance.presentation.MaintenanceWarningCard
 import java.time.Instant
 import java.time.LocalDate
 import java.time.ZoneOffset

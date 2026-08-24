@@ -1,4 +1,4 @@
-package com.driverpro.feature.maintenance
+package com.driverpro.maintenance.presentation
 
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
@@ -43,10 +43,10 @@ import com.driverpro.R
 import com.driverpro.core.di.DriverProViewModelFactory
 import com.driverpro.core.ui.component.AlertCard
 import com.driverpro.core.ui.format.BrazilianFormatter
-import com.driverpro.core.ui.format.MaintenanceLabels
-import com.driverpro.domain.model.MaintenanceAlert
-import com.driverpro.domain.model.MaintenanceStatus
-import com.driverpro.domain.model.VehicleMaintenance
+import com.driverpro.maintenance.presentation.MaintenanceLabels
+import com.driverpro.maintenance.domain.MaintenanceAlert
+import com.driverpro.maintenance.domain.MaintenanceStatus
+import com.driverpro.maintenance.domain.VehicleMaintenance
 
 /**
  * Manutenção preventiva por quilometragem (ROADMAP v0.9.0).

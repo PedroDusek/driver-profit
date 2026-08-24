@@ -1,6 +1,5 @@
-package com.driverpro.domain.model
+package com.driverpro.maintenance.domain
 
-import com.driverpro.expenses.domain.MaintenanceCategory
 import com.driverpro.vehicle.domain.Vehicle
 
 import java.time.Instant
