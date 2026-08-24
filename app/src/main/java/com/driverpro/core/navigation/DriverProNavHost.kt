@@ -13,7 +13,7 @@ import com.driverpro.personal.domain.PersonalUsage
 import com.driverpro.vehicle.domain.Vehicle
 import com.driverpro.earnings.domain.WorkSession
 import com.driverpro.feature.backup.BackupScreen
-import com.driverpro.feature.dashboard.DashboardScreen
+import com.driverpro.dashboard.presentation.DashboardScreen
 import com.driverpro.earnings.presentation.form.EarningsFormScreen
 import com.driverpro.earnings.presentation.list.EarningsListScreen
 import com.driverpro.expenses.presentation.form.ExpenseFormScreen

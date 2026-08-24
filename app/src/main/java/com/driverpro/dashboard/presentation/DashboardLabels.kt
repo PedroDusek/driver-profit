@@ -1,8 +1,8 @@
-package com.driverpro.core.ui.format
+package com.driverpro.dashboard.presentation
 
 import androidx.annotation.StringRes
 import com.driverpro.R
-import com.driverpro.domain.model.DashboardPeriod
+import com.driverpro.dashboard.domain.DashboardPeriod
 
 /** Tradução dos períodos do dashboard para textos da interface. */
 object DashboardLabels {

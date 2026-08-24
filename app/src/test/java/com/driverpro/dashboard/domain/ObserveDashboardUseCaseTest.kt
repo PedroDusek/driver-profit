@@ -1,4 +1,4 @@
-package com.driverpro.domain.usecase
+package com.driverpro.dashboard.domain
 
 import com.driverpro.core.domain.Money
 import com.driverpro.core.domain.DateRange

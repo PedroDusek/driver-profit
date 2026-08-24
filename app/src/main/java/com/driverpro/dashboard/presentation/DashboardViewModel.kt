@@ -1,12 +1,12 @@
-package com.driverpro.feature.dashboard
+package com.driverpro.dashboard.presentation
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import com.driverpro.domain.model.DashboardMetrics
-import com.driverpro.domain.model.DashboardPeriod
+import com.driverpro.dashboard.domain.DashboardMetrics
+import com.driverpro.dashboard.domain.DashboardPeriod
 import com.driverpro.core.domain.DateRange
 import com.driverpro.maintenance.domain.VehicleMaintenance
-import com.driverpro.domain.usecase.ObserveDashboardUseCase
+import com.driverpro.dashboard.domain.ObserveDashboardUseCase
 import com.driverpro.maintenance.domain.ObserveMaintenanceUseCase
 import com.driverpro.personal.domain.ObserveOdometerReconciliationUseCase
 import com.driverpro.personal.domain.VehicleReconciliation

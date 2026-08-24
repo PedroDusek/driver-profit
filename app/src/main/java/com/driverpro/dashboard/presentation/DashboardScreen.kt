@@ -1,4 +1,4 @@
-package com.driverpro.feature.dashboard
+package com.driverpro.dashboard.presentation
 
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.horizontalScroll
@@ -62,14 +62,14 @@ import com.driverpro.core.ui.component.DonutSlice
 import com.driverpro.core.ui.component.StatTile
 import com.driverpro.expenses.presentation.visual
 import com.driverpro.core.ui.format.BrazilianFormatter
-import com.driverpro.core.ui.format.DashboardLabels
+import com.driverpro.dashboard.presentation.DashboardLabels
 import com.driverpro.expenses.presentation.ExpenseLabels
 import com.driverpro.core.ui.theme.DriverProTheme
 import com.driverpro.core.ui.theme.ProfitColors
 import com.driverpro.core.ui.theme.TabularFigures
 import com.driverpro.core.ui.theme.content
-import com.driverpro.domain.model.DashboardMetrics
-import com.driverpro.domain.model.DashboardPeriod
+import com.driverpro.dashboard.domain.DashboardMetrics
+import com.driverpro.dashboard.domain.DashboardPeriod
 import com.driverpro.core.domain.DateRange
 import com.driverpro.expenses.domain.ExpenseCategory
 import com.driverpro.personal.domain.VehicleReconciliation

@@ -1,7 +1,7 @@
-package com.driverpro.domain.usecase
+package com.driverpro.dashboard.domain
 
 import com.driverpro.core.domain.Money
-import com.driverpro.domain.model.DashboardMetrics
+import com.driverpro.dashboard.domain.DashboardMetrics
 import com.driverpro.core.domain.DateRange
 import com.driverpro.earnings.domain.ObserveWorkSessionsBetweenUseCase
 import com.driverpro.personal.domain.ObservePersonalUsageInPeriodUseCase

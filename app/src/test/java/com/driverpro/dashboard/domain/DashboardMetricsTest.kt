@@ -1,4 +1,4 @@
-package com.driverpro.domain.model
+package com.driverpro.dashboard.domain
 import com.driverpro.earnings.domain.WorkSession
 import com.driverpro.earnings.domain.Platform
 

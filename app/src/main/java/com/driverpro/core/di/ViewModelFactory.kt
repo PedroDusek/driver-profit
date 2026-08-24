@@ -8,7 +8,7 @@ import androidx.lifecycle.viewmodel.viewModelFactory
 import com.driverpro.DriverProApplication
 import com.driverpro.core.di.AppContainer
 import com.driverpro.feature.backup.BackupViewModel
-import com.driverpro.feature.dashboard.DashboardViewModel
+import com.driverpro.dashboard.presentation.DashboardViewModel
 import com.driverpro.earnings.presentation.form.EarningsFormViewModel
 import com.driverpro.earnings.presentation.list.EarningsListViewModel
 import com.driverpro.expenses.presentation.form.ExpenseFormViewModel

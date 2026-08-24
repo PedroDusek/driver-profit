@@ -1,5 +1,6 @@
 package com.driverpro.domain.model
 
+import com.driverpro.dashboard.domain.DashboardMetrics
 import com.driverpro.expenses.domain.Expense
 import com.driverpro.expenses.domain.ExpenseCategory
 

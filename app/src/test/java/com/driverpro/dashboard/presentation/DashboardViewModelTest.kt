@@ -1,15 +1,15 @@
-package com.driverpro.feature.dashboard
+package com.driverpro.dashboard.presentation
 
 import com.driverpro.core.domain.Money
 import com.driverpro.core.domain.WorkDuration
-import com.driverpro.domain.model.DashboardPeriod
+import com.driverpro.dashboard.domain.DashboardPeriod
 import com.driverpro.core.domain.DateRange
 import com.driverpro.expenses.domain.Expense
 import com.driverpro.expenses.domain.ExpenseCategory
 import com.driverpro.earnings.domain.Platform
 import com.driverpro.earnings.domain.WorkSession
 import com.driverpro.expenses.domain.ObserveAccruedExpensesUseCase
-import com.driverpro.domain.usecase.ObserveDashboardUseCase
+import com.driverpro.dashboard.domain.ObserveDashboardUseCase
 import com.driverpro.expenses.domain.ObserveExpensesBetweenUseCase
 import com.driverpro.maintenance.domain.ObserveMaintenanceUseCase
 import com.driverpro.personal.domain.ObserveOdometerReconciliationUseCase
