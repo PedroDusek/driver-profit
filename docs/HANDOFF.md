@@ -13,8 +13,39 @@ projeto em uma sessão nova, junto com `PRD.md`, `ARCHITECTURE.md` e
 **Está tudo na `main`, publicado.** v0.11.0, v0.12.0 e v0.13.0 — pedidos de
 produto do Pedro, não itens do roadmap original — foram mergeadas, tagueadas,
 empurradas para `origin` e liberadas com sucesso. v0.14.0 (este rebrand) está
-pronta numa branch de feature (`feature/driverpro-rebrand`), aguardando o
-mesmo caminho.
+pronta numa branch de feature (`feature/driverpro-rebrand`), com o
+[PR #22](https://github.com/PedroDusek/driver-profit/pull/22) aberto contra a
+`main`, aguardando `connectedDebugAndroidTest` e revisão.
+
+> **Reorganização de pacotes feature-first, pronta numa branch separada
+> (ainda não empurrada, sem PR).** A pedido do Pedro, `core/`, `data/`,
+> `domain/` e `feature/` (organizados por tipo técnico de arquivo) viraram
+> `vehicle/`, `expenses/`, `earnings/`, `maintenance/`, `personal/`,
+> `dashboard/`, `backup/` e `more/` — cada um com `data/domain/presentation`
+> só onde faz sentido. `core/` ficou reservado ao que é genuinely
+> compartilhado (banco, DI, navegação, design system). **Branch
+> separada de propósito**: `refactor/feature-first-architecture`, criada a
+> partir da ponta de `feature/driverpro-rebrand` (commit `a4c7356`, antes do
+> PR #22 abrir mais commits) — misturar reorganização estrutural com o
+> redesign visual do PR #22 tornaria a revisão de qualquer um dos dois mais
+> difícil. Só mudou pacote — nenhuma regra de negócio, cálculo, tela,
+> navegação, schema ou migration mudou. 10 commits, um por etapa (Core →
+> Vehicle → Expenses → Earnings → Maintenance → Personal → Dashboard → Backup
+> → More → Cleanup), cada um com `compileDebugKotlin` +
+> `compileDebugUnitTestKotlin` + `compileDebugAndroidTestKotlin` +
+> `testDebugUnitTest` verdes; gate final completo
+> (`testDebugUnitTest lintDebug assembleDebug`) verde. Documentação
+> atualizada (`ARCHITECTURE.md` ganhou árvore de pacotes nova e tabela de
+> dependências cruzadas entre features; `CHANGELOG.md` tem a entrada).
+> Detalhes da auditoria e do mapa de pacotes em
+> `C:\Users\pedro\.claude\plans\agile-skipping-marshmallow.md`.
+>
+> **O que falta:** empurrar a branch e abrir o PR (decisão do Pedro — ainda
+> não pedida nesta sessão), decidir a ordem de merge com o PR #22 (a branch
+> parte da ponta dele, então ou o #22 mergeia primeiro e esta rebaseia, ou
+> o contrário e o #22 sofre o mesmo conflito que qualquer merge teria com um
+> reorganização de pacotes por baixo), e rodar `connectedDebugAndroidTest` no
+> aparelho — só o Pedro roda isso, é rotina do projeto.
 
 > **Correção:** esta seção dizia que v0.13.0 ainda estava numa branch
 > aguardando merge. Não estava mais — `git log`/`git tag` confirmam que já
