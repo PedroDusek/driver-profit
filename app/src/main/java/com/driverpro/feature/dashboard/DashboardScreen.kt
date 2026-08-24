@@ -6,6 +6,7 @@ import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.RowScope
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
@@ -33,6 +34,7 @@ import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.NavigationBar
 import androidx.compose.material3.NavigationBarItem
+import androidx.compose.material3.NavigationBarItemDefaults
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextButton
@@ -45,9 +47,12 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.Preview
+import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.lifecycle.viewmodel.compose.viewModel
@@ -64,10 +69,12 @@ import com.driverpro.core.ui.component.visual
 import com.driverpro.core.ui.format.BrazilianFormatter
 import com.driverpro.core.ui.format.DashboardLabels
 import com.driverpro.core.ui.format.ExpenseLabels
+import com.driverpro.core.ui.theme.DarkNavUnselected
 import com.driverpro.core.ui.theme.DriverProTheme
 import com.driverpro.core.ui.theme.ProfitColors
 import com.driverpro.core.ui.theme.TabularFigures
 import com.driverpro.core.ui.theme.content
+import com.driverpro.core.ui.theme.driverProTopAppBarColors
 import com.driverpro.domain.model.DashboardMetrics
 import com.driverpro.domain.model.DashboardPeriod
 import com.driverpro.domain.model.DateRange
@@ -111,7 +118,10 @@ fun DashboardScreen(
     Scaffold(
         modifier = modifier.fillMaxSize(),
         topBar = {
-            TopAppBar(title = { Text(text = stringResource(R.string.app_name)) })
+            TopAppBar(
+                title = { Text(text = stringResource(R.string.app_name)) },
+                colors = driverProTopAppBarColors(),
+            )
         },
         bottomBar = {
             DashboardNavigationBar(
@@ -216,38 +226,86 @@ private fun DashboardNavigationBar(
     onOpenVehicles: () -> Unit,
     onOpenMore: () -> Unit,
 ) {
-    NavigationBar {
-        NavigationBarItem(
-            selected = true,
-            onClick = {},
-            icon = { Icon(Icons.Default.Dashboard, contentDescription = null) },
-            label = { Text(stringResource(R.string.nav_dashboard)) },
+    Column {
+        // Fio separando a barra do conteúdo. Na referência é o único limite
+        // entre os dois: a barra tem a mesma cor do fundo da página, então
+        // sem essa linha ela simplesmente não existe como região.
+        HorizontalDivider(
+            thickness = Dp.Hairline,
+            color = MaterialTheme.colorScheme.outlineVariant,
         )
-        NavigationBarItem(
-            selected = false,
-            onClick = onOpenEarnings,
-            icon = { Icon(Icons.Default.Payments, contentDescription = null) },
-            label = { Text(stringResource(R.string.earnings_list_title)) },
-        )
-        NavigationBarItem(
-            selected = false,
-            onClick = onOpenExpenses,
-            icon = { Icon(Icons.AutoMirrored.Filled.ReceiptLong, contentDescription = null) },
-            label = { Text(stringResource(R.string.expenses_list_title)) },
-        )
-        NavigationBarItem(
-            selected = false,
-            onClick = onOpenVehicles,
-            icon = { Icon(Icons.Default.DirectionsCar, contentDescription = null) },
-            label = { Text(stringResource(R.string.vehicle_list_title)) },
-        )
-        NavigationBarItem(
-            selected = false,
-            onClick = onOpenMore,
-            icon = { Icon(Icons.Default.MoreHoriz, contentDescription = null) },
-            label = { Text(stringResource(R.string.nav_more)) },
-        )
+        NavigationBar(
+            containerColor = MaterialTheme.colorScheme.background,
+            tonalElevation = 0.dp,
+        ) {
+            DashboardNavItem(
+                selected = true,
+                onClick = {},
+                icon = Icons.Default.Dashboard,
+                label = stringResource(R.string.nav_dashboard),
+            )
+            DashboardNavItem(
+                selected = false,
+                onClick = onOpenEarnings,
+                icon = Icons.Default.Payments,
+                label = stringResource(R.string.earnings_list_title),
+            )
+            DashboardNavItem(
+                selected = false,
+                onClick = onOpenExpenses,
+                icon = Icons.AutoMirrored.Filled.ReceiptLong,
+                label = stringResource(R.string.expenses_list_title),
+            )
+            DashboardNavItem(
+                selected = false,
+                onClick = onOpenVehicles,
+                icon = Icons.Default.DirectionsCar,
+                label = stringResource(R.string.vehicle_list_title),
+            )
+            DashboardNavItem(
+                selected = false,
+                onClick = onOpenMore,
+                icon = Icons.Default.MoreHoriz,
+                label = stringResource(R.string.nav_more),
+            )
+        }
     }
+}
+
+/**
+ * Item da barra inferior no estilo da referência: **verde quando ativo,
+ * cinza quando não**, e nada mais.
+ *
+ * O `NavigationBarItem` do Material 3 desenha, por padrão, uma pílula
+ * colorida (`secondaryContainer`) atrás do ícone selecionado — é a assinatura
+ * do M3, e é justamente o que a referência não tem. Zerar o `indicatorColor`
+ * apaga a pílula e deixa a cor do próprio ícone e do rótulo carregarem o
+ * estado, que é como o design comunica seleção.
+ *
+ * Cor não é o único sinal: o item ativo também recebe
+ * `selected = true`, que o TalkBack anuncia. Quem não distingue verde de
+ * cinza continua sabendo onde está.
+ */
+@Composable
+private fun RowScope.DashboardNavItem(
+    selected: Boolean,
+    onClick: () -> Unit,
+    icon: ImageVector,
+    label: String,
+) {
+    NavigationBarItem(
+        selected = selected,
+        onClick = onClick,
+        icon = { Icon(icon, contentDescription = null) },
+        label = { Text(label) },
+        colors = NavigationBarItemDefaults.colors(
+            indicatorColor = Color.Transparent,
+            selectedIconColor = MaterialTheme.colorScheme.primary,
+            selectedTextColor = MaterialTheme.colorScheme.primary,
+            unselectedIconColor = DarkNavUnselected,
+            unselectedTextColor = DarkNavUnselected,
+        ),
+    )
 }
 
 @Composable

@@ -56,6 +56,7 @@ import com.driverpro.core.ui.format.EarningsLabels
 import com.driverpro.core.ui.theme.DriverProTheme
 import com.driverpro.core.ui.theme.PlatformAccentColors
 import com.driverpro.core.ui.theme.TabularFigures
+import com.driverpro.core.ui.theme.driverProTopAppBarColors
 import com.driverpro.domain.model.Platform
 import com.driverpro.domain.model.WorkSession
 import java.time.Instant
@@ -79,6 +80,7 @@ fun EarningsListScreen(
         modifier = modifier.fillMaxSize(),
         topBar = {
             TopAppBar(
+                colors = driverProTopAppBarColors(),
                 title = { Text(stringResource(R.string.earnings_list_title)) },
                 navigationIcon = {
                     IconButton(onClick = onBack) {

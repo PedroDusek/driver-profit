@@ -1,13 +1,17 @@
 package com.driverpro.core.ui.theme
 
 import android.os.Build
-import androidx.compose.foundation.isSystemInDarkTheme
+import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.TopAppBarColors
+import androidx.compose.material3.TopAppBarDefaults
 import androidx.compose.material3.darkColorScheme
 import androidx.compose.material3.dynamicDarkColorScheme
 import androidx.compose.material3.dynamicLightColorScheme
 import androidx.compose.material3.lightColorScheme
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.CompositionLocalProvider
+import androidx.compose.runtime.staticCompositionLocalOf
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalContext
 
@@ -44,7 +48,7 @@ private val LightColors = lightColorScheme(
 )
 
 private val DarkColors = darkColorScheme(
-    primary = BrandGreen80,
+    primary = BrandGreen60,
     onPrimary = BrandGreen20,
     primaryContainer = BrandGreen30,
     onPrimaryContainer = BrandGreen90,
@@ -76,7 +80,25 @@ private val DarkColors = darkColorScheme(
 )
 
 /**
+ * Se o tema **do app** está escuro.
+ *
+ * Existe porque `isSystemInDarkTheme()` responde pelo aparelho, não pelo app,
+ * e desde que o [DriverProTheme] passou a fixar o escuro as duas respostas
+ * divergem em todo aparelho configurado no claro. Quem precisa escolher uma
+ * cor por tema — [content], abaixo — tem que perguntar ao tema que está
+ * realmente pintando a tela, senão devolve a cor clara sobre fundo escuro.
+ */
+internal val LocalIsDarkTheme = staticCompositionLocalOf { true }
+
+/**
  * Tema do aplicativo.
+ *
+ * **Escuro por padrão, e não conforme o aparelho.** A identidade visual do
+ * DriverPro é o navy com verde da referência do Figma; seguir o claro/escuro
+ * do sistema faria a maioria dos motoristas nunca ver o app que foi
+ * desenhado. O parâmetro [darkTheme] continua existindo — e `LightColors`
+ * continua no código, íntegro — para quem quiser reverter isso, e para
+ * previews pedirem o claro explicitamente.
  *
  * `dynamicColor` (Material You) desligado por padrão: um app com identidade
  * visual própria não deveria trocar de cor conforme o papel de parede do
@@ -85,7 +107,7 @@ private val DarkColors = darkColorScheme(
  */
 @Composable
 fun DriverProTheme(
-    darkTheme: Boolean = isSystemInDarkTheme(),
+    darkTheme: Boolean = true,
     dynamicColor: Boolean = false,
     content: @Composable () -> Unit,
 ) {
@@ -98,23 +120,48 @@ fun DriverProTheme(
         else -> LightColors
     }
 
-    MaterialTheme(
-        colorScheme = colorScheme,
-        typography = DriverProTypography,
-        shapes = DriverProShapes,
-        content = content,
-    )
+    CompositionLocalProvider(LocalIsDarkTheme provides darkTheme) {
+        MaterialTheme(
+            colorScheme = colorScheme,
+            typography = DriverProTypography,
+            shapes = DriverProShapes,
+            content = content,
+        )
+    }
 }
 
 /**
+ * Cores da barra de título de todas as telas.
+ *
+ * O padrão do Material 3 pinta a `TopAppBar` com `surface`, que no tema
+ * escuro é a cor dos **cards** — o resultado é uma faixa mais clara no topo,
+ * separada do resto da página. A referência do Figma não tem essa faixa: o
+ * título vive no mesmo plano do conteúdo. Usar `background` funde a barra com
+ * a página e devolve esse plano único.
+ *
+ * Vive aqui, e não repetida em cada tela, porque são doze telas: espalhar a
+ * configuração garantiria que uma delas ficasse para trás na próxima
+ * mudança de paleta.
+ */
+@OptIn(ExperimentalMaterial3Api::class)
+@Composable
+fun driverProTopAppBarColors(): TopAppBarColors = TopAppBarDefaults.topAppBarColors(
+    containerColor = MaterialTheme.colorScheme.background,
+    scrolledContainerColor = MaterialTheme.colorScheme.background,
+)
+
+/**
  * Cor de texto de [ProfitColors] para o tema atual (claro ou escuro) — usada
- * no número de lucro do Dashboard, que segue em card branco/neutro
- * (`IMAGENS/Referencia Visual.jpeg` não pinta o card inteiro, só o número).
+ * no número de lucro do Dashboard, que segue em card neutro (a referência não
+ * pinta o card inteiro, só o número).
  */
 @Composable
-fun ProfitColors.content(positive: Boolean): Color = when {
-    isSystemInDarkTheme() && positive -> positiveDark
-    isSystemInDarkTheme() && !positive -> negativeDark
-    positive -> positiveLight
-    else -> negativeLight
+fun ProfitColors.content(positive: Boolean): Color {
+    val dark = LocalIsDarkTheme.current
+    return when {
+        dark && positive -> positiveDark
+        dark && !positive -> negativeDark
+        positive -> positiveLight
+        else -> negativeLight
+    }
 }

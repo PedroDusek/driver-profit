@@ -43,6 +43,7 @@ import com.driverpro.core.ui.component.IconChip
 import com.driverpro.core.ui.component.ListItemCard
 import com.driverpro.core.ui.format.BrazilianFormatter
 import com.driverpro.core.ui.theme.TabularFigures
+import com.driverpro.core.ui.theme.driverProTopAppBarColors
 import com.driverpro.domain.model.PersonalUsage
 import com.driverpro.domain.model.PersonalUsageSource
 import com.driverpro.domain.usecase.OdometerReconciliation
@@ -66,6 +67,7 @@ fun PersonalUsageListScreen(
         modifier = modifier.fillMaxSize(),
         topBar = {
             TopAppBar(
+                colors = driverProTopAppBarColors(),
                 title = { Text(stringResource(R.string.personal_usage_title)) },
                 navigationIcon = {
                     IconButton(onClick = onBack) {

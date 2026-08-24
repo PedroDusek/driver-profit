@@ -40,6 +40,7 @@ import com.driverpro.R
 import com.driverpro.core.ui.DriverProViewModelFactory
 import com.driverpro.core.ui.format.VehicleLabels
 import com.driverpro.core.ui.theme.DriverProTheme
+import com.driverpro.core.ui.theme.driverProTopAppBarColors
 import com.driverpro.domain.model.VehicleField
 import com.driverpro.domain.model.VehicleFuel
 
@@ -71,6 +72,7 @@ fun VehicleFormScreen(
         modifier = modifier.fillMaxSize(),
         topBar = {
             TopAppBar(
+                colors = driverProTopAppBarColors(),
                 title = {
                     Text(
                         stringResource(

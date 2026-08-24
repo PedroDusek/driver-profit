@@ -47,6 +47,7 @@ import com.driverpro.core.ui.format.MaintenanceLabels
 import com.driverpro.domain.model.MaintenanceAlert
 import com.driverpro.domain.model.MaintenanceStatus
 import com.driverpro.domain.model.VehicleMaintenance
+import com.driverpro.core.ui.theme.driverProTopAppBarColors
 
 /**
  * Manutenção preventiva por quilometragem (ROADMAP v0.9.0).
@@ -70,6 +71,7 @@ fun MaintenanceScreen(
         modifier = modifier.fillMaxSize(),
         topBar = {
             TopAppBar(
+                colors = driverProTopAppBarColors(),
                 title = { Text(text = stringResource(R.string.maintenance_title)) },
                 navigationIcon = {
                     IconButton(onClick = onBack) {

@@ -27,6 +27,7 @@ import androidx.compose.ui.unit.dp
 import com.driverpro.R
 import com.driverpro.core.ui.component.IconChip
 import com.driverpro.core.ui.component.ListItemCard
+import com.driverpro.core.ui.theme.driverProTopAppBarColors
 
 /**
  * Hub das seções secundárias (v0.14.0) — Uso pessoal, Manutenção e
@@ -46,6 +47,7 @@ fun MoreScreen(
         modifier = modifier.fillMaxSize(),
         topBar = {
             TopAppBar(
+                colors = driverProTopAppBarColors(),
                 title = { Text(stringResource(R.string.nav_more)) },
                 navigationIcon = {
                     IconButton(onClick = onBack) {

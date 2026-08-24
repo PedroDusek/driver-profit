@@ -50,6 +50,7 @@ import com.driverpro.core.ui.component.CaretAtEndTextField
 import com.driverpro.core.ui.format.BrazilianFormatter
 import com.driverpro.core.ui.format.EarningsLabels
 import com.driverpro.core.ui.theme.DriverProTheme
+import com.driverpro.core.ui.theme.driverProTopAppBarColors
 import com.driverpro.domain.model.Platform
 import com.driverpro.domain.model.WorkSessionField
 import java.time.Instant
@@ -85,6 +86,7 @@ fun EarningsFormScreen(
         modifier = modifier.fillMaxSize(),
         topBar = {
             TopAppBar(
+                colors = driverProTopAppBarColors(),
                 title = {
                     Text(
                         stringResource(

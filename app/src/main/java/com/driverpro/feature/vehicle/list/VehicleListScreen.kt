@@ -43,6 +43,7 @@ import com.driverpro.core.ui.component.ListItemCard
 import com.driverpro.core.ui.format.BrazilianFormatter
 import com.driverpro.core.ui.format.VehicleLabels
 import com.driverpro.core.ui.theme.DriverProTheme
+import com.driverpro.core.ui.theme.driverProTopAppBarColors
 import com.driverpro.domain.model.Vehicle
 import com.driverpro.domain.model.VehicleFuel
 import java.time.Instant
@@ -64,6 +65,7 @@ fun VehicleListScreen(
         modifier = modifier.fillMaxSize(),
         topBar = {
             TopAppBar(
+                colors = driverProTopAppBarColors(),
                 title = { Text(stringResource(R.string.vehicle_list_title)) },
                 navigationIcon = {
                     IconButton(onClick = onBack) {

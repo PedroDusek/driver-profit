@@ -57,6 +57,7 @@ import com.driverpro.core.ui.format.ExpenseLabels
 import com.driverpro.core.ui.format.QuantityInput
 import com.driverpro.core.ui.theme.DriverProTheme
 import com.driverpro.core.ui.theme.TabularFigures
+import com.driverpro.core.ui.theme.driverProTopAppBarColors
 import com.driverpro.domain.model.ConsumptionEstimate
 import com.driverpro.domain.model.Expense
 import com.driverpro.domain.model.ExpenseCategory
@@ -82,6 +83,7 @@ fun ExpensesListScreen(
         modifier = modifier.fillMaxSize(),
         topBar = {
             TopAppBar(
+                colors = driverProTopAppBarColors(),
                 title = { Text(stringResource(R.string.expenses_list_title)) },
                 navigationIcon = {
                     IconButton(onClick = onBack) {

@@ -56,6 +56,7 @@ import com.driverpro.domain.model.ExpenseCategory
 import com.driverpro.domain.model.ExpenseDetailKind
 import com.driverpro.domain.model.ExpenseField
 import com.driverpro.domain.model.MaintenanceCategory
+import com.driverpro.core.ui.theme.driverProTopAppBarColors
 import java.time.Instant
 import java.time.LocalDate
 import java.time.ZoneOffset
@@ -92,6 +93,7 @@ fun ExpenseFormScreen(
         modifier = modifier.fillMaxSize(),
         topBar = {
             TopAppBar(
+                colors = driverProTopAppBarColors(),
                 title = {
                     Text(
                         stringResource(

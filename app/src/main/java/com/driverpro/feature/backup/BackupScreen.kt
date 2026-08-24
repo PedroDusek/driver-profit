@@ -35,6 +35,7 @@ import androidx.lifecycle.viewmodel.compose.viewModel
 import com.driverpro.R
 import com.driverpro.core.ui.DriverProViewModelFactory
 import com.driverpro.core.ui.format.BackupLabels
+import com.driverpro.core.ui.theme.driverProTopAppBarColors
 import java.time.LocalDate
 import java.time.format.DateTimeFormatter
 
@@ -68,6 +69,7 @@ fun BackupScreen(
         modifier = modifier.fillMaxSize(),
         topBar = {
             TopAppBar(
+                colors = driverProTopAppBarColors(),
                 title = { Text(text = stringResource(R.string.backup_title)) },
                 navigationIcon = {
                     IconButton(onClick = onBack) {

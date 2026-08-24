@@ -48,6 +48,7 @@ import com.driverpro.core.ui.component.CaretAtEndTextField
 import com.driverpro.core.ui.format.BrazilianFormatter
 import com.driverpro.core.ui.format.PersonalUsageLabels
 import com.driverpro.domain.model.PersonalUsageField
+import com.driverpro.core.ui.theme.driverProTopAppBarColors
 import java.time.Instant
 import java.time.LocalDate
 import java.time.ZoneOffset
@@ -77,6 +78,7 @@ fun PersonalUsageFormScreen(
         modifier = modifier.fillMaxSize(),
         topBar = {
             TopAppBar(
+                colors = driverProTopAppBarColors(),
                 title = {
                     Text(
                         stringResource(

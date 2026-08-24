@@ -14,6 +14,30 @@ internal val BrandGreen80 = Color(0xFF6FE3B4)
 internal val BrandGreen90 = Color(0xFFD4F5E6)
 internal val BrandGreen20 = Color(0xFF04321F)
 
+/**
+ * Verde de assinatura do app — o esmeralda vivo da referência do Figma.
+ *
+ * Fica **fora** da rampa tonal `BrandGreen10..90` de propósito: aquela rampa
+ * segue a numeração do Material 3, onde o número é luminosidade, e o tom que
+ * o M3 escolheria para o tema escuro seria o `80` (`#6FE3B4`) — um menta
+ * pálido. O design não usa esse menta: usa um verde saturado, e é ele que
+ * carrega a leitura "isto é dinheiro seu, e está subindo".
+ *
+ * Contraste sobre [DarkBackground]: ~7,6:1 — passa em AA para texto normal e
+ * em AAA para texto grande, que é o caso dos números-herói do dashboard.
+ */
+internal val BrandGreen60 = Color(0xFF22C55E)
+
+/**
+ * Cinza dos itens **não** selecionados da barra inferior.
+ *
+ * Mais apagado que [DarkOnSurfaceVariant] (`#B7C2D6`), que é o cinza de texto
+ * secundário: na referência a distância entre a aba ativa e as inativas é
+ * grande, e reaproveitar o cinza de texto deixaria as quatro inativas
+ * competindo com a ativa.
+ */
+internal val DarkNavUnselected = Color(0xFF8A94A6)
+
 internal val Slate10 = Color(0xFF0B1F16)
 internal val Slate20 = Color(0xFF20352A)
 internal val Slate30 = Color(0xFF38503F)
@@ -81,7 +105,9 @@ object ProfitColors {
     val positiveContainerLight = BrandGreen90
     val onPositiveContainerLight = BrandGreen10
 
-    val positiveDark = BrandGreen80
+    // O mesmo esmeralda da marca: na referência, o número do lucro e a aba
+    // ativa são exatamente a mesma cor.
+    val positiveDark = BrandGreen60
     val onPositiveDark = BrandGreen20
     val positiveContainerDark = BrandGreen30
     val onPositiveContainerDark = BrandGreen90
