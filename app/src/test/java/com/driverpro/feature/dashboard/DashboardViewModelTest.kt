@@ -12,13 +12,13 @@ import com.driverpro.expenses.domain.ObserveAccruedExpensesUseCase
 import com.driverpro.domain.usecase.ObserveDashboardUseCase
 import com.driverpro.expenses.domain.ObserveExpensesBetweenUseCase
 import com.driverpro.maintenance.domain.ObserveMaintenanceUseCase
-import com.driverpro.domain.usecase.ObserveOdometerReconciliationUseCase
-import com.driverpro.domain.usecase.ObservePersonalUsageInPeriodUseCase
+import com.driverpro.personal.domain.ObserveOdometerReconciliationUseCase
+import com.driverpro.personal.domain.ObservePersonalUsageInPeriodUseCase
 import com.driverpro.earnings.domain.ObserveWorkSessionsBetweenUseCase
 import com.driverpro.expenses.domain.FakeExpenseRepository
 import com.driverpro.maintenance.domain.FakeMaintenanceScheduleRepository
-import com.driverpro.testing.FakePersonalUsageRepository
-import com.driverpro.testing.FakeReconciliationDismissalRepository
+import com.driverpro.personal.domain.FakePersonalUsageRepository
+import com.driverpro.personal.domain.FakeReconciliationDismissalRepository
 import com.driverpro.vehicle.domain.FakeVehicleRepository
 import com.driverpro.earnings.domain.FakeWorkSessionRepository
 import com.driverpro.testing.MainDispatcherRule

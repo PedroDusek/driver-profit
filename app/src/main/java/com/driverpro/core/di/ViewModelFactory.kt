@@ -14,8 +14,8 @@ import com.driverpro.earnings.presentation.list.EarningsListViewModel
 import com.driverpro.expenses.presentation.form.ExpenseFormViewModel
 import com.driverpro.expenses.presentation.list.ExpensesListViewModel
 import com.driverpro.maintenance.presentation.MaintenanceViewModel
-import com.driverpro.feature.personal.form.PersonalUsageFormViewModel
-import com.driverpro.feature.personal.list.PersonalUsageListViewModel
+import com.driverpro.personal.presentation.form.PersonalUsageFormViewModel
+import com.driverpro.personal.presentation.list.PersonalUsageListViewModel
 import com.driverpro.vehicle.presentation.form.VehicleFormViewModel
 import com.driverpro.vehicle.presentation.list.VehicleListViewModel
 

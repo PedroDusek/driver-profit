@@ -1,8 +1,6 @@
 package com.driverpro.maintenance.data
 
 import com.driverpro.maintenance.data.MaintenanceScheduleDao
-import com.driverpro.data.local.entity.toDomain
-import com.driverpro.data.local.entity.toEntity
 import com.driverpro.maintenance.domain.MaintenanceItem
 import com.driverpro.maintenance.domain.MaintenanceSchedule
 import com.driverpro.maintenance.domain.MaintenanceScheduleRepository

@@ -6,7 +6,7 @@ import com.driverpro.expenses.domain.ExpenseCategory
 import com.driverpro.core.domain.FuelType
 import com.driverpro.maintenance.domain.MaintenanceCategory
 import com.driverpro.maintenance.domain.MaintenanceItem
-import com.driverpro.domain.model.PersonalUsageSource
+import com.driverpro.personal.domain.PersonalUsageSource
 import com.driverpro.earnings.domain.Platform
 import com.driverpro.vehicle.domain.VehicleFuel
 import java.time.Instant

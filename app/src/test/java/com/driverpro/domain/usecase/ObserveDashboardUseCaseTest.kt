@@ -7,7 +7,8 @@ import com.driverpro.expenses.domain.ExpenseCategory
 import com.driverpro.expenses.domain.ObserveAccruedExpensesUseCase
 import com.driverpro.expenses.domain.ObserveExpensesBetweenUseCase
 import com.driverpro.expenses.domain.FakeExpenseRepository
-import com.driverpro.testing.FakePersonalUsageRepository
+import com.driverpro.personal.domain.FakePersonalUsageRepository
+import com.driverpro.personal.domain.ObservePersonalUsageInPeriodUseCase
 import com.driverpro.earnings.domain.FakeWorkSessionRepository
 import com.driverpro.earnings.domain.ObserveWorkSessionsBetweenUseCase
 import kotlinx.coroutines.flow.first

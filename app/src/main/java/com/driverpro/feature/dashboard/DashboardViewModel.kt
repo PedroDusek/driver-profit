@@ -8,8 +8,8 @@ import com.driverpro.core.domain.DateRange
 import com.driverpro.maintenance.domain.VehicleMaintenance
 import com.driverpro.domain.usecase.ObserveDashboardUseCase
 import com.driverpro.maintenance.domain.ObserveMaintenanceUseCase
-import com.driverpro.domain.usecase.ObserveOdometerReconciliationUseCase
-import com.driverpro.domain.usecase.VehicleReconciliation
+import com.driverpro.personal.domain.ObserveOdometerReconciliationUseCase
+import com.driverpro.personal.domain.VehicleReconciliation
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.SharingStarted

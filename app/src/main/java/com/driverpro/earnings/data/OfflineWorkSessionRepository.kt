@@ -1,8 +1,6 @@
 package com.driverpro.earnings.data
 
 import com.driverpro.earnings.data.WorkSessionDao
-import com.driverpro.data.local.entity.toDomain
-import com.driverpro.data.local.entity.toEntity
 import com.driverpro.earnings.domain.WorkSession
 import com.driverpro.earnings.domain.WorkSessionRepository
 import kotlinx.coroutines.CoroutineDispatcher

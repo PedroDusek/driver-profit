@@ -1,8 +1,6 @@
 package com.driverpro.expenses.data
 
 import com.driverpro.expenses.data.ExpenseDao
-import com.driverpro.data.local.entity.toDomain
-import com.driverpro.data.local.entity.toEntity
 import com.driverpro.core.domain.DateRange
 import com.driverpro.expenses.domain.Expense
 import com.driverpro.expenses.domain.ExpenseRepository

@@ -1,8 +1,6 @@
 package com.driverpro.vehicle.data
 
 import com.driverpro.vehicle.data.VehicleDao
-import com.driverpro.data.local.entity.toDomain
-import com.driverpro.data.local.entity.toEntity
 import com.driverpro.vehicle.domain.Vehicle
 import com.driverpro.vehicle.domain.VehicleRepository
 import kotlinx.coroutines.CoroutineDispatcher
