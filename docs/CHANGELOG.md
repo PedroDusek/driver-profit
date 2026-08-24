@@ -7,6 +7,15 @@ Versionamento conforme [Semantic Versioning](https://semver.org/lang/pt-BR/).
 
 ### Alterado
 
+- **Reorganização de pacotes: feature-first.** `core/`, `data/`, `domain/` e
+  `feature/` (organizados por tipo técnico de arquivo) viraram
+  `vehicle/`, `expenses/`, `earnings/`, `maintenance/`, `personal/`,
+  `dashboard/`, `backup/` e `more/` (organizados por funcionalidade do
+  produto, cada um com `data/domain/presentation` só onde faz sentido).
+  `core/` ficou reservado ao que é genuinely compartilhado: banco de dados,
+  injeção de dependência, navegação e design system. Mudança só de pacote —
+  nenhuma regra de negócio, cálculo, tela, schema ou migration mudou. Detalhes
+  em `ARCHITECTURE.md`
 - **Nome do produto: DriverPro.** `com.driverprofit` virou `com.driverpro` em
   todo o projeto — pacote Kotlin, `applicationId`, banco (`driverpro.db`),
   ícone e documentação. Seguro agora porque nenhuma instalação de terceiro

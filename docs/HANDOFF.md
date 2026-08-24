@@ -196,7 +196,7 @@ estimado em si chega na v0.8.0.
 
 ## 5. Decisões técnicas que não devem ser revertidas
 
-- **Dinheiro é `Long` em centavos** (`core/common/Money`). Nunca `Double`
+- **Dinheiro é `Long` em centavos** (`core/domain/Money`). Nunca `Double`
 - **Divisão devolve `null`**, não zero: um período sem km não tem R$/km. A UI
   exibe `—`
 - **Tempo é `Long` em minutos** (`WorkDuration`); **quantidade é `Long` em
