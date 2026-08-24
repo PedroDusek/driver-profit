@@ -12,14 +12,14 @@ import com.driverpro.expenses.domain.Expense
 import com.driverpro.personal.domain.PersonalUsage
 import com.driverpro.vehicle.domain.Vehicle
 import com.driverpro.earnings.domain.WorkSession
-import com.driverpro.feature.backup.BackupScreen
+import com.driverpro.backup.presentation.BackupScreen
 import com.driverpro.dashboard.presentation.DashboardScreen
 import com.driverpro.earnings.presentation.form.EarningsFormScreen
 import com.driverpro.earnings.presentation.list.EarningsListScreen
 import com.driverpro.expenses.presentation.form.ExpenseFormScreen
 import com.driverpro.expenses.presentation.list.ExpensesListScreen
 import com.driverpro.maintenance.presentation.MaintenanceScreen
-import com.driverpro.feature.more.MoreScreen
+import com.driverpro.more.presentation.MoreScreen
 import com.driverpro.personal.presentation.form.PersonalUsageFormScreen
 import com.driverpro.personal.presentation.list.PersonalUsageListScreen
 import com.driverpro.vehicle.presentation.form.VehicleFormScreen

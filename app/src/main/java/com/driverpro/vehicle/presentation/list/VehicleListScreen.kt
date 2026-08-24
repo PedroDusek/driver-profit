@@ -41,7 +41,7 @@ import com.driverpro.core.di.DriverProViewModelFactory
 import com.driverpro.core.ui.component.IconChip
 import com.driverpro.core.ui.component.ListItemCard
 import com.driverpro.core.ui.format.BrazilianFormatter
-import com.driverpro.core.ui.format.VehicleLabels
+import com.driverpro.vehicle.presentation.VehicleLabels
 import com.driverpro.core.ui.theme.DriverProTheme
 import com.driverpro.vehicle.domain.Vehicle
 import com.driverpro.vehicle.domain.VehicleFuel

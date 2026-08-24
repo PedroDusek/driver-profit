@@ -1,4 +1,4 @@
-package com.driverpro.core.ui.format
+package com.driverpro.vehicle.presentation
 
 import androidx.annotation.StringRes
 import com.driverpro.R

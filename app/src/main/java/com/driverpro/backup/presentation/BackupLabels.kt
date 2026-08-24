@@ -1,9 +1,9 @@
-package com.driverpro.core.ui.format
+package com.driverpro.backup.presentation
 
 import androidx.annotation.StringRes
 import com.driverpro.R
-import com.driverpro.data.backup.BackupError
-import com.driverpro.feature.backup.BackupMessage
+import com.driverpro.backup.data.BackupError
+import com.driverpro.backup.presentation.BackupMessage
 
 /** Tradução de [BackupMessage] para textos da interface. */
 object BackupLabels {

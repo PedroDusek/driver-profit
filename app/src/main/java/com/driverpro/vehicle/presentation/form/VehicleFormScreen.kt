@@ -38,7 +38,7 @@ import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.lifecycle.viewmodel.compose.viewModel
 import com.driverpro.R
 import com.driverpro.core.di.DriverProViewModelFactory
-import com.driverpro.core.ui.format.VehicleLabels
+import com.driverpro.vehicle.presentation.VehicleLabels
 import com.driverpro.core.ui.theme.DriverProTheme
 import com.driverpro.vehicle.domain.VehicleField
 import com.driverpro.vehicle.domain.VehicleFuel

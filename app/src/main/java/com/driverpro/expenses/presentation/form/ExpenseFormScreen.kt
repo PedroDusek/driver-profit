@@ -50,7 +50,7 @@ import com.driverpro.core.di.DriverProViewModelFactory
 import com.driverpro.core.ui.component.CaretAtEndTextField
 import com.driverpro.core.ui.format.BrazilianFormatter
 import com.driverpro.expenses.presentation.ExpenseLabels
-import com.driverpro.core.ui.format.VehicleLabels
+import com.driverpro.vehicle.presentation.VehicleLabels
 import com.driverpro.expenses.domain.ChargingLocation
 import com.driverpro.expenses.domain.ExpenseCategory
 import com.driverpro.expenses.domain.ExpenseDetailKind

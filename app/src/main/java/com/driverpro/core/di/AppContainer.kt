@@ -2,8 +2,8 @@ package com.driverpro.core.di
 
 import android.content.Context
 import androidx.room.Room
-import com.driverpro.data.backup.ExportBackupUseCase
-import com.driverpro.data.backup.ImportBackupUseCase
+import com.driverpro.backup.data.ExportBackupUseCase
+import com.driverpro.backup.data.ImportBackupUseCase
 import com.driverpro.core.database.DriverProDatabase
 import com.driverpro.core.database.Migrations
 import com.driverpro.expenses.data.OfflineExpenseRepository
