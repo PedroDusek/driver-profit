@@ -11,11 +11,11 @@ import androidx.navigation.navArgument
 import com.driverpro.expenses.domain.Expense
 import com.driverpro.domain.model.PersonalUsage
 import com.driverpro.vehicle.domain.Vehicle
-import com.driverpro.domain.model.WorkSession
+import com.driverpro.earnings.domain.WorkSession
 import com.driverpro.feature.backup.BackupScreen
 import com.driverpro.feature.dashboard.DashboardScreen
-import com.driverpro.feature.earnings.form.EarningsFormScreen
-import com.driverpro.feature.earnings.list.EarningsListScreen
+import com.driverpro.earnings.presentation.form.EarningsFormScreen
+import com.driverpro.earnings.presentation.list.EarningsListScreen
 import com.driverpro.expenses.presentation.form.ExpenseFormScreen
 import com.driverpro.expenses.presentation.list.ExpensesListScreen
 import com.driverpro.feature.maintenance.MaintenanceScreen

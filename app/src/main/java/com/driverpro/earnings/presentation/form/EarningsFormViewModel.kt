@@ -1,4 +1,4 @@
-package com.driverpro.feature.earnings.form
+package com.driverpro.earnings.presentation.form
 
 import androidx.lifecycle.SavedStateHandle
 import androidx.lifecycle.ViewModel
@@ -7,17 +7,17 @@ import com.driverpro.core.domain.Money
 import com.driverpro.core.domain.WorkDuration
 import com.driverpro.core.navigation.DriverProDestination
 import com.driverpro.core.ui.format.MoneyInput
-import com.driverpro.domain.model.Platform
-import com.driverpro.domain.model.WorkSession
-import com.driverpro.domain.model.WorkSessionDraft
-import com.driverpro.domain.model.WorkSessionField
-import com.driverpro.domain.model.WorkSessionFieldError
-import com.driverpro.domain.model.WorkSessionValidationError
-import com.driverpro.domain.model.toDraft
-import com.driverpro.domain.usecase.GetWorkSessionUseCase
+import com.driverpro.earnings.domain.Platform
+import com.driverpro.earnings.domain.WorkSession
+import com.driverpro.earnings.domain.WorkSessionDraft
+import com.driverpro.earnings.domain.WorkSessionField
+import com.driverpro.earnings.domain.WorkSessionFieldError
+import com.driverpro.earnings.domain.WorkSessionValidationError
+import com.driverpro.earnings.domain.toDraft
+import com.driverpro.earnings.domain.GetWorkSessionUseCase
 import com.driverpro.vehicle.domain.ObserveVehiclesUseCase
-import com.driverpro.domain.usecase.SaveWorkSessionResult
-import com.driverpro.domain.usecase.SaveWorkSessionUseCase
+import com.driverpro.earnings.domain.SaveWorkSessionResult
+import com.driverpro.earnings.domain.SaveWorkSessionUseCase
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow

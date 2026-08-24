@@ -1,4 +1,4 @@
-package com.driverpro.domain.model
+package com.driverpro.earnings.domain
 
 /**
  * Plataforma de transporte em que a sessão de trabalho foi feita.

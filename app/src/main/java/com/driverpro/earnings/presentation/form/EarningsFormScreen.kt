@@ -1,4 +1,4 @@
-package com.driverpro.feature.earnings.form
+package com.driverpro.earnings.presentation.form
 
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
@@ -48,10 +48,10 @@ import com.driverpro.R
 import com.driverpro.core.di.DriverProViewModelFactory
 import com.driverpro.core.ui.component.CaretAtEndTextField
 import com.driverpro.core.ui.format.BrazilianFormatter
-import com.driverpro.core.ui.format.EarningsLabels
+import com.driverpro.earnings.presentation.EarningsLabels
 import com.driverpro.core.ui.theme.DriverProTheme
-import com.driverpro.domain.model.Platform
-import com.driverpro.domain.model.WorkSessionField
+import com.driverpro.earnings.domain.Platform
+import com.driverpro.earnings.domain.WorkSessionField
 import java.time.Instant
 import java.time.LocalDate
 import java.time.ZoneOffset

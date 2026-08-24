@@ -1,10 +1,10 @@
-package com.driverpro.data.repository
+package com.driverpro.earnings.data
 
-import com.driverpro.data.local.dao.WorkSessionDao
+import com.driverpro.earnings.data.WorkSessionDao
 import com.driverpro.data.local.entity.toDomain
 import com.driverpro.data.local.entity.toEntity
-import com.driverpro.domain.model.WorkSession
-import com.driverpro.domain.repository.WorkSessionRepository
+import com.driverpro.earnings.domain.WorkSession
+import com.driverpro.earnings.domain.WorkSessionRepository
 import kotlinx.coroutines.CoroutineDispatcher
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.Flow

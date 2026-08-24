@@ -3,7 +3,7 @@ package com.driverpro.core.navigation
 import com.driverpro.expenses.domain.Expense
 import com.driverpro.domain.model.PersonalUsage
 import com.driverpro.vehicle.domain.Vehicle
-import com.driverpro.domain.model.WorkSession
+import com.driverpro.earnings.domain.WorkSession
 
 /**
  * Destinos de navegação.

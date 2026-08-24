@@ -11,20 +11,20 @@ import com.driverpro.data.repository.OfflineMaintenanceScheduleRepository
 import com.driverpro.data.repository.OfflinePersonalUsageRepository
 import com.driverpro.data.repository.OfflineReconciliationDismissalRepository
 import com.driverpro.vehicle.data.OfflineVehicleRepository
-import com.driverpro.data.repository.OfflineWorkSessionRepository
+import com.driverpro.earnings.data.OfflineWorkSessionRepository
 import com.driverpro.expenses.domain.ExpenseRepository
 import com.driverpro.domain.repository.MaintenanceScheduleRepository
 import com.driverpro.domain.repository.PersonalUsageRepository
 import com.driverpro.domain.repository.ReconciliationDismissalRepository
 import com.driverpro.vehicle.domain.VehicleRepository
-import com.driverpro.domain.repository.WorkSessionRepository
+import com.driverpro.earnings.domain.WorkSessionRepository
 import com.driverpro.expenses.domain.DeleteExpenseUseCase
 import com.driverpro.vehicle.domain.DeleteVehicleUseCase
-import com.driverpro.domain.usecase.DeleteWorkSessionUseCase
+import com.driverpro.earnings.domain.DeleteWorkSessionUseCase
 import com.driverpro.expenses.domain.ExpenseValidator
 import com.driverpro.expenses.domain.GetExpenseUseCase
 import com.driverpro.vehicle.domain.GetVehicleUseCase
-import com.driverpro.domain.usecase.GetWorkSessionUseCase
+import com.driverpro.earnings.domain.GetWorkSessionUseCase
 import com.driverpro.expenses.domain.ObserveAccruedExpensesUseCase
 import com.driverpro.domain.usecase.ObserveDashboardUseCase
 import com.driverpro.domain.usecase.ObserveMaintenanceUseCase
@@ -44,14 +44,14 @@ import com.driverpro.domain.usecase.SaveReconciledPersonalUsageUseCase
 import com.driverpro.expenses.domain.ObserveVehicleOdometerUseCase
 import com.driverpro.expenses.domain.ObserveVehicleOdometersUseCase
 import com.driverpro.vehicle.domain.ObserveVehiclesUseCase
-import com.driverpro.domain.usecase.ObserveWorkSessionsBetweenUseCase
-import com.driverpro.domain.usecase.ObserveWorkSessionsUseCase
+import com.driverpro.earnings.domain.ObserveWorkSessionsBetweenUseCase
+import com.driverpro.earnings.domain.ObserveWorkSessionsUseCase
 import com.driverpro.expenses.domain.SaveExpenseUseCase
 import com.driverpro.vehicle.domain.SaveVehicleUseCase
-import com.driverpro.domain.usecase.SaveWorkSessionUseCase
+import com.driverpro.earnings.domain.SaveWorkSessionUseCase
 import com.driverpro.vehicle.domain.SetCurrentVehicleUseCase
 import com.driverpro.vehicle.domain.VehicleValidator
-import com.driverpro.domain.usecase.WorkSessionValidator
+import com.driverpro.earnings.domain.WorkSessionValidator
 
 /**
  * Injeção de dependências manual.

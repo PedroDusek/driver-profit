@@ -1,7 +1,7 @@
-package com.driverpro.testing
+package com.driverpro.earnings.domain
 
-import com.driverpro.domain.model.WorkSession
-import com.driverpro.domain.repository.WorkSessionRepository
+import com.driverpro.earnings.domain.WorkSession
+import com.driverpro.earnings.domain.WorkSessionRepository
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.map

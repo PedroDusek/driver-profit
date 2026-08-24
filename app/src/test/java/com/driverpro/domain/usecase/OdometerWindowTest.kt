@@ -8,8 +8,8 @@ import com.driverpro.expenses.domain.ExpenseCategory
 import com.driverpro.domain.model.PersonalUsage
 import com.driverpro.domain.model.PersonalUsageSource
 import com.driverpro.domain.model.ReconciliationDismissal
-import com.driverpro.domain.model.Platform
-import com.driverpro.domain.model.WorkSession
+import com.driverpro.earnings.domain.Platform
+import com.driverpro.earnings.domain.WorkSession
 import org.junit.Assert.assertEquals
 import org.junit.Assert.assertFalse
 import org.junit.Assert.assertTrue

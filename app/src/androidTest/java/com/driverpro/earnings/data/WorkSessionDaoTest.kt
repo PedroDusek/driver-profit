@@ -1,12 +1,12 @@
-package com.driverpro.data.local
+package com.driverpro.earnings.data
 
 import androidx.room.Room
 import androidx.test.core.app.ApplicationProvider
 import androidx.test.ext.junit.runners.AndroidJUnit4
-import com.driverpro.data.local.dao.WorkSessionDao
+import com.driverpro.earnings.data.WorkSessionDao
 import com.driverpro.core.database.DriverProDatabase
-import com.driverpro.data.local.entity.WorkSessionEntity
-import com.driverpro.domain.model.Platform
+import com.driverpro.earnings.data.WorkSessionEntity
+import com.driverpro.earnings.domain.Platform
 import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.test.runTest
 import org.junit.After

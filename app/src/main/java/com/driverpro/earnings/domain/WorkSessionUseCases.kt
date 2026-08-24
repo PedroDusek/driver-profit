@@ -1,9 +1,9 @@
-package com.driverpro.domain.usecase
+package com.driverpro.earnings.domain
 
-import com.driverpro.domain.model.WorkSession
-import com.driverpro.domain.model.WorkSessionDraft
-import com.driverpro.domain.model.WorkSessionFieldError
-import com.driverpro.domain.repository.WorkSessionRepository
+import com.driverpro.earnings.domain.WorkSession
+import com.driverpro.earnings.domain.WorkSessionDraft
+import com.driverpro.earnings.domain.WorkSessionFieldError
+import com.driverpro.earnings.domain.WorkSessionRepository
 import kotlinx.coroutines.flow.Flow
 import java.time.LocalDate
 

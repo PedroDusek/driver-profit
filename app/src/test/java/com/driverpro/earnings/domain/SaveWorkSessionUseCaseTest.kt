@@ -1,12 +1,12 @@
-package com.driverpro.domain.usecase
+package com.driverpro.earnings.domain
 
 import com.driverpro.core.domain.Money
 import com.driverpro.core.domain.WorkDuration
-import com.driverpro.domain.model.Platform
-import com.driverpro.domain.model.WorkSession
-import com.driverpro.domain.model.WorkSessionDraft
-import com.driverpro.domain.model.WorkSessionField
-import com.driverpro.testing.FakeWorkSessionRepository
+import com.driverpro.earnings.domain.Platform
+import com.driverpro.earnings.domain.WorkSession
+import com.driverpro.earnings.domain.WorkSessionDraft
+import com.driverpro.earnings.domain.WorkSessionField
+import com.driverpro.earnings.domain.FakeWorkSessionRepository
 import kotlinx.coroutines.test.runTest
 import org.junit.Assert.assertEquals
 import org.junit.Assert.assertTrue

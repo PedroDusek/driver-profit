@@ -1,11 +1,11 @@
-package com.driverpro.data.local.dao
+package com.driverpro.earnings.data
 
 import androidx.room.Dao
 import androidx.room.Delete
 import androidx.room.Insert
 import androidx.room.Query
 import androidx.room.Update
-import com.driverpro.data.local.entity.WorkSessionEntity
+import com.driverpro.earnings.data.WorkSessionEntity
 import kotlinx.coroutines.flow.Flow
 
 /**

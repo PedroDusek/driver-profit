@@ -1,10 +1,10 @@
-package com.driverpro.core.ui.format
+package com.driverpro.earnings.presentation
 
 import androidx.annotation.StringRes
 import com.driverpro.R
-import com.driverpro.domain.model.Platform
-import com.driverpro.domain.model.WorkSessionField
-import com.driverpro.domain.model.WorkSessionValidationError
+import com.driverpro.earnings.domain.Platform
+import com.driverpro.earnings.domain.WorkSessionField
+import com.driverpro.earnings.domain.WorkSessionValidationError
 
 /**
  * Tradução dos enums de ganhos para textos da interface.

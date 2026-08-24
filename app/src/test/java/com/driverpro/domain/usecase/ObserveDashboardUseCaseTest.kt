@@ -8,7 +8,8 @@ import com.driverpro.expenses.domain.ObserveAccruedExpensesUseCase
 import com.driverpro.expenses.domain.ObserveExpensesBetweenUseCase
 import com.driverpro.expenses.domain.FakeExpenseRepository
 import com.driverpro.testing.FakePersonalUsageRepository
-import com.driverpro.testing.FakeWorkSessionRepository
+import com.driverpro.earnings.domain.FakeWorkSessionRepository
+import com.driverpro.earnings.domain.ObserveWorkSessionsBetweenUseCase
 import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.test.runTest
 import org.junit.Assert.assertEquals

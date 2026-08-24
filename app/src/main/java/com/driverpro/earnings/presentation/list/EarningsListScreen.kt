@@ -1,4 +1,4 @@
-package com.driverpro.feature.earnings.list
+package com.driverpro.earnings.presentation.list
 
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
@@ -52,12 +52,12 @@ import com.driverpro.core.di.DriverProViewModelFactory
 import com.driverpro.core.ui.component.IconChip
 import com.driverpro.core.ui.component.ListItemCard
 import com.driverpro.core.ui.format.BrazilianFormatter
-import com.driverpro.core.ui.format.EarningsLabels
+import com.driverpro.earnings.presentation.EarningsLabels
 import com.driverpro.core.ui.theme.DriverProTheme
 import com.driverpro.core.ui.theme.PlatformAccentColors
 import com.driverpro.core.ui.theme.TabularFigures
-import com.driverpro.domain.model.Platform
-import com.driverpro.domain.model.WorkSession
+import com.driverpro.earnings.domain.Platform
+import com.driverpro.earnings.domain.WorkSession
 import java.time.Instant
 import java.time.LocalDate
 import kotlin.math.roundToInt

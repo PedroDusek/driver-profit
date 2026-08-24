@@ -2,6 +2,7 @@ package com.driverpro.domain.model
 
 import com.driverpro.core.domain.Money
 import com.driverpro.core.domain.WorkDuration
+import com.driverpro.earnings.domain.WorkSession
 import com.driverpro.expenses.domain.Expense
 import com.driverpro.expenses.domain.ExpenseCategory
 

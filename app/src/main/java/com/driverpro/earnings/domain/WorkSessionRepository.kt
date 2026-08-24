@@ -1,6 +1,6 @@
-package com.driverpro.domain.repository
+package com.driverpro.earnings.domain
 
-import com.driverpro.domain.model.WorkSession
+import com.driverpro.earnings.domain.WorkSession
 import kotlinx.coroutines.flow.Flow
 import java.time.LocalDate
 

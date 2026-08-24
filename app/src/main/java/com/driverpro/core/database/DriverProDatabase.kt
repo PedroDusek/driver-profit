@@ -8,13 +8,13 @@ import com.driverpro.data.local.dao.MaintenanceScheduleDao
 import com.driverpro.data.local.dao.PersonalUsageDao
 import com.driverpro.data.local.dao.ReconciliationDismissalDao
 import com.driverpro.vehicle.data.VehicleDao
-import com.driverpro.data.local.dao.WorkSessionDao
+import com.driverpro.earnings.data.WorkSessionDao
 import com.driverpro.expenses.data.ExpenseEntity
 import com.driverpro.data.local.entity.MaintenanceScheduleEntity
 import com.driverpro.data.local.entity.PersonalUsageEntity
 import com.driverpro.data.local.entity.ReconciliationDismissalEntity
 import com.driverpro.vehicle.data.VehicleEntity
-import com.driverpro.data.local.entity.WorkSessionEntity
+import com.driverpro.earnings.data.WorkSessionEntity
 
 /**
  * Banco local do aplicativo (offline-first, PRD §1).

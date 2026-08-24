@@ -9,8 +9,8 @@ import com.driverpro.DriverProApplication
 import com.driverpro.core.di.AppContainer
 import com.driverpro.feature.backup.BackupViewModel
 import com.driverpro.feature.dashboard.DashboardViewModel
-import com.driverpro.feature.earnings.form.EarningsFormViewModel
-import com.driverpro.feature.earnings.list.EarningsListViewModel
+import com.driverpro.earnings.presentation.form.EarningsFormViewModel
+import com.driverpro.earnings.presentation.list.EarningsListViewModel
 import com.driverpro.expenses.presentation.form.ExpenseFormViewModel
 import com.driverpro.expenses.presentation.list.ExpensesListViewModel
 import com.driverpro.feature.maintenance.MaintenanceViewModel

@@ -1,4 +1,4 @@
-package com.driverpro.data.local.entity
+package com.driverpro.earnings.data
 
 import com.driverpro.vehicle.data.VehicleEntity
 
@@ -9,8 +9,8 @@ import androidx.room.Index
 import androidx.room.PrimaryKey
 import com.driverpro.core.domain.Money
 import com.driverpro.core.domain.WorkDuration
-import com.driverpro.domain.model.Platform
-import com.driverpro.domain.model.WorkSession
+import com.driverpro.earnings.domain.Platform
+import com.driverpro.earnings.domain.WorkSession
 import java.time.Instant
 import java.time.LocalDate
 

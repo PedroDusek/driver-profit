@@ -6,12 +6,12 @@ import com.driverpro.domain.model.PersonalUsage
 import com.driverpro.domain.model.PersonalUsageSource
 import com.driverpro.domain.model.ReconciliationDismissal
 import com.driverpro.vehicle.domain.Vehicle
-import com.driverpro.domain.model.WorkSession
+import com.driverpro.earnings.domain.WorkSession
 import com.driverpro.expenses.domain.ExpenseRepository
 import com.driverpro.domain.repository.PersonalUsageRepository
 import com.driverpro.domain.repository.ReconciliationDismissalRepository
 import com.driverpro.vehicle.domain.VehicleRepository
-import com.driverpro.domain.repository.WorkSessionRepository
+import com.driverpro.earnings.domain.WorkSessionRepository
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.combine
 import java.time.Clock

@@ -1,4 +1,4 @@
-package com.driverpro.domain.model
+package com.driverpro.earnings.domain
 
 /** Campo do formulário de sessão de trabalho ao qual um erro se refere. */
 enum class WorkSessionField {

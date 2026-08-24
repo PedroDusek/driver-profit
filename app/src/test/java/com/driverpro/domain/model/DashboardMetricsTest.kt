@@ -1,4 +1,6 @@
 package com.driverpro.domain.model
+import com.driverpro.earnings.domain.WorkSession
+import com.driverpro.earnings.domain.Platform
 
 import com.driverpro.expenses.domain.Expense
 import com.driverpro.expenses.domain.ExpenseCategory

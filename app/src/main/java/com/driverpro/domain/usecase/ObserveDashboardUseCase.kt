@@ -3,6 +3,7 @@ package com.driverpro.domain.usecase
 import com.driverpro.core.domain.Money
 import com.driverpro.domain.model.DashboardMetrics
 import com.driverpro.core.domain.DateRange
+import com.driverpro.earnings.domain.ObserveWorkSessionsBetweenUseCase
 import com.driverpro.expenses.domain.ObserveAccruedExpensesUseCase
 import com.driverpro.expenses.domain.ObserveExpensesBetweenUseCase
 import kotlinx.coroutines.flow.Flow

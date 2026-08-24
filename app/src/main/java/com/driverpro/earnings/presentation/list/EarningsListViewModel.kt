@@ -1,13 +1,13 @@
-package com.driverpro.feature.earnings.list
+package com.driverpro.earnings.presentation.list
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.driverpro.core.domain.Money
 import com.driverpro.core.domain.WorkDuration
-import com.driverpro.domain.model.Platform
-import com.driverpro.domain.model.WorkSession
-import com.driverpro.domain.usecase.DeleteWorkSessionUseCase
-import com.driverpro.domain.usecase.ObserveWorkSessionsUseCase
+import com.driverpro.earnings.domain.Platform
+import com.driverpro.earnings.domain.WorkSession
+import com.driverpro.earnings.domain.DeleteWorkSessionUseCase
+import com.driverpro.earnings.domain.ObserveWorkSessionsUseCase
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.StateFlow

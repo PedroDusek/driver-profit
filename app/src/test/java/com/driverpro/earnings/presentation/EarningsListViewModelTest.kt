@@ -1,14 +1,14 @@
-package com.driverpro.feature.earnings
+package com.driverpro.earnings.presentation
 
 import com.driverpro.core.domain.Money
 import com.driverpro.core.domain.WorkDuration
-import com.driverpro.domain.model.Platform
-import com.driverpro.domain.model.WorkSession
-import com.driverpro.domain.usecase.DeleteWorkSessionUseCase
-import com.driverpro.domain.usecase.ObserveWorkSessionsUseCase
-import com.driverpro.feature.earnings.list.EarningsListUiState
-import com.driverpro.feature.earnings.list.EarningsListViewModel
-import com.driverpro.testing.FakeWorkSessionRepository
+import com.driverpro.earnings.domain.Platform
+import com.driverpro.earnings.domain.WorkSession
+import com.driverpro.earnings.domain.DeleteWorkSessionUseCase
+import com.driverpro.earnings.domain.ObserveWorkSessionsUseCase
+import com.driverpro.earnings.presentation.list.EarningsListUiState
+import com.driverpro.earnings.presentation.list.EarningsListViewModel
+import com.driverpro.earnings.domain.FakeWorkSessionRepository
 import com.driverpro.testing.MainDispatcherRule
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.Job
