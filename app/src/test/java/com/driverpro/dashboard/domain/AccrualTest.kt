@@ -1,4 +1,4 @@
-package com.driverpro.domain.model
+package com.driverpro.dashboard.domain
 
 import com.driverpro.dashboard.domain.DashboardMetrics
 import com.driverpro.expenses.domain.Expense

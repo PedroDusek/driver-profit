@@ -90,7 +90,7 @@ import java.time.ZoneOffset
  *
  * Navegação secundária (v0.14.0): a barra inferior leva às três seções mais
  * usadas direto; o resto (uso pessoal, manutenção, backup) mora em "Mais" —
- * ver [com.driverpro.feature.more.MoreScreen]. Antes disso eram seis ícones
+ * ver [com.driverpro.more.presentation.MoreScreen]. Antes disso eram seis ícones
  * na TopAppBar, sem rótulo.
  */
 @OptIn(ExperimentalMaterial3Api::class)
