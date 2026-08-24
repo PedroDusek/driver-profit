@@ -11,8 +11,8 @@ import com.driverpro.feature.backup.BackupViewModel
 import com.driverpro.feature.dashboard.DashboardViewModel
 import com.driverpro.feature.earnings.form.EarningsFormViewModel
 import com.driverpro.feature.earnings.list.EarningsListViewModel
-import com.driverpro.feature.expenses.form.ExpenseFormViewModel
-import com.driverpro.feature.expenses.list.ExpensesListViewModel
+import com.driverpro.expenses.presentation.form.ExpenseFormViewModel
+import com.driverpro.expenses.presentation.list.ExpensesListViewModel
 import com.driverpro.feature.maintenance.MaintenanceViewModel
 import com.driverpro.feature.personal.form.PersonalUsageFormViewModel
 import com.driverpro.feature.personal.list.PersonalUsageListViewModel

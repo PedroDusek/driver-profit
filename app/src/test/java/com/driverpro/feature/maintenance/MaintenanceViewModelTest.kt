@@ -1,10 +1,10 @@
 package com.driverpro.feature.maintenance
 
 import com.driverpro.core.domain.Money
-import com.driverpro.domain.model.Expense
-import com.driverpro.domain.model.ExpenseCategory
-import com.driverpro.domain.model.ExpenseDetail
-import com.driverpro.domain.model.MaintenanceCategory
+import com.driverpro.expenses.domain.Expense
+import com.driverpro.expenses.domain.ExpenseCategory
+import com.driverpro.expenses.domain.ExpenseDetail
+import com.driverpro.expenses.domain.MaintenanceCategory
 import com.driverpro.domain.model.MaintenanceItem
 import com.driverpro.domain.model.MaintenanceStatus
 import com.driverpro.vehicle.domain.Vehicle
@@ -13,7 +13,7 @@ import com.driverpro.domain.usecase.MaintenanceValidationError
 import com.driverpro.domain.usecase.ObserveMaintenanceUseCase
 import com.driverpro.domain.usecase.ResetMaintenanceIntervalUseCase
 import com.driverpro.domain.usecase.SaveMaintenanceIntervalUseCase
-import com.driverpro.testing.FakeExpenseRepository
+import com.driverpro.expenses.domain.FakeExpenseRepository
 import com.driverpro.testing.FakeMaintenanceScheduleRepository
 import com.driverpro.vehicle.domain.FakeVehicleRepository
 import com.driverpro.testing.MainDispatcherRule

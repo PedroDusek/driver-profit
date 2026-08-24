@@ -3,12 +3,12 @@
 import com.driverpro.vehicle.domain.Vehicle
 import com.driverpro.vehicle.domain.VehicleFuel
 import com.driverpro.vehicle.domain.DeleteVehicleUseCase
-import com.driverpro.domain.usecase.ObserveVehicleOdometersUseCase
+import com.driverpro.expenses.domain.ObserveVehicleOdometersUseCase
 import com.driverpro.vehicle.domain.ObserveVehiclesUseCase
 import com.driverpro.vehicle.domain.SetCurrentVehicleUseCase
 import com.driverpro.vehicle.presentation.list.VehicleListUiState
 import com.driverpro.vehicle.presentation.list.VehicleListViewModel
-import com.driverpro.testing.FakeExpenseRepository
+import com.driverpro.expenses.domain.FakeExpenseRepository
 import com.driverpro.vehicle.domain.FakeVehicleRepository
 import com.driverpro.testing.MainDispatcherRule
 import kotlinx.coroutines.ExperimentalCoroutinesApi

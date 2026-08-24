@@ -1,10 +1,10 @@
 package com.driverpro.core.database
 
 import androidx.room.TypeConverter
-import com.driverpro.domain.model.ChargingLocation
-import com.driverpro.domain.model.ExpenseCategory
+import com.driverpro.expenses.domain.ChargingLocation
+import com.driverpro.expenses.domain.ExpenseCategory
 import com.driverpro.core.domain.FuelType
-import com.driverpro.domain.model.MaintenanceCategory
+import com.driverpro.expenses.domain.MaintenanceCategory
 import com.driverpro.domain.model.MaintenanceItem
 import com.driverpro.domain.model.PersonalUsageSource
 import com.driverpro.domain.model.Platform

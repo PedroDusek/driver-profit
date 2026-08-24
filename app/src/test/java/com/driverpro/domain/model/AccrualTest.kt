@@ -1,5 +1,8 @@
 package com.driverpro.domain.model
 
+import com.driverpro.expenses.domain.Expense
+import com.driverpro.expenses.domain.ExpenseCategory
+
 import com.driverpro.core.domain.DateRange
 
 import com.driverpro.core.domain.Money

@@ -2,6 +2,7 @@ package com.driverpro.core.ui.format
 
 import androidx.annotation.StringRes
 import com.driverpro.R
+import com.driverpro.expenses.presentation.ExpenseLabels
 import com.driverpro.domain.model.MaintenanceItem
 import com.driverpro.domain.model.MaintenanceStatus
 import com.driverpro.domain.usecase.MaintenanceValidationError

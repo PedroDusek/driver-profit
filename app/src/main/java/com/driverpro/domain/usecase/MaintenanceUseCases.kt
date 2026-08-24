@@ -4,7 +4,7 @@ import com.driverpro.domain.model.MaintenanceItem
 import com.driverpro.domain.model.MaintenanceMonitor
 import com.driverpro.domain.model.MaintenanceSchedule
 import com.driverpro.domain.model.VehicleMaintenance
-import com.driverpro.domain.repository.ExpenseRepository
+import com.driverpro.expenses.domain.ExpenseRepository
 import com.driverpro.domain.repository.MaintenanceScheduleRepository
 import com.driverpro.vehicle.domain.VehicleRepository
 import kotlinx.coroutines.flow.Flow

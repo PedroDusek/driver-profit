@@ -60,10 +60,10 @@ import com.driverpro.core.ui.component.CategoryLegendRow
 import com.driverpro.core.ui.component.DonutChart
 import com.driverpro.core.ui.component.DonutSlice
 import com.driverpro.core.ui.component.StatTile
-import com.driverpro.core.ui.component.visual
+import com.driverpro.expenses.presentation.visual
 import com.driverpro.core.ui.format.BrazilianFormatter
 import com.driverpro.core.ui.format.DashboardLabels
-import com.driverpro.core.ui.format.ExpenseLabels
+import com.driverpro.expenses.presentation.ExpenseLabels
 import com.driverpro.core.ui.theme.DriverProTheme
 import com.driverpro.core.ui.theme.ProfitColors
 import com.driverpro.core.ui.theme.TabularFigures
@@ -71,7 +71,7 @@ import com.driverpro.core.ui.theme.content
 import com.driverpro.domain.model.DashboardMetrics
 import com.driverpro.domain.model.DashboardPeriod
 import com.driverpro.core.domain.DateRange
-import com.driverpro.domain.model.ExpenseCategory
+import com.driverpro.expenses.domain.ExpenseCategory
 import com.driverpro.domain.usecase.VehicleReconciliation
 import com.driverpro.feature.maintenance.MaintenanceWarningCard
 import java.time.Instant

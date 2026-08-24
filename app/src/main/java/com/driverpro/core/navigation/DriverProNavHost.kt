@@ -8,7 +8,7 @@ import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
 import androidx.navigation.navArgument
-import com.driverpro.domain.model.Expense
+import com.driverpro.expenses.domain.Expense
 import com.driverpro.domain.model.PersonalUsage
 import com.driverpro.vehicle.domain.Vehicle
 import com.driverpro.domain.model.WorkSession
@@ -16,8 +16,8 @@ import com.driverpro.feature.backup.BackupScreen
 import com.driverpro.feature.dashboard.DashboardScreen
 import com.driverpro.feature.earnings.form.EarningsFormScreen
 import com.driverpro.feature.earnings.list.EarningsListScreen
-import com.driverpro.feature.expenses.form.ExpenseFormScreen
-import com.driverpro.feature.expenses.list.ExpensesListScreen
+import com.driverpro.expenses.presentation.form.ExpenseFormScreen
+import com.driverpro.expenses.presentation.list.ExpensesListScreen
 import com.driverpro.feature.maintenance.MaintenanceScreen
 import com.driverpro.feature.more.MoreScreen
 import com.driverpro.feature.personal.form.PersonalUsageFormScreen

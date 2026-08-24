@@ -3,8 +3,8 @@ package com.driverpro.domain.usecase
 import com.driverpro.core.domain.Money
 import com.driverpro.core.domain.WorkDuration
 import com.driverpro.core.domain.DateRange
-import com.driverpro.domain.model.Expense
-import com.driverpro.domain.model.ExpenseCategory
+import com.driverpro.expenses.domain.Expense
+import com.driverpro.expenses.domain.ExpenseCategory
 import com.driverpro.domain.model.PersonalUsage
 import com.driverpro.domain.model.PersonalUsageSource
 import com.driverpro.domain.model.ReconciliationDismissal

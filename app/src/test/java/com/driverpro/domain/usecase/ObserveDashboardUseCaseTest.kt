@@ -2,9 +2,11 @@ package com.driverpro.domain.usecase
 
 import com.driverpro.core.domain.Money
 import com.driverpro.core.domain.DateRange
-import com.driverpro.domain.model.Expense
-import com.driverpro.domain.model.ExpenseCategory
-import com.driverpro.testing.FakeExpenseRepository
+import com.driverpro.expenses.domain.Expense
+import com.driverpro.expenses.domain.ExpenseCategory
+import com.driverpro.expenses.domain.ObserveAccruedExpensesUseCase
+import com.driverpro.expenses.domain.ObserveExpensesBetweenUseCase
+import com.driverpro.expenses.domain.FakeExpenseRepository
 import com.driverpro.testing.FakePersonalUsageRepository
 import com.driverpro.testing.FakeWorkSessionRepository
 import kotlinx.coroutines.flow.first

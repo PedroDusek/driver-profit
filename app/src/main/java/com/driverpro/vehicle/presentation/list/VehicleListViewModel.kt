@@ -4,7 +4,7 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.driverpro.vehicle.domain.Vehicle
 import com.driverpro.vehicle.domain.DeleteVehicleUseCase
-import com.driverpro.domain.usecase.ObserveVehicleOdometersUseCase
+import com.driverpro.expenses.domain.ObserveVehicleOdometersUseCase
 import com.driverpro.vehicle.domain.ObserveVehiclesUseCase
 import com.driverpro.vehicle.domain.SetCurrentVehicleUseCase
 import kotlinx.coroutines.flow.MutableStateFlow

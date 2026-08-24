@@ -1,13 +1,13 @@
 package com.driverpro.domain.usecase
 
 import com.driverpro.core.domain.DateRange
-import com.driverpro.domain.model.Expense
+import com.driverpro.expenses.domain.Expense
 import com.driverpro.domain.model.PersonalUsage
 import com.driverpro.domain.model.PersonalUsageSource
 import com.driverpro.domain.model.ReconciliationDismissal
 import com.driverpro.vehicle.domain.Vehicle
 import com.driverpro.domain.model.WorkSession
-import com.driverpro.domain.repository.ExpenseRepository
+import com.driverpro.expenses.domain.ExpenseRepository
 import com.driverpro.domain.repository.PersonalUsageRepository
 import com.driverpro.domain.repository.ReconciliationDismissalRepository
 import com.driverpro.vehicle.domain.VehicleRepository

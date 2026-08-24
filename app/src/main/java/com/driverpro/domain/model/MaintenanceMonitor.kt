@@ -1,6 +1,12 @@
 package com.driverpro.domain.model
 
 import com.driverpro.core.domain.FuelType
+import com.driverpro.expenses.domain.Consumption
+import com.driverpro.expenses.domain.ConsumptionEstimator
+import com.driverpro.expenses.domain.Expense
+import com.driverpro.expenses.domain.ExpenseCategory
+import com.driverpro.expenses.domain.ExpenseDetail
+import com.driverpro.expenses.domain.fuelTypeOrNull
 
 /**
  * Decide a situação de cada item de manutenção a partir do que foi lançado.

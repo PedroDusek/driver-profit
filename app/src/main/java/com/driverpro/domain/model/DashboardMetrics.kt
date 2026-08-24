@@ -2,6 +2,8 @@ package com.driverpro.domain.model
 
 import com.driverpro.core.domain.Money
 import com.driverpro.core.domain.WorkDuration
+import com.driverpro.expenses.domain.Expense
+import com.driverpro.expenses.domain.ExpenseCategory
 
 /**
  * Indicadores de rentabilidade de um período (PRD §21, §29).
