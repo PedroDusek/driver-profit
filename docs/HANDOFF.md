@@ -47,6 +47,20 @@ pronta numa branch de feature (`feature/driverpro-rebrand`), com o
 > reorganização de pacotes por baixo), e rodar `connectedDebugAndroidTest` no
 > aparelho — só o Pedro roda isso, é rotina do projeto.
 
+> **Bug corrigido, em branch própria: `fix/reconciliation-warning-not-reopening`**,
+> a partir de `feature/driverpro-rebrand` (não de `main`, que ainda está no
+> pacote antigo `com.driverprofit` sem o rebrand). O Pedro relatou em teste no
+> aparelho que o aviso de "Odômetro não confere" sumia e não voltava depois de
+> adicionar/remover jornadas e uso pessoal. Causa: em
+> `PersonalUsageListViewModel`, fechar o diálogo de conciliação sem responder
+> (toque fora, botão voltar) guardava a janela por `DateRange` num set em
+> memória e a silenciava **para sempre** na sessão da tela, mesmo que a sobra
+> real mudasse depois. Corrigido guardando também a sobra vista no momento do
+> fechamento (`Map<DateRange, Long?>`); a janela só continua silenciada
+> enquanto a sobra recalculada for a mesma. 4 testes novos em
+> `PersonalUsageListViewModelTest`, reproduzindo o cenário antes de corrigir.
+> Gate completo verde. Não empurrada, sem PR.
+
 > **Correção:** esta seção dizia que v0.13.0 ainda estava numa branch
 > aguardando merge. Não estava mais — `git log`/`git tag` confirmam que já
 > tinha sido mergeada e tagueada na `main` antes desta sessão. A lição de
