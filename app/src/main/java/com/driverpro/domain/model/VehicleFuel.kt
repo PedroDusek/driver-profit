@@ -1,5 +1,7 @@
 package com.driverpro.domain.model
 
+import com.driverpro.core.domain.FuelType
+
 /**
  * Como o veículo é alimentado.
  *
@@ -38,24 +40,4 @@ enum class VehicleFuel(val refuelOptions: List<FuelType>) {
     /** Indica se faz sentido oferecer registro de carregamento elétrico. */
     val supportsCharging: Boolean
         get() = FuelType.ELECTRICITY in refuelOptions
-}
-
-/**
- * Insumo efetivamente colocado no veículo em um abastecimento ou recarga.
- *
- * A unidade de medida faz parte do tipo para impedir, em tempo de compilação,
- * que GNV seja tratado em litros ou energia em litros (PRD §10, §27).
- */
-enum class FuelType(val unit: MeasurementUnit) {
-    GASOLINE(MeasurementUnit.LITER),
-    ETHANOL(MeasurementUnit.LITER),
-    CNG(MeasurementUnit.CUBIC_METER),
-    ELECTRICITY(MeasurementUnit.KILOWATT_HOUR),
-}
-
-/** Unidades de medida usadas para quantificar combustível e energia. */
-enum class MeasurementUnit {
-    LITER,
-    CUBIC_METER,
-    KILOWATT_HOUR,
 }

@@ -1,6 +1,6 @@
 package com.driverpro.testing
 
-import com.driverpro.domain.model.DateRange
+import com.driverpro.core.domain.DateRange
 import com.driverpro.domain.model.Expense
 import com.driverpro.domain.repository.ExpenseRepository
 import kotlinx.coroutines.flow.Flow

@@ -1,6 +1,8 @@
 package com.driverpro.domain.model
 
-import com.driverpro.core.common.Quantity
+import com.driverpro.core.domain.FuelType
+import com.driverpro.core.domain.MeasurementUnit
+import com.driverpro.core.domain.Quantity
 import java.time.LocalDate
 
 /**

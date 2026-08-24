@@ -1,12 +1,12 @@
-package com.driverpro.data.local
+package com.driverpro.core.database
 
 import android.database.sqlite.SQLiteConstraintException
 import androidx.room.testing.MigrationTestHelper
 import androidx.sqlite.db.framework.FrameworkSQLiteOpenHelperFactory
 import androidx.test.ext.junit.runners.AndroidJUnit4
 import androidx.test.platform.app.InstrumentationRegistry
-import com.driverpro.data.local.database.DriverProDatabase
-import com.driverpro.data.local.database.Migrations
+import com.driverpro.core.database.DriverProDatabase
+import com.driverpro.core.database.Migrations
 import org.junit.Assert.assertEquals
 import org.junit.Assert.assertFalse
 import org.junit.Assert.assertTrue

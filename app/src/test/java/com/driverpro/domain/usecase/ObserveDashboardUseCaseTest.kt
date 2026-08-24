@@ -1,7 +1,7 @@
 package com.driverpro.domain.usecase
 
-import com.driverpro.core.common.Money
-import com.driverpro.domain.model.DateRange
+import com.driverpro.core.domain.Money
+import com.driverpro.core.domain.DateRange
 import com.driverpro.domain.model.Expense
 import com.driverpro.domain.model.ExpenseCategory
 import com.driverpro.testing.FakeExpenseRepository

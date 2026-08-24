@@ -1,4 +1,4 @@
-package com.driverpro.core.common
+package com.driverpro.core.domain
 
 /**
  * Tempo online do motorista, em **minutos** (PRD §27).

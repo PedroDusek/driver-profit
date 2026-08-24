@@ -1,4 +1,4 @@
-package com.driverpro.core.common
+package com.driverpro.core.domain
 
 import org.junit.Assert.assertEquals
 import org.junit.Assert.assertTrue

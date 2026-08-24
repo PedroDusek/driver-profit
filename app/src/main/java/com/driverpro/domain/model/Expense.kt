@@ -1,7 +1,10 @@
 package com.driverpro.domain.model
 
-import com.driverpro.core.common.Money
-import com.driverpro.core.common.Quantity
+import com.driverpro.core.domain.DateRange
+import com.driverpro.core.domain.FuelType
+import com.driverpro.core.domain.MeasurementUnit
+import com.driverpro.core.domain.Money
+import com.driverpro.core.domain.Quantity
 import java.time.Instant
 import java.time.LocalDate
 

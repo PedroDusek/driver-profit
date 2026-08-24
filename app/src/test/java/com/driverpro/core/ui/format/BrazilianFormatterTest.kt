@@ -1,7 +1,7 @@
 package com.driverpro.core.ui.format
 
-import com.driverpro.core.common.Money
-import com.driverpro.core.common.WorkDuration
+import com.driverpro.core.domain.Money
+import com.driverpro.core.domain.WorkDuration
 import org.junit.Assert.assertEquals
 import org.junit.Test
 import java.time.LocalDate

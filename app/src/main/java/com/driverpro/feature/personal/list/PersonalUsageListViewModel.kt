@@ -2,7 +2,7 @@ package com.driverpro.feature.personal.list
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import com.driverpro.domain.model.DateRange
+import com.driverpro.core.domain.DateRange
 import com.driverpro.domain.model.PersonalUsage
 import com.driverpro.domain.usecase.DeletePersonalUsageUseCase
 import com.driverpro.domain.usecase.DismissReconciliationUseCase

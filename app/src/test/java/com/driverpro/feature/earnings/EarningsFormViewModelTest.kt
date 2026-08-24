@@ -1,8 +1,8 @@
 ﻿package com.driverpro.feature.earnings
 
 import androidx.lifecycle.SavedStateHandle
-import com.driverpro.core.common.Money
-import com.driverpro.core.common.WorkDuration
+import com.driverpro.core.domain.Money
+import com.driverpro.core.domain.WorkDuration
 import com.driverpro.core.navigation.DriverProDestination
 import com.driverpro.domain.model.Platform
 import com.driverpro.domain.model.Vehicle

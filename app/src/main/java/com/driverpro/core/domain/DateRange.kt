@@ -1,4 +1,4 @@
-package com.driverpro.domain.model
+package com.driverpro.core.domain
 
 import java.time.LocalDate
 import java.time.temporal.ChronoUnit

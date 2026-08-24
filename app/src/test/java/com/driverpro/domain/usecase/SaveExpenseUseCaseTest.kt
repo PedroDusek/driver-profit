@@ -1,12 +1,12 @@
 package com.driverpro.domain.usecase
 
-import com.driverpro.core.common.Money
-import com.driverpro.core.common.Quantity
+import com.driverpro.core.domain.Money
+import com.driverpro.core.domain.Quantity
 import com.driverpro.domain.model.Expense
 import com.driverpro.domain.model.ExpenseCategory
 import com.driverpro.domain.model.ExpenseDraft
 import com.driverpro.domain.model.ExpenseField
-import com.driverpro.domain.model.FuelType
+import com.driverpro.core.domain.FuelType
 import com.driverpro.domain.model.Vehicle
 import com.driverpro.domain.model.VehicleFuel
 import com.driverpro.testing.FakeExpenseRepository

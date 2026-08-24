@@ -2,8 +2,8 @@ package com.driverpro.feature.earnings.list
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import com.driverpro.core.common.Money
-import com.driverpro.core.common.WorkDuration
+import com.driverpro.core.domain.Money
+import com.driverpro.core.domain.WorkDuration
 import com.driverpro.domain.model.Platform
 import com.driverpro.domain.model.WorkSession
 import com.driverpro.domain.usecase.DeleteWorkSessionUseCase

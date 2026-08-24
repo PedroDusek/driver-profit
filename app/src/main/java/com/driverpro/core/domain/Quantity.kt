@@ -1,4 +1,4 @@
-package com.driverpro.core.common
+package com.driverpro.core.domain
 
 /**
  * Quantidade de combustível ou energia, em **milésimos da unidade**.

@@ -1,6 +1,8 @@
 package com.driverpro.domain.model
 
-import com.driverpro.core.common.Money
+import com.driverpro.core.domain.DateRange
+
+import com.driverpro.core.domain.Money
 import org.junit.Assert.assertEquals
 import org.junit.Assert.assertNull
 import org.junit.Test
@@ -151,7 +153,7 @@ class AccrualTest {
             totalRides = 50,
             workKilometers = 800,
             personalKilometers = 200,
-            totalOnlineTime = com.driverpro.core.common.WorkDuration.of(40, 0),
+            totalOnlineTime = com.driverpro.core.domain.WorkDuration.of(40, 0),
             accruedFixedCost = Money.of(240, 0),
         )
 

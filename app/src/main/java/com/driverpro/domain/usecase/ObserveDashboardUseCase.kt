@@ -1,8 +1,8 @@
 package com.driverpro.domain.usecase
 
-import com.driverpro.core.common.Money
+import com.driverpro.core.domain.Money
 import com.driverpro.domain.model.DashboardMetrics
-import com.driverpro.domain.model.DateRange
+import com.driverpro.core.domain.DateRange
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.combine
 

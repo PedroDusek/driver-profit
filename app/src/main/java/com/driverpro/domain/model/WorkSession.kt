@@ -1,7 +1,7 @@
 package com.driverpro.domain.model
 
-import com.driverpro.core.common.Money
-import com.driverpro.core.common.WorkDuration
+import com.driverpro.core.domain.Money
+import com.driverpro.core.domain.WorkDuration
 import java.time.Instant
 import java.time.LocalDate
 

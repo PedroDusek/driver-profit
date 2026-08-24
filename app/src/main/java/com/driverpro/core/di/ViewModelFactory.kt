@@ -1,4 +1,4 @@
-package com.driverpro.core.ui
+package com.driverpro.core.di
 
 import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.createSavedStateHandle

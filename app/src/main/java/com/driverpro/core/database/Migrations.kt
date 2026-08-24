@@ -1,4 +1,4 @@
-package com.driverpro.data.local.database
+package com.driverpro.core.database
 
 import androidx.room.migration.Migration
 import androidx.sqlite.db.SupportSQLiteDatabase

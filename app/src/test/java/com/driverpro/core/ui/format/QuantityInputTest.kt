@@ -1,6 +1,6 @@
 package com.driverpro.core.ui.format
 
-import com.driverpro.core.common.Quantity
+import com.driverpro.core.domain.Quantity
 import org.junit.Assert.assertEquals
 import org.junit.Assert.assertNull
 import org.junit.Test

@@ -5,7 +5,7 @@ import androidx.room.Entity
 import androidx.room.ForeignKey
 import androidx.room.Index
 import androidx.room.PrimaryKey
-import com.driverpro.domain.model.DateRange
+import com.driverpro.core.domain.DateRange
 import com.driverpro.domain.model.ReconciliationDismissal
 import java.time.Instant
 import java.time.LocalDate

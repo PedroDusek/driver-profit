@@ -4,7 +4,7 @@ import androidx.room.Room
 import androidx.test.core.app.ApplicationProvider
 import androidx.test.ext.junit.runners.AndroidJUnit4
 import com.driverpro.data.local.dao.WorkSessionDao
-import com.driverpro.data.local.database.DriverProDatabase
+import com.driverpro.core.database.DriverProDatabase
 import com.driverpro.data.local.entity.WorkSessionEntity
 import com.driverpro.domain.model.Platform
 import kotlinx.coroutines.flow.first

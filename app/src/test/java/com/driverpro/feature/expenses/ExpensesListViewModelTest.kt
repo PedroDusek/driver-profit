@@ -1,6 +1,6 @@
 package com.driverpro.feature.expenses
 
-import com.driverpro.core.common.Money
+import com.driverpro.core.domain.Money
 import com.driverpro.domain.model.Expense
 import com.driverpro.domain.model.ExpenseCategory
 import com.driverpro.domain.usecase.DeleteExpenseUseCase

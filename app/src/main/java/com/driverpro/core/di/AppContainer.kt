@@ -4,8 +4,8 @@ import android.content.Context
 import androidx.room.Room
 import com.driverpro.data.backup.ExportBackupUseCase
 import com.driverpro.data.backup.ImportBackupUseCase
-import com.driverpro.data.local.database.DriverProDatabase
-import com.driverpro.data.local.database.Migrations
+import com.driverpro.core.database.DriverProDatabase
+import com.driverpro.core.database.Migrations
 import com.driverpro.data.repository.OfflineExpenseRepository
 import com.driverpro.data.repository.OfflineMaintenanceScheduleRepository
 import com.driverpro.data.repository.OfflinePersonalUsageRepository

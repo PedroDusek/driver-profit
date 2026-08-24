@@ -1,5 +1,8 @@
 package com.driverpro.domain.model
 
+import com.driverpro.core.domain.FuelType
+import com.driverpro.core.domain.MeasurementUnit
+
 import org.junit.Assert.assertEquals
 import org.junit.Assert.assertFalse
 import org.junit.Assert.assertTrue

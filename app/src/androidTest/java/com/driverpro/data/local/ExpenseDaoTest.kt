@@ -5,12 +5,12 @@ import androidx.test.core.app.ApplicationProvider
 import androidx.test.ext.junit.runners.AndroidJUnit4
 import com.driverpro.data.local.dao.ExpenseDao
 import com.driverpro.data.local.dao.VehicleDao
-import com.driverpro.data.local.database.DriverProDatabase
+import com.driverpro.core.database.DriverProDatabase
 import com.driverpro.data.local.entity.ExpenseEntity
 import com.driverpro.data.local.entity.VehicleEntity
 import com.driverpro.domain.model.ChargingLocation
 import com.driverpro.domain.model.ExpenseCategory
-import com.driverpro.domain.model.FuelType
+import com.driverpro.core.domain.FuelType
 import com.driverpro.domain.model.MaintenanceCategory
 import com.driverpro.domain.model.VehicleFuel
 import kotlinx.coroutines.flow.first

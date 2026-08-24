@@ -3,8 +3,8 @@ package com.driverpro.feature.expenses.form
 import androidx.lifecycle.SavedStateHandle
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import com.driverpro.core.common.Money
-import com.driverpro.core.common.Quantity
+import com.driverpro.core.domain.Money
+import com.driverpro.core.domain.Quantity
 import com.driverpro.core.navigation.DriverProDestination
 import com.driverpro.core.ui.format.MoneyInput
 import com.driverpro.core.ui.format.QuantityInput
@@ -16,9 +16,9 @@ import com.driverpro.domain.model.ExpenseDraft
 import com.driverpro.domain.model.ExpenseField
 import com.driverpro.domain.model.ExpenseFieldError
 import com.driverpro.domain.model.ExpenseValidationError
-import com.driverpro.domain.model.FuelType
+import com.driverpro.core.domain.FuelType
 import com.driverpro.domain.model.MaintenanceCategory
-import com.driverpro.domain.model.MeasurementUnit
+import com.driverpro.core.domain.MeasurementUnit
 import com.driverpro.domain.model.Vehicle
 import com.driverpro.domain.model.toDraft
 import com.driverpro.domain.usecase.GetExpenseUseCase

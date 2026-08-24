@@ -6,8 +6,8 @@ import android.net.Uri
 import androidx.room.Room
 import androidx.test.core.app.ApplicationProvider
 import androidx.test.ext.junit.runners.AndroidJUnit4
-import com.driverpro.data.local.database.DriverProDatabase
-import com.driverpro.data.local.database.Migrations
+import com.driverpro.core.database.DriverProDatabase
+import com.driverpro.core.database.Migrations
 import com.driverpro.data.local.entity.VehicleEntity
 import com.driverpro.domain.model.VehicleFuel
 import kotlinx.coroutines.test.runTest

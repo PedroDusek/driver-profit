@@ -1,7 +1,9 @@
 package com.driverpro.domain.model
 
-import com.driverpro.core.common.Money
-import com.driverpro.core.common.Quantity
+import com.driverpro.core.domain.FuelType
+
+import com.driverpro.core.domain.Money
+import com.driverpro.core.domain.Quantity
 import org.junit.Assert.assertEquals
 import org.junit.Assert.assertFalse
 import org.junit.Assert.assertNull

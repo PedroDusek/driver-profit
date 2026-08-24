@@ -40,7 +40,7 @@ import androidx.compose.ui.unit.dp
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.lifecycle.viewmodel.compose.viewModel
 import com.driverpro.R
-import com.driverpro.core.ui.DriverProViewModelFactory
+import com.driverpro.core.di.DriverProViewModelFactory
 import com.driverpro.core.ui.component.AlertCard
 import com.driverpro.core.ui.format.BrazilianFormatter
 import com.driverpro.core.ui.format.MaintenanceLabels

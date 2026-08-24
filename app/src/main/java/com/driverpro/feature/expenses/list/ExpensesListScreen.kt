@@ -43,9 +43,9 @@ import androidx.compose.ui.unit.dp
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.lifecycle.viewmodel.compose.viewModel
 import com.driverpro.R
-import com.driverpro.core.common.Money
-import com.driverpro.core.common.Quantity
-import com.driverpro.core.ui.DriverProViewModelFactory
+import com.driverpro.core.domain.Money
+import com.driverpro.core.domain.Quantity
+import com.driverpro.core.di.DriverProViewModelFactory
 import com.driverpro.core.ui.component.CategoryLegendRow
 import com.driverpro.core.ui.component.DonutChart
 import com.driverpro.core.ui.component.DonutSlice
@@ -61,7 +61,7 @@ import com.driverpro.domain.model.ConsumptionEstimate
 import com.driverpro.domain.model.Expense
 import com.driverpro.domain.model.ExpenseCategory
 import com.driverpro.domain.model.ExpenseDetail
-import com.driverpro.domain.model.FuelType
+import com.driverpro.core.domain.FuelType
 import java.time.Instant
 import java.time.LocalDate
 

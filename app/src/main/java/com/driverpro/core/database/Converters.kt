@@ -1,9 +1,9 @@
-package com.driverpro.data.local.database
+package com.driverpro.core.database
 
 import androidx.room.TypeConverter
 import com.driverpro.domain.model.ChargingLocation
 import com.driverpro.domain.model.ExpenseCategory
-import com.driverpro.domain.model.FuelType
+import com.driverpro.core.domain.FuelType
 import com.driverpro.domain.model.MaintenanceCategory
 import com.driverpro.domain.model.MaintenanceItem
 import com.driverpro.domain.model.PersonalUsageSource

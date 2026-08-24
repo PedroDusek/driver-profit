@@ -3,8 +3,8 @@ package com.driverpro.feature.earnings.form
 import androidx.lifecycle.SavedStateHandle
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import com.driverpro.core.common.Money
-import com.driverpro.core.common.WorkDuration
+import com.driverpro.core.domain.Money
+import com.driverpro.core.domain.WorkDuration
 import com.driverpro.core.navigation.DriverProDestination
 import com.driverpro.core.ui.format.MoneyInput
 import com.driverpro.domain.model.Platform

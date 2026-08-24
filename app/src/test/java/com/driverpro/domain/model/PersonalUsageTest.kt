@@ -1,5 +1,7 @@
 package com.driverpro.domain.model
 
+import com.driverpro.core.domain.DateRange
+
 import org.junit.Assert.assertEquals
 import org.junit.Test
 import java.time.Instant

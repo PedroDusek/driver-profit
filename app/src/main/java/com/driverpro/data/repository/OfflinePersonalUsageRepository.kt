@@ -3,7 +3,7 @@ package com.driverpro.data.repository
 import com.driverpro.data.local.dao.PersonalUsageDao
 import com.driverpro.data.local.entity.toDomain
 import com.driverpro.data.local.entity.toEntity
-import com.driverpro.domain.model.DateRange
+import com.driverpro.core.domain.DateRange
 import com.driverpro.domain.model.PersonalUsage
 import com.driverpro.domain.repository.PersonalUsageRepository
 import kotlinx.coroutines.CoroutineDispatcher

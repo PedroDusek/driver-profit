@@ -1,4 +1,4 @@
-package com.driverpro.core.common
+package com.driverpro.core.domain
 
 /**
  * Valor monetário em **centavos** (PRD §26).

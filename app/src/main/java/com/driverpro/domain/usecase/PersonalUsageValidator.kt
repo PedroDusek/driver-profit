@@ -1,6 +1,6 @@
 package com.driverpro.domain.usecase
 
-import com.driverpro.domain.model.DateRange
+import com.driverpro.core.domain.DateRange
 import com.driverpro.domain.model.PersonalUsage
 import com.driverpro.domain.model.PersonalUsageDraft
 import com.driverpro.domain.model.PersonalUsageField

@@ -52,9 +52,9 @@ import androidx.compose.ui.unit.dp
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.lifecycle.viewmodel.compose.viewModel
 import com.driverpro.R
-import com.driverpro.core.common.Money
-import com.driverpro.core.common.WorkDuration
-import com.driverpro.core.ui.DriverProViewModelFactory
+import com.driverpro.core.domain.Money
+import com.driverpro.core.domain.WorkDuration
+import com.driverpro.core.di.DriverProViewModelFactory
 import com.driverpro.core.ui.component.AlertCard
 import com.driverpro.core.ui.component.CategoryLegendRow
 import com.driverpro.core.ui.component.DonutChart
@@ -70,7 +70,7 @@ import com.driverpro.core.ui.theme.TabularFigures
 import com.driverpro.core.ui.theme.content
 import com.driverpro.domain.model.DashboardMetrics
 import com.driverpro.domain.model.DashboardPeriod
-import com.driverpro.domain.model.DateRange
+import com.driverpro.core.domain.DateRange
 import com.driverpro.domain.model.ExpenseCategory
 import com.driverpro.domain.usecase.VehicleReconciliation
 import com.driverpro.feature.maintenance.MaintenanceWarningCard

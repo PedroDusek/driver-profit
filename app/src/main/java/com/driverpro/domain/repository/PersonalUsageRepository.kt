@@ -1,6 +1,6 @@
 package com.driverpro.domain.repository
 
-import com.driverpro.domain.model.DateRange
+import com.driverpro.core.domain.DateRange
 import com.driverpro.domain.model.PersonalUsage
 import kotlinx.coroutines.flow.Flow
 

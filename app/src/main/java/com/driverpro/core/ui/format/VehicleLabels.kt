@@ -2,7 +2,7 @@ package com.driverpro.core.ui.format
 
 import androidx.annotation.StringRes
 import com.driverpro.R
-import com.driverpro.domain.model.FuelType
+import com.driverpro.core.domain.FuelType
 import com.driverpro.domain.model.VehicleField
 import com.driverpro.domain.model.VehicleFuel
 import com.driverpro.domain.model.VehicleValidationError

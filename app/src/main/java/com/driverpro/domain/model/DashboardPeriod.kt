@@ -1,5 +1,7 @@
 package com.driverpro.domain.model
 
+import com.driverpro.core.domain.DateRange
+
 import java.time.DayOfWeek
 import java.time.LocalDate
 import java.time.temporal.TemporalAdjusters

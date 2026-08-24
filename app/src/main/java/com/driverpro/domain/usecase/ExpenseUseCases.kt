@@ -1,6 +1,6 @@
 package com.driverpro.domain.usecase
 
-import com.driverpro.domain.model.DateRange
+import com.driverpro.core.domain.DateRange
 import com.driverpro.domain.model.Expense
 import com.driverpro.domain.model.ExpenseDraft
 import com.driverpro.domain.model.ExpenseFieldError

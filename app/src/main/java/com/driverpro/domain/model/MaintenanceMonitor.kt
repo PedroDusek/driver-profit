@@ -1,5 +1,7 @@
 package com.driverpro.domain.model
 
+import com.driverpro.core.domain.FuelType
+
 /**
  * Decide a situação de cada item de manutenção a partir do que foi lançado.
  *

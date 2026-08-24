@@ -2,7 +2,7 @@ package com.driverpro.feature.expenses.list
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import com.driverpro.core.common.Money
+import com.driverpro.core.domain.Money
 import com.driverpro.domain.model.ConsumptionEstimate
 import com.driverpro.domain.model.ConsumptionEstimator
 import com.driverpro.domain.model.Expense

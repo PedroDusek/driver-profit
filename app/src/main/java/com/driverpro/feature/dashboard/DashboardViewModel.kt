@@ -4,7 +4,7 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.driverpro.domain.model.DashboardMetrics
 import com.driverpro.domain.model.DashboardPeriod
-import com.driverpro.domain.model.DateRange
+import com.driverpro.core.domain.DateRange
 import com.driverpro.domain.model.VehicleMaintenance
 import com.driverpro.domain.usecase.ObserveDashboardUseCase
 import com.driverpro.domain.usecase.ObserveMaintenanceUseCase

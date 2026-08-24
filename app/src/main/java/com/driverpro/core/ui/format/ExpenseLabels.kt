@@ -7,7 +7,7 @@ import com.driverpro.domain.model.ExpenseCategory
 import com.driverpro.domain.model.ExpenseField
 import com.driverpro.domain.model.ExpenseValidationError
 import com.driverpro.domain.model.MaintenanceCategory
-import com.driverpro.domain.model.MeasurementUnit
+import com.driverpro.core.domain.MeasurementUnit
 
 /** Tradução dos enums de despesa para textos da interface. */
 object ExpenseLabels {

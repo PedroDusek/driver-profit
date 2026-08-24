@@ -1,7 +1,7 @@
 package com.driverpro.domain.usecase
 
-import com.driverpro.core.common.Money
-import com.driverpro.core.common.Quantity
+import com.driverpro.core.domain.Money
+import com.driverpro.core.domain.Quantity
 import com.driverpro.domain.model.ChargingLocation
 import com.driverpro.domain.model.Expense
 import com.driverpro.domain.model.ExpenseCategory
@@ -10,7 +10,7 @@ import com.driverpro.domain.model.ExpenseDraft
 import com.driverpro.domain.model.ExpenseField
 import com.driverpro.domain.model.ExpenseFieldError
 import com.driverpro.domain.model.ExpenseValidationError
-import com.driverpro.domain.model.FuelType
+import com.driverpro.core.domain.FuelType
 import com.driverpro.domain.model.MaintenanceCategory
 import com.driverpro.domain.model.Vehicle
 import com.driverpro.domain.model.VehicleFuel
@@ -289,7 +289,7 @@ class ExpenseValidatorTest {
 
         assertEquals(emptyList<ExpenseFieldError>(), validator.validate(draft, cngCar))
         assertEquals(
-            com.driverpro.domain.model.MeasurementUnit.CUBIC_METER,
+            com.driverpro.core.domain.MeasurementUnit.CUBIC_METER,
             validator.toExpense(draft).unit,
         )
     }
