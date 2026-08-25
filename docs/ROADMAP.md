@@ -402,7 +402,7 @@ banco, não um formato novo.
       `CategoryBarRow`, `ListItemCard`
 - [x] Navegação: barra inferior no lugar de seis ícones na TopAppBar; uso
       pessoal, manutenção e backup viram entradas em "Mais"
-      (`feature/more/MoreScreen.kt`)
+      (`more/presentation/MoreScreen.kt`)
 - [x] Ícone do launcher redesenhado na cor de marca nova
 - [ ] `connectedDebugAndroidTest` no aparelho físico (a pasta de schemas do
       Room mudou de nome — ver `DATABASE.md`)

@@ -1,8 +1,8 @@
 package com.driverpro.core.ui.format
 
-import com.driverpro.core.common.Money
-import com.driverpro.core.common.WorkDuration
-import com.driverpro.domain.model.Consumption
+import com.driverpro.core.domain.Money
+import com.driverpro.core.domain.WorkDuration
+import com.driverpro.expenses.domain.Consumption
 import java.time.LocalDate
 import java.time.format.DateTimeFormatter
 

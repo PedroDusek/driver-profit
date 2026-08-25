@@ -1,6 +1,6 @@
 package com.driverpro.core.ui.format
 
-import com.driverpro.core.common.Money
+import com.driverpro.core.domain.Money
 
 /**
  * Entrada monetária digitada em centavos.

@@ -17,6 +17,15 @@ ou cálculo.
 
 ### Alterado
 
+- **Reorganização de pacotes: feature-first.** `core/`, `data/`, `domain/` e
+  `feature/` (organizados por tipo técnico de arquivo) viraram
+  `vehicle/`, `expenses/`, `earnings/`, `maintenance/`, `personal/`,
+  `dashboard/`, `backup/` e `more/` (organizados por funcionalidade do
+  produto, cada um com `data/domain/presentation` só onde faz sentido).
+  `core/` ficou reservado ao que é genuinely compartilhado: banco de dados,
+  injeção de dependência, navegação e design system. Mudança só de pacote —
+  nenhuma regra de negócio, cálculo, tela, schema ou migration mudou. Detalhes
+  em `ARCHITECTURE.md`
 - **Barra inferior: aba ativa em verde, inativas em cinza.** O
   `NavigationBarItem` do Material 3 desenha por padrão uma pílula colorida
   atrás do ícone selecionado; a referência não tem essa cápsula, e zerar o

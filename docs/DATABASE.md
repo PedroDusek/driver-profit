@@ -284,7 +284,7 @@ Data como epoch day mantém consulta por período como comparação numérica �
 
 ## Conversores
 
-`data/local/database/Converters.kt`:
+`core/database/Converters.kt`:
 
 | Kotlin | SQLite |
 | --- | --- |
@@ -303,7 +303,7 @@ Data como epoch day mantém consulta por período como comparação numérica �
 **`fallbackToDestructiveMigration()` é proibido.** Apagar o histórico
 financeiro do motorista para resolver mudança de schema não é uma opção.
 
-As migrações vivem em `data/local/database/Migrations.kt` e são registradas no
+As migrações vivem em `core/database/Migrations.kt` e são registradas no
 builder em `core/di/AppContainer.kt`.
 
 Toda alteração de schema exige, no mesmo PR:

@@ -1,6 +1,6 @@
 package com.driverpro.core.ui.format
 
-import com.driverpro.core.common.Quantity
+import com.driverpro.core.domain.Quantity
 
 /**
  * Entrada e saída de quantidades digitadas pelo motorista.

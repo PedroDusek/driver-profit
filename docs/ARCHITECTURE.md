@@ -30,10 +30,22 @@ DAO
 Room
 ```
 
-A dependência aponta sempre para dentro: `feature` conhece `domain`, `domain`
-não conhece `data` nem `feature`. A inversão acontece porque a interface
-`VehicleRepository` vive em `domain/repository` e a implementação
-`OfflineVehicleRepository` vive em `data/repository`.
+A dependência aponta sempre para dentro: `presentation` conhece `domain`,
+`domain` não conhece `data` nem `presentation`. A inversão acontece porque a
+interface `VehicleRepository` vive em `vehicle/domain` e a implementação
+`OfflineVehicleRepository` vive em `vehicle/data` — mesmo padrão em toda
+feature, não só veículo.
+
+Isso vale **dentro** de uma feature. Entre features, a regra é outra: uma
+feature pode depender do `domain` de outra quando o conceito é
+genuinamente dela — `dashboard/domain` depende dos use cases de
+`earnings`/`expenses`/`personal` porque agregar é o próprio trabalho do
+dashboard, e `expenses/domain` depende de `maintenance/domain` porque uma
+despesa de categoria manutenção referencia a categoria de serviço, que é
+conceito de manutenção. O que não existe é o inverso — `vehicle` não
+importa de `expenses`, `maintenance` não importa de `dashboard` — e toda
+dependência cruzada real está registrada na seção "Estrutura de pacotes"
+abaixo.
 
 ### Responsabilidades
 
@@ -49,33 +61,72 @@ de rentabilidade com JUnit, sem emulador.
 
 ## Estrutura de pacotes
 
+**Feature-first**, não por camada técnica. A pergunta que decide onde um
+arquivo mora é sempre "que funcionalidade é dona deste código", nunca "que
+tipo técnico é este arquivo" — a organização anterior (`core/`, `data/`,
+`domain/`, `feature/` como pastas de topo, cada uma subdividida por tipo)
+espalhava o domínio de veículo, por exemplo, por sete pastas diferentes.
+Reorganizado numa branch dedicada, separada do redesign visual, depois da
+v0.14.0.
+
 ```
 com.driverpro/
 ├── DriverProApplication.kt   # cria o AppContainer
-├── MainActivity.kt              # única Activity
-├── core/
-│   ├── common/                  # Money, WorkDuration — tipos base do domínio
-│   ├── di/                      # AppContainer
-│   ├── navigation/              # rotas e NavHost
+├── MainActivity.kt           # única Activity
+│
+├── core/                     # só o que é genuinamente compartilhado
+│   ├── database/             # DriverProDatabase, Converters, Migrations
+│   ├── di/                   # AppContainer, ViewModelFactory
+│   ├── domain/                # Money, Quantity, WorkDuration, DateRange,
+│   │                          # FuelType/MeasurementUnit — value objects
+│   │                          # usados por toda feature, dono nenhuma
+│   ├── navigation/            # rotas e NavHost
 │   └── ui/
-│       ├── format/              # BrazilianFormatter
-│       └── theme/               # cores, tipografia, tema
-├── data/
-│   ├── local/
-│   │   ├── dao/
-│   │   ├── database/            # RoomDatabase, TypeConverters
-│   │   └── entity/              # entidades + mapeamento para domínio
-│   └── repository/              # implementações
-├── domain/
-│   ├── model/                   # Vehicle, enums de propulsão
-│   ├── repository/              # contratos
-│   └── usecase/                 # regras de negócio (a partir de v0.2.0)
-└── feature/                     # uma pasta por tela
-    ├── dashboard/
-    ├── earnings/                # list/ e form/
-    ├── expenses/                # list/ e form/
-    └── vehicle/                 # list/ e form/
+│       ├── component/         # IconChip, StatTile, DonutChart... sem
+│       │                      # import de tipo de domínio nenhum
+│       ├── format/             # BrazilianFormatter, MoneyInput,
+│       │                       # QuantityInput — formatação genérica
+│       └── theme/              # cores, forma, tipografia
+│
+├── vehicle/  expenses/  earnings/  maintenance/  personal/
+│   ├── data/    (entidade, dao, repository impl)
+│   ├── domain/  (modelo, repository interface, use cases)
+│   └── presentation/  (screen, viewmodel; form/ e list/ onde existem)
+│
+├── dashboard/
+│   ├── domain/        # agrega as outras — sem data/, não persiste nada
+│   └── presentation/
+│
+├── backup/
+│   ├── data/           # I/O de infraestrutura pura — sem domain/
+│   └── presentation/
+│
+└── more/
+    └── presentation/    # hub de navegação — só presentation/
 ```
+
+Cada feature concentra o máximo possível do seu próprio código — para
+trabalhar em "despesas", a maior parte do que importa está dentro de
+`expenses/`. Nem toda feature tem as três camadas: `dashboard` não persiste
+nada, `backup` não tem regra de negócio própria, `more` é puramente
+navegação. Criar `data/`/`domain/` vazios "para completar" contrariaria o
+próprio motivo da reorganização.
+
+**Dependências cruzadas conhecidas** (uma feature importando o domínio de
+outra, sempre na direção de quem é dono do conceito):
+
+| De | Para | Por quê |
+| --- | --- | --- |
+| `dashboard/domain` | `earnings`, `expenses`, `personal` (`domain`) | Dashboard agrega os três — é o próprio trabalho dele |
+| `expenses/domain` | `maintenance/domain` (`MaintenanceCategory`) | Uma despesa de categoria manutenção referencia a categoria de serviço; a classificação é conceito de manutenção |
+| `maintenance/domain` | `expenses/domain` (`Consumption`, `Expense`) | O piso de quilometragem implícita vem do consumo calculado a partir de abastecimentos |
+| `personal/domain` (`ReconcileOdometerUseCase`) | `earnings`, `expenses` (`domain`) | A conciliação lê sessões de trabalho e despesas para calcular a sobra do odômetro |
+| toda feature | `core/domain`, `core/ui/*` | Value objects e design system genuinamente compartilhados |
+| toda `*/presentation` | `core/di`, `core/navigation` | Fábrica de ViewModel e rotas são centralizadas |
+
+`Money`, `Quantity`, `WorkDuration`, `DateRange`, `FuelType` e
+`MeasurementUnit` vivem em `core/domain` — não em `core/common` — porque são
+usados por toda feature e não pertencem a nenhuma sozinha.
 
 A estrutura é proporcional ao projeto: módulo Gradle único, sem camadas
 cerimoniais. Multi-módulo só se o tempo de build virar problema real.
@@ -84,7 +135,7 @@ cerimoniais. Multi-módulo só se o tempo de build virar problema real.
 
 ### Dinheiro é `Long` em centavos
 
-`core/common/Money.kt`. `R$ 286,40` é `28640`.
+`core/domain/Money.kt`. `R$ 286,40` é `28640`.
 
 Ponto flutuante acumula erro: somar cem lançamentos de `0.07` em `Double` não
 dá `7.00`. Em um app cujo produto **é** a exatidão do número, isso é
@@ -100,7 +151,7 @@ A UI exibe `—`. Isso resolve o requisito "nunca permitir divisão por zero"
 
 ### Tempo é `Long` em minutos
 
-`core/common/WorkDuration.kt`. `8h20` é `500`. Horas decimais existem apenas
+`core/domain/WorkDuration.kt`. `8h20` é `500`. Horas decimais existem apenas
 como divisor em R$/hora, via `toHours()`, e nunca são persistidas.
 
 ### Unidades são parte do tipo
@@ -182,7 +233,7 @@ salvo) — o mesmo padrão que despesa já usava desde a v0.4.0.
 
 ### O cálculo do dashboard vive no domínio
 
-`domain/model/DashboardMetrics.kt`. Recebe as sessões e as despesas de um
+`dashboard/domain/DashboardMetrics.kt`. Recebe as sessões e as despesas de um
 período e devolve os doze indicadores do PRD §21. Kotlin puro: sem Android,
 sem Room, sem `Context`.
 
@@ -210,7 +261,7 @@ O rateio de custo fixo ao longo do tempo é da v1.4 (PRD §47).
 
 ### O alerta de manutenção não degrada como o resto do app
 
-`domain/model/MaintenanceMonitor.kt`. É a única funcionalidade que se recusa a
+`maintenance/domain/MaintenanceMonitor.kt`. É a única funcionalidade que se recusa a
 trabalhar com o que tem.
 
 Todas as outras degradam com elegância: sem uso pessoal, o custo/km sai
@@ -254,7 +305,7 @@ que divergiria da primeira na primeira correção de lançamento.
 
 ### Período é `sealed`, e o dia de referência é parâmetro
 
-`domain/model/DashboardPeriod.kt`. "Personalizado" carrega um intervalo e os
+`dashboard/domain/DashboardPeriod.kt`. "Personalizado" carrega um intervalo e os
 demais não; com `enum`, esse intervalo viajaria por fora, num campo anulável
 que só faz sentido para uma das constantes, e cada leitor do estado precisaria
 lembrar dessa combinação.
@@ -299,7 +350,7 @@ atualizar esta seção.
 
 `VehicleValidator` retorna `VehicleFieldError(field, error)`, onde `error` é um
 enum como `REQUIRED` ou `YEAR_OUT_OF_RANGE`. Quem traduz para texto é
-`core/ui/format/VehicleLabels`, na camada de apresentação.
+`vehicle/presentation/VehicleLabels`, na camada de apresentação.
 
 Se o domínio devolvesse a frase pronta, ele precisaria de `Context` para ler
 string resources — e deixaria de rodar em teste JUnit puro. Como bônus, mudar
@@ -311,7 +362,7 @@ forma mais eficiente de irritar quem preenche formulário.
 
 ### ViewModel factory centralizada
 
-`core/ui/ViewModelFactory.kt`. Com DI manual, cada ViewModel precisa de uma
+`core/di/ViewModelFactory.kt`. Com DI manual, cada ViewModel precisa de uma
 fábrica que monte suas dependências; concentrá-las num arquivo evita espalhar
 `viewModelFactory { }` dentro dos Composables.
 
@@ -327,10 +378,10 @@ Ver [DATABASE.md](DATABASE.md).
 
 ### Backup toca Context e SQLite bruto de propósito
 
-`data/backup/ExportBackupUseCase.kt` e `ImportBackupUseCase.kt` (v0.13.0)
-vivem em `data/`, não em `domain/usecase/`, e recebem `Context` e
-`DriverProDatabase` diretamente — desvio deliberado da regra "domínio não
-conhece Android" que vale para o resto do projeto.
+`backup/data/ExportBackupUseCase.kt` e `ImportBackupUseCase.kt` (v0.13.0)
+vivem em `backup/data/` — a feature `backup` nem tem pasta `domain/` — e
+recebem `Context` e `DriverProDatabase` diretamente, desvio deliberado da
+regra "domínio não conhece Android" que vale para o resto do projeto.
 
 Motivo: a funcionalidade inteira **é** infraestrutura. Exportar é um
 checkpoint de WAL (`PRAGMA wal_checkpoint(FULL)`, mesmo motivo do
@@ -402,7 +453,7 @@ visualização de dado do app além de texto) e `ListItemCard` (padroniza
 ganhou `bottomBar` com `NavigationBar` (Dashboard, Ganhos, Despesas, Veículos,
 Mais). Mudança só de apresentação — cada item chama exatamente o
 `navController.navigate(...)` que já existia. Uso pessoal, manutenção e backup
-saíram da TopAppBar e viraram entradas em `feature/more/MoreScreen.kt`, novo
+saíram da TopAppBar e viraram entradas em `more/presentation/MoreScreen.kt`, novo
 destino (`DriverProDestination.MORE`) que não existia antes; nenhuma tela de
 destino mudou de comportamento, só como se chega até ela.
 
@@ -445,6 +496,43 @@ para uma referência visual concreta que faz diferente.
   confundir com a legenda de categoria de despesa na mesma tela do app.
 - **Ícone redesenhado de novo**, agora com gradiente azul→verde reproduzindo a
   logo (`ic_launcher_foreground.xml`), sobre fundo navy sólido.
+
+### Reorganização feature-first (branch separada, depois da v0.14.0)
+
+O Pedro pediu a reestruturação que resultou na seção "Estrutura de pacotes"
+lá em cima — trocar organização por camada técnica (`core/`, `data/`,
+`domain/`, `feature/`, cada uma subdividida por tipo de arquivo) por
+organização por funcionalidade. Numa branch própria, separada da v0.14.0 de
+propósito: são mudanças de natureza completamente diferente (visual vs.
+estrutura de pacotes), e misturá-las tornaria qualquer uma das duas mais
+difícil de revisar.
+
+**Critério para o que fica em `core`:** só código que não pertence a uma
+feature específica e é usado por múltiplas. Antes da reorganização,
+`core/common/` já guardava `Money`/`Quantity`/`WorkDuration` por esse motivo
+— o problema era o resto: `core/ui/format/` também guardava `VehicleLabels`,
+`ExpenseLabels`, `MaintenanceLabels` e todos os outros `*Labels.kt`,
+específicos de uma feature cada, só porque `BrazilianFormatter` (esse sim
+genuinamente compartilhado) morava ali do lado. Cada `*Labels.kt` foi para a
+`presentation/` da sua feature; `ExpenseCategoryVisuals.kt` (acoplado a
+`ExpenseCategory`) saiu de `core/ui/component/` para `expenses/presentation/`
+pelo mesmo motivo. O teste aplicado em cada caso duvidoso está registrado na
+tabela de dependências cruzadas, acima.
+
+**`DriverProDatabase` mudou de FQCN**, de `com.driverpro.data.local.database`
+para `com.driverpro.core.database` — exceção explícita do critério acima,
+porque banco, conversores e migrations são infraestrutura genuinamente
+compartilhada. Isso arrastou a pasta de schemas exportados do Room
+(`app/schemas/`), que o `MigrationTestHelper` localiza pelo FQCN da classe —
+mesma mecânica do rename `com.driverprofit` → `com.driverpro` da v0.14.0.
+Entidades e DAOs também mudaram de pacote ao seguir cada feature, mas isso
+**não** afeta schema nenhum: Room identifica tabela pelo nome SQL
+(`@Entity(tableName = ...)`), não pelo FQCN da classe Kotlin.
+
+**Nenhuma regra de negócio, cálculo, tela, navegação ou schema mudou** — só
+o endereço dos arquivos e as declarações `package`/`import`. O gate
+(`testDebugUnitTest`, `lintDebug`, `assembleDebug`) ficou verde a cada etapa,
+uma feature por vez, exatamente como pedido.
 
 ## Regras de dependência
 
