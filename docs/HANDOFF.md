@@ -4,62 +4,59 @@ Documento de continuidade. Leia isto **antes** de qualquer coisa ao retomar o
 projeto em uma sessão nova, junto com `PRD.md`, `ARCHITECTURE.md` e
 `DEVELOPMENT.md`.
 
-**Última atualização:** v0.14.0
+**Última atualização:** v0.15.0 (em preparação, PR #23)
 
 ---
 
 ## 0. Comece por aqui
 
-**Está tudo na `main`, publicado.** v0.11.0, v0.12.0 e v0.13.0 — pedidos de
-produto do Pedro, não itens do roadmap original — foram mergeadas, tagueadas,
-empurradas para `origin` e liberadas com sucesso. v0.14.0 (este rebrand) está
-pronta numa branch de feature (`feature/driverpro-rebrand`), com o
-[PR #22](https://github.com/PedroDusek/driver-profit/pull/22) aberto contra a
-`main`, aguardando `connectedDebugAndroidTest` e revisão.
+**Tudo consolidado numa branch só: `feature/dark-green-redesign`.** Ela é a
+ponta real do projeto e leva, nesta ordem: o rebrand v0.14.0, o redesign
+visual novo, a navegação por abas, a reorganização feature-first e a correção
+do aviso de conciliação. [PR #23](https://github.com/PedroDusek/driver-profit/pull/23),
+gate verde.
 
-> **Reorganização de pacotes feature-first, pronta numa branch separada
-> (ainda não empurrada, sem PR).** A pedido do Pedro, `core/`, `data/`,
-> `domain/` e `feature/` (organizados por tipo técnico de arquivo) viraram
-> `vehicle/`, `expenses/`, `earnings/`, `maintenance/`, `personal/`,
-> `dashboard/`, `backup/` e `more/` — cada um com `data/domain/presentation`
-> só onde faz sentido. `core/` ficou reservado ao que é genuinely
-> compartilhado (banco, DI, navegação, design system). **Branch
-> separada de propósito**: `refactor/feature-first-architecture`, criada a
-> partir da ponta de `feature/driverpro-rebrand` (commit `a4c7356`, antes do
-> PR #22 abrir mais commits) — misturar reorganização estrutural com o
-> redesign visual do PR #22 tornaria a revisão de qualquer um dos dois mais
-> difícil. Só mudou pacote — nenhuma regra de negócio, cálculo, tela,
-> navegação, schema ou migration mudou. 10 commits, um por etapa (Core →
-> Vehicle → Expenses → Earnings → Maintenance → Personal → Dashboard → Backup
-> → More → Cleanup), cada um com `compileDebugKotlin` +
-> `compileDebugUnitTestKotlin` + `compileDebugAndroidTestKotlin` +
-> `testDebugUnitTest` verdes; gate final completo
-> (`testDebugUnitTest lintDebug assembleDebug`) verde. Documentação
-> atualizada (`ARCHITECTURE.md` ganhou árvore de pacotes nova e tabela de
-> dependências cruzadas entre features; `CHANGELOG.md` tem a entrada).
-> Detalhes da auditoria e do mapa de pacotes em
-> `C:\Users\pedro\.claude\plans\agile-skipping-marshmallow.md`.
+> **A `main` está bem atrás.** Ela ainda tem v0.13.0, com o pacote antigo
+> `com.driverprofit` e a estrutura por camada técnica. Tudo que veio depois
+> vive no PR #23.
+
+> **Reorganização feature-first — mergeada** (commit `7600fdd`). `core/`,
+> `data/`, `domain/` e `feature/` (organizados por tipo técnico de arquivo)
+> deram lugar a `vehicle/`, `expenses/`, `earnings/`, `maintenance/`,
+> `personal/`, `dashboard/`, `backup/` e `more/`, cada um com
+> `data/domain/presentation` só onde faz sentido. `core/` ficou com banco, DI,
+> navegação e design system. Nenhuma regra de negócio, cálculo, tela, schema
+> ou migration mudou — só o endereço dos arquivos.
 >
-> **O que falta:** empurrar a branch e abrir o PR (decisão do Pedro — ainda
-> não pedida nesta sessão), decidir a ordem de merge com o PR #22 (a branch
-> parte da ponta dele, então ou o #22 mergeia primeiro e esta rebaseia, ou
-> o contrário e o #22 sofre o mesmo conflito que qualquer merge teria com um
-> reorganização de pacotes por baixo), e rodar `connectedDebugAndroidTest` no
-> aparelho — só o Pedro roda isso, é rotina do projeto.
+> Foram 12 conflitos, **todos em bloco de import**: a detecção de rename do
+> git seguiu os arquivos corretamente, então o conflito ficou restrito ao topo
+> de cada tela, onde a refatoração mudou o caminho dos símbolos e o redesign
+> tinha adicionado imports novos. Regra de resolução: o caminho da refatoração
+> manda (ela moveu os arquivos), e os imports que só o redesign tinha foram
+> preservados.
+>
+> A auditoria e o mapa de pacotes estão em
+> `C:\Users\pedro\.claude\plans\agile-skipping-marshmallow.md`. A árvore nova e
+> a tabela de dependências cruzadas entre features estão em `ARCHITECTURE.md`.
 
-> **Bug corrigido, em branch própria: `fix/reconciliation-warning-not-reopening`**,
-> a partir de `feature/driverpro-rebrand` (não de `main`, que ainda está no
-> pacote antigo `com.driverprofit` sem o rebrand). O Pedro relatou em teste no
-> aparelho que o aviso de "Odômetro não confere" sumia e não voltava depois de
-> adicionar/remover jornadas e uso pessoal. Causa: em
-> `PersonalUsageListViewModel`, fechar o diálogo de conciliação sem responder
-> (toque fora, botão voltar) guardava a janela por `DateRange` num set em
-> memória e a silenciava **para sempre** na sessão da tela, mesmo que a sobra
-> real mudasse depois. Corrigido guardando também a sobra vista no momento do
-> fechamento (`Map<DateRange, Long?>`); a janela só continua silenciada
-> enquanto a sobra recalculada for a mesma. 4 testes novos em
-> `PersonalUsageListViewModelTest`, reproduzindo o cenário antes de corrigir.
-> Gate completo verde. Não empurrada, sem PR.
+> **Correção do aviso de conciliação — mergeada** (commit `2611005`). O aviso
+> de "Odômetro não confere" sumia e não voltava depois de adicionar ou remover
+> jornadas e uso pessoal. Causa: em `PersonalUsageListViewModel`, fechar o
+> diálogo sem responder (toque fora, botão voltar) guardava a janela por
+> `DateRange` num set em memória e a silenciava **para sempre** na sessão da
+> tela, mesmo que a sobra real mudasse depois. Passa a guardar também a sobra
+> vista no momento do fechamento (`Map<DateRange, Long?>`): a janela só
+> continua silenciada enquanto a sobra recalculada for a mesma. 4 testes novos
+> em `PersonalUsageListViewModelTest`, escritos para reproduzir o defeito
+> antes de corrigi-lo.
+
+> **O PR #22 deve ser fechado, não mergeado.** Todos os commits do rebrand já
+> estão dentro do #23; mergear os dois duplicaria o histórico.
+
+> **O que falta antes de taguear a v0.15.0:** rodar
+> `connectedDebugAndroidTest` num aparelho (só o Pedro roda isso — o CI não
+> tem device, então gate verde no PR **não** diz nada sobre migração), e
+> conferir o visual novo no celular.
 
 > **Correção:** esta seção dizia que v0.13.0 ainda estava numa branch
 > aguardando merge. Não estava mais — `git log`/`git tag` confirmam que já
@@ -94,7 +91,8 @@ pronta numa branch de feature (`feature/driverpro-rebrand`), com o
 | v0.11.0 IPVA sem competência | ✅ | 9 | ✅ |
 | v0.12.0 Veículo atual | ✅ | **10** | ✅ |
 | v0.13.0 Exportar e importar arquivo | ✅ | 10 | ✅ |
-| v0.14.0 Nome e redesign visual (DriverPro) | branch pronta | 10 | — |
+| v0.14.0 Nome e redesign visual (DriverPro) | absorvida no PR #23 | 10 | — |
+| **v0.15.0** Identidade visual, abas fixas, feature-first | PR #23, gate verde | 10 | — |
 
 O PRD §58 volta a valer: dá para fazer `git checkout v0.8.0` e reproduzir aquele
 estado.
@@ -292,9 +290,10 @@ estimado em si chega na v0.8.0.
 | v0.11.0 IPVA sem competência | ✅ |
 | v0.12.0 Veículo atual | ✅ |
 | v0.13.0 Exportar e importar arquivo | ✅ |
-| **v0.14.0 Nome e redesign visual (DriverPro)** | ⬅️ pronta, branch não mergeada |
-| v0.15.0 Crash handling · v0.16.0 Testes de fluxo | |
-| v0.17.0 Analytics · v0.18.0 UX polish · v0.19.0 Hardening · v0.20.0 RC · v1.0.0 MVP | |
+| v0.14.0 Nome e redesign visual (DriverPro) | absorvida no PR #23 |
+| **v0.15.0 Identidade visual, abas fixas, feature-first** | ⬅️ PR #23, aguarda teste no aparelho |
+| v0.16.0 Crash handling · v0.17.0 Testes de fluxo | |
+| v0.18.0 Analytics · v0.19.0 UX polish · v0.20.0 Hardening · v0.21.0 RC · v1.0.0 MVP | |
 
 O bloco v0.6.0–v0.10.0 foi desenhado em conjunto: cada versão é pequena,
 testável e reversível, e a ordem é de dependência, não de preferência. O
