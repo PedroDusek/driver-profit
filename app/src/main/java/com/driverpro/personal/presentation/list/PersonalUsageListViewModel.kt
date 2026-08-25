@@ -45,12 +45,18 @@ class PersonalUsageListViewModel(
     val usagePendingDeletion: StateFlow<PersonalUsage?> = pendingDeletion.asStateFlow()
 
     /**
-     * Divergências dispensadas nesta sessão de tela.
+     * Divergências dispensadas nesta sessão de tela, com a sobra que tinham
+     * no momento em que o motorista fechou o diálogo sem responder.
      *
      * Guardadas por janela, e não como um booleano: resolver a de hoje não pode
-     * silenciar a que aparecer no próximo abastecimento.
+     * silenciar a que aparecer no próximo abastecimento. E guardadas com a
+     * sobra, e não só a janela: se ele editar um lançamento depois — apagar a
+     * jornada que explicava parte, por exemplo — e a sobra daquela mesma
+     * janela mudar, é uma divergência diferente da que ele viu e ignorou, e
+     * precisa perguntar de novo. Sem isso o diálogo fechado sem resposta
+     * silenciava a janela em definitivo, mesmo quando a sobra dobrava.
      */
-    private val dismissed = MutableStateFlow<Set<DateRange>>(emptySet())
+    private val dismissed = MutableStateFlow<Map<DateRange, Long?>>(emptyMap())
 
     /**
      * A conciliação aparece **sozinha** quando há divergência.
@@ -63,7 +69,7 @@ class PersonalUsageListViewModel(
     val pendingReconciliation: StateFlow<OdometerReconciliation?> =
         combine(observeReconciliation(), dismissed) { pending, ignored ->
             pending.map { it.reconciliation }
-                .firstOrNull { it.period !in ignored }
+                .firstOrNull { ignored[it.period] != it.unexplainedKilometers }
         }
             .stateIn(
                 scope = viewModelScope,
@@ -84,12 +90,12 @@ class PersonalUsageListViewModel(
 
     /** Traz de volta uma divergência que ele tinha dispensado. */
     fun onReconcileRequested() {
-        dismissed.value = emptySet()
+        dismissed.value = emptyMap()
     }
 
     fun onReconcileDismissed() {
         val pending = pendingReconciliation.value ?: return
-        dismissed.value = dismissed.value + pending.period
+        dismissed.value = dismissed.value + (pending.period to pending.unexplainedKilometers)
     }
 
     /**
