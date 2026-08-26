@@ -2,11 +2,12 @@ package com.driverpro.dashboard.presentation
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import com.driverpro.dashboard.domain.DashboardComparison
 import com.driverpro.dashboard.domain.DashboardMetrics
 import com.driverpro.dashboard.domain.DashboardPeriod
 import com.driverpro.core.domain.DateRange
 import com.driverpro.maintenance.domain.VehicleMaintenance
-import com.driverpro.dashboard.domain.ObserveDashboardUseCase
+import com.driverpro.dashboard.domain.ObserveDashboardComparisonUseCase
 import com.driverpro.maintenance.domain.ObserveMaintenanceUseCase
 import com.driverpro.personal.domain.ObserveOdometerReconciliationUseCase
 import com.driverpro.personal.domain.VehicleReconciliation
@@ -32,8 +33,19 @@ sealed interface DashboardUiState {
         override val period: DashboardPeriod,
         /** Intervalo efetivamente consultado, já resolvido a partir de hoje. */
         val range: DateRange,
-        val metrics: DashboardMetrics,
-    ) : DashboardUiState
+        /** Intervalo anterior equivalente, contra o qual a variação é medida. */
+        val previousRange: DateRange,
+        val comparison: DashboardComparison,
+    ) : DashboardUiState {
+
+        /**
+         * Os números do período escolhido.
+         *
+         * Atalho para `comparison.current`, e não um campo à parte: guardar os
+         * dois lados separados abriria espaço para eles divergirem.
+         */
+        val metrics: DashboardMetrics get() = comparison.current
+    }
 }
 
 /**
@@ -49,7 +61,7 @@ sealed interface DashboardUiState {
  */
 @OptIn(ExperimentalCoroutinesApi::class)
 class DashboardViewModel(
-    observeDashboard: ObserveDashboardUseCase,
+    observeDashboardComparison: ObserveDashboardComparisonUseCase,
     observeMaintenance: ObserveMaintenanceUseCase,
     observeReconciliation: ObserveOdometerReconciliationUseCase,
     private val clock: Clock = Clock.systemDefaultZone(),
@@ -102,9 +114,15 @@ class DashboardViewModel(
 
     val uiState: StateFlow<DashboardUiState> = period
         .flatMapLatest { selected ->
-            val range = selected.rangeAt(today())
-            observeDashboard(range).map { metrics ->
-                DashboardUiState.Content(selected, range, metrics)
+            // Os dois intervalos são resolvidos do mesmo `today()`: lidos em
+            // momentos diferentes, uma virada de meia-noite entre as duas
+            // chamadas compararia períodos que não se encaixam.
+            val today = today()
+            val range = selected.rangeAt(today)
+            val previousRange = selected.previousRangeAt(today)
+
+            observeDashboardComparison(range, previousRange).map { comparison ->
+                DashboardUiState.Content(selected, range, previousRange, comparison)
             }
         }
         .stateIn(

@@ -145,6 +145,29 @@ data class DashboardMetrics(
      */
     val fixedCostPerKm: Money? get() = accruedFixedCost.per(workKilometers)
 
+    /**
+     * Quanto custa **rodar** uma hora — só o custo variável.
+     *
+     * O numerador é [workOperationalCost], e não [operationalExpenses] como no
+     * [costPerKm]. Lá os totais dos dois lados podem ser usados porque o rateio
+     * se cancela algebricamente (`(E × Kt/K) ÷ Kt = E ÷ K`); aqui não existe
+     * "hora pessoal", então o cancelamento não vale, e usar a despesa
+     * operacional inteira misturaria numerador de uso total com denominador de
+     * uso profissional.
+     *
+     * **Custo fixo fica de fora**, pelo mesmo motivo que fica fora do
+     * [costPerKm]: seguro, IPVA e financiamento não variam com o quanto se
+     * roda, nem com quantas horas se trabalha. Incluí-los produziria um número
+     * sem sentido em período curto — no dia em que o IPVA de R$ 1.200 é pago
+     * tendo-se trabalhado 3 horas, o custo da hora apareceria como R$ 416,67.
+     * Eles seguem visíveis em [fixedCostPerKm], que é um indicador à parte.
+     *
+     * Consequência assumida: [revenuePerHour] − [costPerHour] **não** dá
+     * [profitPerHour], e a diferença é justamente o custo fixo. É a mesma
+     * assimetria que já existe entre [costPerKm] e [fixedCostPerKm].
+     */
+    val costPerHour: Money? get() = workOperationalCost.per(totalOnlineTime.toHours())
+
     val profitPerKm: Money? get() = netProfit.per(workKilometers)
 
     val profitPerHour: Money? get() = netProfit.per(totalOnlineTime.toHours())

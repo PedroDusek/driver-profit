@@ -79,6 +79,27 @@ class DashboardMetricsTest {
     }
 
     @Test
+    fun `custo por hora usa so o custo variavel`() {
+        // R$ 180,00 de operacional (combustivel + manutencao) em 15 horas.
+        // O seguro de R$ 120,00 fica de fora: ele nao varia com quantas horas
+        // se trabalha, do mesmo jeito que nao varia com quantos km se roda.
+        // Incluindo-o daria R$ 20,00/h, misturando custo fixo em um indicador
+        // que existe para responder quanto custa rodar.
+        assertEquals(Money.of(12, 0), metrics.costPerHour)
+    }
+
+    @Test
+    fun `ganho menos custo por hora nao fecha em lucro por hora`() {
+        // Assimetria assumida, a mesma que ja existe entre costPerKm e
+        // fixedCostPerKm: a diferenca e exatamente o custo fixo por hora
+        // (R$ 120,00 / 15h = R$ 8,00). Documentado para que ninguem "conserte"
+        // isso somando os fixos no custo por hora.
+        assertEquals(Money.of(40, 0), metrics.revenuePerHour)
+        assertEquals(Money.of(12, 0), metrics.costPerHour)
+        assertEquals(Money.of(20, 0), metrics.profitPerHour)
+    }
+
+    @Test
     fun `calcula lucro por km e por hora`() {
         assertEquals(Money.of(1, 0), metrics.profitPerKm)
         assertEquals(Money.of(20, 0), metrics.profitPerHour)
@@ -137,6 +158,18 @@ class DashboardMetricsTest {
         // produto inflado em 25% para quem usa o carro no fim de semana.
         assertEquals(1_000L, comUsoPessoal.totalKilometers)
         assertEquals(Money.of(0, 90), comUsoPessoal.costPerKm)
+    }
+
+    @Test
+    fun `custo por hora usa a parte de trabalho e nao a despesa inteira`() {
+        // 38,5 horas trabalhadas e R$ 900,00 de operacional, dos quais
+        // R$ 720,00 sao da parte de trabalho. Usar os R$ 900,00 daria
+        // R$ 23,38/h - numerador de uso total sobre denominador de uso
+        // profissional, porque hora online e 100% trabalho. No custo por km o
+        // rateio se cancela algebricamente e por isso la os totais podem ser
+        // usados; aqui nao existe "hora pessoal", entao nao ha cancelamento.
+        assertEquals(Money.of(720, 0), comUsoPessoal.workOperationalCost)
+        assertEquals(Money.of(18, 70), comUsoPessoal.costPerHour)
     }
 
     @Test
@@ -242,6 +275,7 @@ class DashboardMetricsTest {
 
         assertNull(noTime.revenuePerHour)
         assertNull(noTime.profitPerHour)
+        assertNull(noTime.costPerHour)
     }
 
     @Test
@@ -265,6 +299,7 @@ class DashboardMetricsTest {
         assertNull(empty.revenuePerHour)
         assertNull(empty.revenuePerRide)
         assertNull(empty.costPerKm)
+        assertNull(empty.costPerHour)
         assertNull(empty.profitPerKm)
         assertNull(empty.profitPerHour)
     }

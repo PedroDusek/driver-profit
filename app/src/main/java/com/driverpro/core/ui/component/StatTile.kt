@@ -24,6 +24,14 @@ fun StatTile(
     label: String,
     value: String,
     modifier: Modifier = Modifier,
+    /**
+     * Variação contra o período anterior, desenhada abaixo do valor.
+     *
+     * Slot opcional em vez de parâmetros de texto e cor: mantém o `StatTile`
+     * sem saber o que é uma comparação, e deixa o mesmo
+     * [TrendBadge] ser reaproveitado fora da grade de indicadores.
+     */
+    trend: (@Composable () -> Unit)? = null,
 ) {
     DriverProCard(modifier = modifier) {
         Column(
@@ -43,6 +51,7 @@ fun StatTile(
                 maxLines = 1,
                 overflow = TextOverflow.Ellipsis,
             )
+            trend?.invoke()
         }
     }
 }

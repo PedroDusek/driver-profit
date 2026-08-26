@@ -26,6 +26,7 @@ import com.driverpro.expenses.domain.GetExpenseUseCase
 import com.driverpro.vehicle.domain.GetVehicleUseCase
 import com.driverpro.earnings.domain.GetWorkSessionUseCase
 import com.driverpro.expenses.domain.ObserveAccruedExpensesUseCase
+import com.driverpro.dashboard.domain.ObserveDashboardComparisonUseCase
 import com.driverpro.dashboard.domain.ObserveDashboardUseCase
 import com.driverpro.maintenance.domain.ObserveMaintenanceUseCase
 import com.driverpro.maintenance.domain.ResetMaintenanceIntervalUseCase
@@ -83,6 +84,7 @@ interface AppContainer {
     val deleteExpense: DeleteExpenseUseCase
 
     val observeDashboard: ObserveDashboardUseCase
+    val observeDashboardComparison: ObserveDashboardComparisonUseCase
 
     val observeVehicleOdometer: ObserveVehicleOdometerUseCase
     val observeVehicleOdometers: ObserveVehicleOdometersUseCase
@@ -274,5 +276,9 @@ class DefaultAppContainer(private val context: Context) : AppContainer {
                 ObservePersonalUsageInPeriodUseCase(personalUsageRepository),
             observeAccruedInPeriod = ObserveAccruedExpensesUseCase(expenseRepository),
         )
+    }
+
+    override val observeDashboardComparison: ObserveDashboardComparisonUseCase by lazy {
+        ObserveDashboardComparisonUseCase(observeDashboard)
     }
 }

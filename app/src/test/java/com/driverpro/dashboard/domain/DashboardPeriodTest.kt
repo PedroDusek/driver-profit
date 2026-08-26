@@ -140,4 +140,93 @@ class DashboardPeriodTest {
     fun `intervalo invertido e recusado`() {
         DateRange(LocalDate.of(2026, 8, 31), LocalDate.of(2026, 8, 1))
     }
+
+    // --- Periodo anterior, base da comparacao ---
+
+    @Test
+    fun `o anterior de hoje e ontem, e o de ontem e anteontem`() {
+        assertEquals(
+            DateRange.of(LocalDate.of(2026, 8, 11)),
+            DashboardPeriod.Today.previousRangeAt(wednesday),
+        )
+        assertEquals(
+            DateRange.of(LocalDate.of(2026, 8, 10)),
+            DashboardPeriod.Yesterday.previousRangeAt(wednesday),
+        )
+    }
+
+    @Test
+    fun `o anterior da semana e a semana ISO inteira que veio antes`() {
+        // Segunda a domingo, nao "sete dias atras a partir de hoje": a
+        // comparacao precisa cobrir a mesma fatia de calendario.
+        assertEquals(
+            DateRange(LocalDate.of(2026, 8, 3), LocalDate.of(2026, 8, 9)),
+            DashboardPeriod.ThisWeek.previousRangeAt(wednesday),
+        )
+    }
+
+    @Test
+    fun `o anterior do mes e o mes inteiro que veio antes`() {
+        assertEquals(
+            DateRange(LocalDate.of(2026, 7, 1), LocalDate.of(2026, 7, 31)),
+            DashboardPeriod.ThisMonth.previousRangeAt(wednesday),
+        )
+        assertEquals(
+            DateRange(LocalDate.of(2026, 6, 1), LocalDate.of(2026, 6, 30)),
+            DashboardPeriod.LastMonth.previousRangeAt(wednesday),
+        )
+    }
+
+    @Test
+    fun `mes anterior respeita o tamanho do mes e nao desloca dias`() {
+        // 31 de marco: recuar 31 dias cairia em 28 de fevereiro, e a
+        // comparacao passaria a incluir tres dias de janeiro e perder tres de
+        // fevereiro. O anterior de marco e fevereiro inteiro, seja ele de 28
+        // ou de 29 dias.
+        val marco31 = LocalDate.of(2026, 3, 31)
+        assertEquals(
+            DateRange(LocalDate.of(2026, 2, 1), LocalDate.of(2026, 2, 28)),
+            DashboardPeriod.ThisMonth.previousRangeAt(marco31),
+        )
+
+        // 2028 e bissexto: o mesmo codigo tem que devolver 29 dias.
+        val marco31Bissexto = LocalDate.of(2028, 3, 31)
+        assertEquals(
+            DateRange(LocalDate.of(2028, 2, 1), LocalDate.of(2028, 2, 29)),
+            DashboardPeriod.ThisMonth.previousRangeAt(marco31Bissexto),
+        )
+    }
+
+    @Test
+    fun `o anterior de um periodo personalizado tem o mesmo numero de dias`() {
+        // Aqui o deslocamento por dias e o certo: intervalo escolhido a mao
+        // nao tem semantica de calendario a preservar.
+        val escolhido = DateRange(LocalDate.of(2026, 8, 10), LocalDate.of(2026, 8, 16))
+        val anterior = DashboardPeriod.Custom(escolhido).previousRangeAt(wednesday)
+
+        assertEquals(DateRange(LocalDate.of(2026, 8, 3), LocalDate.of(2026, 8, 9)), anterior)
+        assertEquals(escolhido.days, anterior.days)
+    }
+
+    @Test
+    fun `periodo anterior nunca se sobrepoe ao atual`() {
+        // Um dia de sobreposicao contaria o mesmo lancamento dos dois lados e
+        // achataria toda variacao.
+        listOf(
+            DashboardPeriod.Today,
+            DashboardPeriod.Yesterday,
+            DashboardPeriod.ThisWeek,
+            DashboardPeriod.ThisMonth,
+            DashboardPeriod.LastMonth,
+            DashboardPeriod.Custom(DateRange(LocalDate.of(2026, 8, 10), LocalDate.of(2026, 8, 16))),
+        ).forEach { period ->
+            val atual = period.rangeAt(wednesday)
+            val anterior = period.previousRangeAt(wednesday)
+
+            assertTrue(
+                "$period: o anterior precisa terminar antes de o atual comecar",
+                anterior.end.isBefore(atual.start),
+            )
+        }
+    }
 }

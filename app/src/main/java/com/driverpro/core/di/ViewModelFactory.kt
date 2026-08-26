@@ -31,7 +31,7 @@ object DriverProViewModelFactory {
     val Factory: ViewModelProvider.Factory = viewModelFactory {
         initializer {
             DashboardViewModel(
-                observeDashboard = container().observeDashboard,
+                observeDashboardComparison = container().observeDashboardComparison,
                 observeMaintenance = container().observeMaintenance,
                 observeReconciliation = container().observeOdometerReconciliation,
             )

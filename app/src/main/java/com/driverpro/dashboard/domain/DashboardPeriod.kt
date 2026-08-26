@@ -28,12 +28,31 @@ sealed interface DashboardPeriod {
     /** Intervalo coberto por este período, tomando [today] como referência. */
     fun rangeAt(today: LocalDate): DateRange
 
+    /**
+     * O intervalo **equivalente anterior** — a base contra a qual o dashboard
+     * compara.
+     *
+     * Cada período tem seu próprio anterior natural, e é por isso que isto é um
+     * método da interface e não uma função genérica sobre [DateRange]: mês não
+     * é "trinta dias atrás". Deslocar o intervalo pelo número de dias erraria
+     * sempre que os meses têm tamanhos diferentes — em 31 de março, recuar 31
+     * dias cairia no dia 28 de fevereiro, e a comparação passaria a incluir
+     * três dias de janeiro e perder três de fevereiro.
+     */
+    fun previousRangeAt(today: LocalDate): DateRange
+
     data object Today : DashboardPeriod {
         override fun rangeAt(today: LocalDate): DateRange = DateRange.of(today)
+
+        override fun previousRangeAt(today: LocalDate): DateRange =
+            DateRange.of(today.minusDays(1))
     }
 
     data object Yesterday : DashboardPeriod {
         override fun rangeAt(today: LocalDate): DateRange = DateRange.of(today.minusDays(1))
+
+        override fun previousRangeAt(today: LocalDate): DateRange =
+            DateRange.of(today.minusDays(2))
     }
 
     /**
@@ -45,23 +64,42 @@ sealed interface DashboardPeriod {
      * conferir.
      */
     data object ThisWeek : DashboardPeriod {
-        override fun rangeAt(today: LocalDate): DateRange {
-            val monday = today.with(DayOfWeek.MONDAY)
-            return DateRange(monday, monday.plusDays(DAYS_IN_WEEK - 1))
-        }
+        override fun rangeAt(today: LocalDate): DateRange = today.weekRange()
+
+        override fun previousRangeAt(today: LocalDate): DateRange =
+            today.minusWeeks(1).weekRange()
     }
 
     data object ThisMonth : DashboardPeriod {
         override fun rangeAt(today: LocalDate): DateRange = today.monthRange()
+
+        override fun previousRangeAt(today: LocalDate): DateRange =
+            today.minusMonths(1).monthRange()
     }
 
     data object LastMonth : DashboardPeriod {
         override fun rangeAt(today: LocalDate): DateRange = today.minusMonths(1).monthRange()
+
+        override fun previousRangeAt(today: LocalDate): DateRange =
+            today.minusMonths(2).monthRange()
     }
 
     /** Intervalo escolhido pelo motorista (PRD §20). */
     data class Custom(val range: DateRange) : DashboardPeriod {
         override fun rangeAt(today: LocalDate): DateRange = range
+
+        /**
+         * O intervalo imediatamente anterior, com **o mesmo número de dias**.
+         *
+         * Aqui o deslocamento por dias é o certo, e não uma armadilha como
+         * seria no mês: um intervalo escolhido à mão não tem semântica de
+         * calendário a preservar. Sete dias terminando no dia 16 comparam com
+         * os sete que terminam no dia 9.
+         */
+        override fun previousRangeAt(today: LocalDate): DateRange = DateRange(
+            start = range.start.minusDays(range.days),
+            end = range.end.minusDays(range.days),
+        )
     }
 
     companion object {
@@ -77,5 +115,11 @@ sealed interface DashboardPeriod {
 
         private fun LocalDate.monthRange(): DateRange =
             DateRange(withDayOfMonth(1), with(TemporalAdjusters.lastDayOfMonth()))
+
+        /** Semana ISO que contém esta data: segunda a domingo. */
+        private fun LocalDate.weekRange(): DateRange {
+            val monday = with(DayOfWeek.MONDAY)
+            return DateRange(monday, monday.plusDays(DAYS_IN_WEEK - 1))
+        }
     }
 }

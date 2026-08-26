@@ -9,6 +9,8 @@ import com.driverpro.expenses.domain.ExpenseCategory
 import com.driverpro.earnings.domain.Platform
 import com.driverpro.earnings.domain.WorkSession
 import com.driverpro.expenses.domain.ObserveAccruedExpensesUseCase
+import com.driverpro.dashboard.domain.MetricChange
+import com.driverpro.dashboard.domain.ObserveDashboardComparisonUseCase
 import com.driverpro.dashboard.domain.ObserveDashboardUseCase
 import com.driverpro.expenses.domain.ObserveExpensesBetweenUseCase
 import com.driverpro.maintenance.domain.ObserveMaintenanceUseCase
@@ -106,11 +108,13 @@ class DashboardViewModelTest {
     private val schedules = FakeMaintenanceScheduleRepository()
 
     private fun viewModel() = DashboardViewModel(
-        observeDashboard = ObserveDashboardUseCase(
-            observeWorkSessionsBetween = ObserveWorkSessionsBetweenUseCase(sessions),
-            observeExpensesBetween = ObserveExpensesBetweenUseCase(expenses),
-            observePersonalUsageInPeriod = ObservePersonalUsageInPeriodUseCase(personalUsage),
-            observeAccruedInPeriod = ObserveAccruedExpensesUseCase(expenses),
+        observeDashboardComparison = ObserveDashboardComparisonUseCase(
+            ObserveDashboardUseCase(
+                observeWorkSessionsBetween = ObserveWorkSessionsBetweenUseCase(sessions),
+                observeExpensesBetween = ObserveExpensesBetweenUseCase(expenses),
+                observePersonalUsageInPeriod = ObservePersonalUsageInPeriodUseCase(personalUsage),
+                observeAccruedInPeriod = ObserveAccruedExpensesUseCase(expenses),
+            ),
         ),
         observeMaintenance = ObserveMaintenanceUseCase(vehicles, expenses, schedules),
         observeReconciliation = ObserveOdometerReconciliationUseCase(
@@ -143,6 +147,64 @@ class DashboardViewModelTest {
         assertEquals(Money.of(300, 0), state.metrics.totalRevenue)
         assertEquals(Money.of(120, 0), state.metrics.totalExpenses)
         assertEquals(Money.of(180, 0), state.metrics.netProfit)
+        job.cancel()
+    }
+
+    @Test
+    fun `hoje compara contra ontem`() = runTest {
+        // Hoje: 300 faturado, 120 de despesa, lucro 180.
+        // Ontem: 200 faturado, 80 de despesa, lucro 120.
+        // 60 a mais sobre uma base de 120 e 50%.
+        val viewModel = viewModel()
+
+        val job = launchCollector(viewModel)
+        advanceUntilIdle()
+
+        val state = viewModel.uiState.value as DashboardUiState.Content
+        assertEquals(DateRange(yesterday, yesterday), state.previousRange)
+        assertEquals(Money.of(120, 0), state.comparison.previous.netProfit)
+
+        val change = state.comparison.netProfit as MetricChange.Measured
+        assertEquals(50, change.percent)
+        assertTrue(change.rising)
+        assertTrue(change.better)
+        job.cancel()
+    }
+
+    @Test
+    fun `a semana compara contra a semana anterior, nao contra sete dias atras`() = runTest {
+        val viewModel = viewModel()
+
+        val job = launchCollector(viewModel)
+        viewModel.onPeriodChange(DashboardPeriod.ThisWeek)
+        advanceUntilIdle()
+
+        val state = viewModel.uiState.value as DashboardUiState.Content
+        // 12/08/2026 e quarta: a semana ISO vai de 10 a 16, e a anterior de 3 a 9.
+        assertEquals(DateRange(LocalDate.of(2026, 8, 10), LocalDate.of(2026, 8, 16)), state.range)
+        assertEquals(
+            DateRange(LocalDate.of(2026, 8, 3), LocalDate.of(2026, 8, 9)),
+            state.previousRange,
+        )
+        job.cancel()
+    }
+
+    @Test
+    fun `sem lancamento no periodo anterior nao ha base de comparacao`() = runTest {
+        // Julho tem lancamento; junho nao. "Mes anterior" (julho) compara com
+        // junho, que esta vazio.
+        val viewModel = viewModel()
+
+        val job = launchCollector(viewModel)
+        viewModel.onPeriodChange(DashboardPeriod.LastMonth)
+        advanceUntilIdle()
+
+        val state = viewModel.uiState.value as DashboardUiState.Content
+        assertEquals(
+            DateRange(LocalDate.of(2026, 6, 1), LocalDate.of(2026, 6, 30)),
+            state.previousRange,
+        )
+        assertEquals(MetricChange.NoBaseline, state.comparison.netProfit)
         job.cancel()
     }
 

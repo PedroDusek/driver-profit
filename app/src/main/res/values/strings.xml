@@ -99,6 +99,19 @@
     <string name="reconcile_no_readings">Sem leituras de odômetro suficientes neste período para conferir.</string>
     <string name="dashboard_profit_per_km">Lucro por km</string>
     <string name="dashboard_profit_per_hour">Lucro por hora</string>
+    <string name="dashboard_cost_per_hour">Custo por hora</string>
+    <string name="dashboard_cost_per_hour_note">Só o custo de rodar: combustível, manutenção e afins, na parte que cabe ao trabalho. Custos fixos ficam fora, do mesmo jeito que ficam fora do custo por km.</string>
+
+    <!-- Comparação com o período anterior -->
+    <string name="dashboard_trend_change">%1$d%% %2$s</string>
+    <string name="dashboard_trend_flat">sem variação %1$s</string>
+    <string name="dashboard_trend_no_baseline">sem dados no período anterior</string>
+    <string name="dashboard_trend_no_base">sem base de comparação</string>
+    <string name="dashboard_compare_yesterday">vs ontem</string>
+    <string name="dashboard_compare_day_before">vs anteontem</string>
+    <string name="dashboard_compare_last_week">vs semana passada</string>
+    <string name="dashboard_compare_last_month">vs mês anterior</string>
+    <string name="dashboard_compare_previous_period">vs período anterior</string>
     <string name="dashboard_fixed_note">Seguro, IPVA e financiamento entram no lucro, mas ficam fora do custo por km: eles não variam com o quanto você roda.</string>
     <string name="dashboard_fixed_expenses">Custos fixos pagos no período</string>
     <string name="dashboard_fixed_accrued">Custo fixo do período</string>

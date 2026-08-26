@@ -74,8 +74,10 @@ import com.driverpro.core.ui.theme.ProfitColors
 import com.driverpro.core.ui.theme.TabularFigures
 import com.driverpro.core.ui.theme.content
 import com.driverpro.core.ui.theme.driverProTopAppBarColors
+import com.driverpro.dashboard.domain.DashboardComparison
 import com.driverpro.dashboard.domain.DashboardMetrics
 import com.driverpro.dashboard.domain.DashboardPeriod
+import com.driverpro.dashboard.domain.MetricChange
 import com.driverpro.dashboard.presentation.DashboardLabels
 import com.driverpro.expenses.domain.ExpenseCategory
 import com.driverpro.expenses.presentation.ExpenseLabels
@@ -187,10 +189,10 @@ fun DashboardScreen(
                     if (state.metrics.isEmpty) {
                         item { EmptyPeriod() }
                     } else {
-                        item { ResultCard(state.metrics) }
+                        item { ResultCard(state.comparison, state.period) }
                         item { VolumeCard(state.metrics) }
-                        item { RevenueRatiosCard(state.metrics) }
-                        item { CostRatiosCard(state.metrics) }
+                        item { RevenueRatiosCard(state.comparison, state.period) }
+                        item { CostRatiosCard(state.comparison, state.period) }
                         if (state.metrics.expensesByCategory.isNotEmpty()) {
                             item { ExpensesByCategoryCard(state.metrics) }
                         }
@@ -297,7 +299,8 @@ private fun EmptyPeriod() {
  * período.
  */
 @Composable
-private fun ResultCard(metrics: DashboardMetrics) {
+private fun ResultCard(comparison: DashboardComparison, period: DashboardPeriod) {
+    val metrics = comparison.current
     val profit = metrics.netProfit
     val positive = !profit.isNegative
     DriverProCard {
@@ -317,10 +320,13 @@ private fun ResultCard(metrics: DashboardMetrics) {
                 style = MaterialTheme.typography.displaySmall.copy(fontFeatureSettings = TabularFigures),
                 color = ProfitColors.content(positive),
             )
+            MetricTrend(comparison.netProfit, period)
             HorizontalDivider()
             MetricRow(
                 label = stringResource(R.string.dashboard_revenue),
                 value = BrazilianFormatter.money(metrics.totalRevenue),
+                change = comparison.totalRevenue,
+                period = period,
             )
             MetricRow(
                 label = stringResource(R.string.dashboard_expenses),
@@ -328,6 +334,8 @@ private fun ResultCard(metrics: DashboardMetrics) {
                 // faturamento menos despesas fecha com o lucro exibido acima.
                 // Sem uso pessoal os dois numeros sao iguais.
                 value = BrazilianFormatter.money(metrics.workExpenses),
+                change = comparison.workExpenses,
+                period = period,
             )
         }
     }
@@ -336,44 +344,87 @@ private fun ResultCard(metrics: DashboardMetrics) {
 @Composable
 private fun VolumeCard(metrics: DashboardMetrics) {
     MetricsCard(title = stringResource(R.string.dashboard_section_volume)) {
+        // Sem comparação: volume varia por motivos que não são desempenho
+        // (folga, feriado), e uma seta vermelha em "corridas" no dia de descanso
+        // sinalizaria problema onde não há.
         StatGrid(
             listOf(
-                stringResource(R.string.dashboard_distance) to
-                    BrazilianFormatter.kilometers(metrics.workKilometers),
-                stringResource(R.string.dashboard_online_time) to
-                    BrazilianFormatter.duration(metrics.totalOnlineTime),
-                stringResource(R.string.dashboard_rides) to metrics.totalRides.toString(),
+                StatItem(
+                    label = stringResource(R.string.dashboard_distance),
+                    value = BrazilianFormatter.kilometers(metrics.workKilometers),
+                ),
+                StatItem(
+                    label = stringResource(R.string.dashboard_online_time),
+                    value = BrazilianFormatter.duration(metrics.totalOnlineTime),
+                ),
+                StatItem(
+                    label = stringResource(R.string.dashboard_rides),
+                    value = metrics.totalRides.toString(),
+                ),
             ),
         )
     }
 }
 
 @Composable
-private fun RevenueRatiosCard(metrics: DashboardMetrics) {
+private fun RevenueRatiosCard(comparison: DashboardComparison, period: DashboardPeriod) {
+    val metrics = comparison.current
     MetricsCard(title = stringResource(R.string.dashboard_section_revenue)) {
         StatGrid(
-            listOf(
-                stringResource(R.string.dashboard_revenue_per_km) to
-                    BrazilianFormatter.moneyOrUnavailable(metrics.revenuePerKm),
-                stringResource(R.string.dashboard_revenue_per_hour) to
-                    BrazilianFormatter.moneyOrUnavailable(metrics.revenuePerHour),
-                stringResource(R.string.dashboard_revenue_per_ride) to
-                    BrazilianFormatter.moneyOrUnavailable(metrics.revenuePerRide),
+            items = listOf(
+                StatItem(
+                    label = stringResource(R.string.dashboard_revenue_per_km),
+                    value = BrazilianFormatter.moneyOrUnavailable(metrics.revenuePerKm),
+                    change = comparison.revenuePerKm,
+                ),
+                StatItem(
+                    label = stringResource(R.string.dashboard_revenue_per_hour),
+                    value = BrazilianFormatter.moneyOrUnavailable(metrics.revenuePerHour),
+                    change = comparison.revenuePerHour,
+                ),
+                StatItem(
+                    label = stringResource(R.string.dashboard_revenue_per_ride),
+                    value = BrazilianFormatter.moneyOrUnavailable(metrics.revenuePerRide),
+                ),
             ),
+            period = period,
         )
     }
 }
+
+/**
+ * Um quadrinho da grade: rótulo, valor e, quando há, a variação contra o
+ * período anterior.
+ *
+ * [change] é anulável porque nem todo indicador é comparado — volume (km,
+ * horas, corridas) fica de fora de propósito, para a tela não virar um campo
+ * de setas.
+ */
+private data class StatItem(
+    val label: String,
+    val value: String,
+    val change: MetricChange? = null,
+)
 
 /** Grade de 2 colunas para indicadores compactos — ver [StatTile]. */
 @Composable
-private fun StatGrid(items: List<Pair<String, String>>) {
+private fun StatGrid(items: List<StatItem>, period: DashboardPeriod? = null) {
     Column(verticalArrangement = Arrangement.spacedBy(8.dp)) {
         items.chunked(2).forEach { row ->
             Row(
                 horizontalArrangement = Arrangement.spacedBy(8.dp),
             ) {
-                row.forEach { (label, value) ->
-                    StatTile(label = label, value = value, modifier = Modifier.weight(1f))
+                row.forEach { item ->
+                    StatTile(
+                        label = item.label,
+                        value = item.value,
+                        modifier = Modifier.weight(1f),
+                        trend = if (item.change != null && period != null) {
+                            { MetricTrend(item.change, period) }
+                        } else {
+                            null
+                        },
+                    )
                 }
                 if (row.size == 1) {
                     Spacer(modifier = Modifier.weight(1f))
@@ -391,11 +442,28 @@ private fun StatGrid(items: List<Pair<String, String>>) {
  * errado para quem conferisse na calculadora.
  */
 @Composable
-private fun CostRatiosCard(metrics: DashboardMetrics) {
+private fun CostRatiosCard(comparison: DashboardComparison, period: DashboardPeriod) {
+    val metrics = comparison.current
     MetricsCard(title = stringResource(R.string.dashboard_section_cost)) {
         MetricRow(
             label = stringResource(R.string.dashboard_cost_per_km),
             value = BrazilianFormatter.moneyOrUnavailable(metrics.costPerKm),
+            change = comparison.costPerKm,
+            period = period,
+        )
+        MetricRow(
+            label = stringResource(R.string.dashboard_cost_per_hour),
+            value = BrazilianFormatter.moneyOrUnavailable(metrics.costPerHour),
+            change = comparison.costPerHour,
+            period = period,
+        )
+        // Sem esta nota, quem somasse custo/hora ao lucro/hora e comparasse
+        // com o ganho/hora acharia a conta errada. A diferenca sao os custos
+        // fixos, que ficam fora do custo de rodar de proposito.
+        Text(
+            text = stringResource(R.string.dashboard_cost_per_hour_note),
+            style = MaterialTheme.typography.bodySmall,
+            color = MaterialTheme.colorScheme.onSurfaceVariant,
         )
 
         // Sem dado de uso pessoal o app calcula com o que tem — e **diz isso**
@@ -436,10 +504,14 @@ private fun CostRatiosCard(metrics: DashboardMetrics) {
         MetricRow(
             label = stringResource(R.string.dashboard_profit_per_km),
             value = BrazilianFormatter.moneyOrUnavailable(metrics.profitPerKm),
+            change = comparison.profitPerKm,
+            period = period,
         )
         MetricRow(
             label = stringResource(R.string.dashboard_profit_per_hour),
             value = BrazilianFormatter.moneyOrUnavailable(metrics.profitPerHour),
+            change = comparison.profitPerHour,
+            period = period,
         )
 
         if (!metrics.fixedExpenses.isZero) {
@@ -633,18 +705,32 @@ private fun SplitRow(label: String, kilometers: Long, share: Int?, amount: Money
     }
 }
 
+/**
+ * Linha rótulo/valor, com a variação alinhada à direita embaixo do valor
+ * quando [change] e [period] são informados.
+ */
 @Composable
-private fun MetricRow(label: String, value: String) {
+private fun MetricRow(
+    label: String,
+    value: String,
+    change: MetricChange? = null,
+    period: DashboardPeriod? = null,
+) {
     Row(
         modifier = Modifier.fillMaxWidth(),
         horizontalArrangement = Arrangement.SpaceBetween,
         verticalAlignment = Alignment.CenterVertically,
     ) {
         Text(text = label, style = MaterialTheme.typography.bodyLarge)
-        Text(
-            text = value,
-            style = MaterialTheme.typography.titleMedium,
-        )
+        Column(horizontalAlignment = Alignment.End) {
+            Text(
+                text = value,
+                style = MaterialTheme.typography.titleMedium,
+            )
+            if (change != null && period != null) {
+                MetricTrend(change, period)
+            }
+        }
     }
 }
 
@@ -729,10 +815,21 @@ private fun DashboardCardsPreview() {
                 personalKilometers = 220,
                 totalOnlineTime = WorkDuration.of(38, 30),
             )
-            ResultCard(metrics)
+            // Período anterior mais fraco de propósito, para o preview mostrar
+            // as setas de variação em vez de "sem dados no período anterior".
+            val previous = metrics.copy(
+                totalRevenue = Money.of(1_100, 0),
+                totalExpenses = Money.of(700, 0),
+                workKilometers = 900,
+                totalOnlineTime = WorkDuration.of(36, 0),
+            )
+            val comparison = DashboardComparison(current = metrics, previous = previous)
+            val period = DashboardPeriod.ThisWeek
+
+            ResultCard(comparison, period)
             VolumeCard(metrics)
-            RevenueRatiosCard(metrics)
-            CostRatiosCard(metrics)
+            RevenueRatiosCard(comparison, period)
+            CostRatiosCard(comparison, period)
             ExpensesByCategoryCard(metrics)
         }
     }
