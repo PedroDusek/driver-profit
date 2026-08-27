@@ -64,6 +64,25 @@ gate verde.
 > **Se subir é bom vive no domínio**, para a tela não ter como pintar de verde
 > um custo que aumentou. 419 testes.
 
+> ⚠️ **A v0.14.0 foi publicada, e a tag dela aponta para fora da `main`.**
+> Este documento afirmava o contrário — que ela nunca tinha sido tagueada — e a
+> afirmação foi copiada para o `CHANGELOG` antes de alguém conferir. As duas
+> coisas estavam erradas.
+>
+> O que é verdade: a tag `v0.14.0` existe, está no `origin`, tem GitHub Release
+> não-rascunho com APK anexado, e está marcada como **Latest** desde
+> 19/08/2026. Ela aponta para `a4c7356`, ponta da antiga
+> `feature/driverpro-rebrand`, que foi **fechada sem merge** — os commits dela
+> entraram pelo PR #23, com SHAs novos. É a **única** das 21 tags de versão
+> fora da `main`.
+>
+> **O release não será apagado**: quebrar link de quem já baixou é pior que a
+> inconsistência. A v0.15.0 assume o *Latest* ao ser tagueada, e o `CHANGELOG`
+> ganhou seção própria para a v0.14.0 registrando o episódio.
+>
+> A lição é a mesma que a correção logo abaixo já registrava, e que se repetiu:
+> conferir `git tag` e `gh release list` antes de confiar no que o handoff diz.
+
 > **O PR #22 deve ser fechado, não mergeado.** Todos os commits do rebrand já
 > estão dentro do #23; mergear os dois duplicaria o histórico.
 
@@ -105,7 +124,7 @@ gate verde.
 | v0.11.0 IPVA sem competência | ✅ | 9 | ✅ |
 | v0.12.0 Veículo atual | ✅ | **10** | ✅ |
 | v0.13.0 Exportar e importar arquivo | ✅ | 10 | ✅ |
-| v0.14.0 Nome e redesign visual (DriverPro) | absorvida no PR #23 | 10 | — |
+| v0.14.0 Nome e redesign visual (DriverPro) | ⚠️ tagueada **fora da main** | 10 | ✅ |
 | **v0.15.0** Identidade visual, abas fixas, feature-first, custo/hora e comparação | PR #23, gate verde | 10 | — |
 
 O PRD §58 volta a valer: dá para fazer `git checkout v0.8.0` e reproduzir aquele
@@ -177,7 +196,7 @@ tem um construtor que roda na JVM com SQLite empacotado, **sem Robolectric**.
 | Código | `C:\Users\pedro\Desktop\driver-profit` |
 | Repositório | https://github.com/PedroDusek/driver-profit (público) |
 | Branch estável | `main`, protegida |
-| Última tag | `v0.13.0` |
+| Última tag | `v0.14.0` (⚠️ aponta fora da `main` — ver seção 0) |
 | Versão do banco | **10** |
 
 ⚠️ **O caminho não pode conter acento.** O projeto nasceu em
@@ -304,7 +323,7 @@ estimado em si chega na v0.8.0.
 | v0.11.0 IPVA sem competência | ✅ |
 | v0.12.0 Veículo atual | ✅ |
 | v0.13.0 Exportar e importar arquivo | ✅ |
-| v0.14.0 Nome e redesign visual (DriverPro) | absorvida no PR #23 |
+| v0.14.0 Nome e redesign visual (DriverPro) | ⚠️ publicada, tag fora da main |
 | **v0.15.0 Identidade visual, abas fixas, feature-first, custo/hora e comparação** | ⬅️ PR #23, aguarda teste no aparelho |
 | v0.16.0 Crash handling · v0.17.0 Testes de fluxo | |
 | v0.18.0 Analytics · v0.19.0 UX polish · v0.20.0 Hardening · v0.21.0 RC · v1.0.0 MVP | |

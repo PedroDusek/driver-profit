@@ -7,10 +7,14 @@ Versionamento conforme [Semantic Versioning](https://semver.org/lang/pt-BR/).
 
 ## [0.15.0] — Identidade visual e comparação de períodos
 
-Reúne o rebrand que estava preparado como v0.14.0 — pronto numa branch, mas
-nunca publicado —, a adaptação ao design de referência do Figma e dois
-indicadores novos no dashboard. Sai como uma versão só porque nada disso
-existiu separadamente num release: a v0.14.0 não chegou a ser tagueada.
+Continua de onde a v0.14.0 parou. Traz a adaptação ao design de referência do
+Figma, a reorganização feature-first, a navegação por abas fixas, dois
+indicadores novos no dashboard e uma correção no aviso de conciliação.
+
+Como a v0.14.0 foi tagueada a partir de um commit que nunca chegou à `main`
+(ver abaixo), esta é a primeira versão em que o rebrand entra na branch
+estável — por isso a lista de "Alterado" repete itens que o release da v0.14.0
+já continha.
 
 **Banco na versão 10, sem migração.** Nada nesta versão toca schema nem
 entidade, e nenhum cálculo existente mudou de resultado.
@@ -125,6 +129,29 @@ entidade, e nenhum cálculo existente mudou de resultado.
   `CategoryLegendRow`, substituindo padrões repetidos em cada tela de lista
 - Breakdown de ganhos por plataforma (`EarningsSummary.byPlatform`), mesmo
   padrão que o breakdown de despesas por categoria já tinha
+
+## [0.14.0] — Nome DriverPro e primeiro redesign
+
+⚠️ **Esta versão foi publicada a partir de um commit que nunca chegou à
+`main`.** A tag `v0.14.0` aponta para `a4c7356`, ponta da antiga branch
+`feature/driverpro-rebrand`, que foi fechada sem merge — seus commits entraram
+no projeto pela v0.15.0, com SHAs novos. É a única tag de versão do projeto
+fora da `main`; as outras vinte apontam para a branch estável.
+
+O release existe, está marcado como *Latest* desde 19/08/2026 e tem APK
+anexado. Não foi removido de propósito: apagar release publicado quebra quem
+já baixou. A v0.15.0 o substitui como *Latest* ao ser tagueada.
+
+Registro tardio: até agora o `CHANGELOG` não tinha seção para esta versão, e o
+`HANDOFF` afirmava que ela nunca havia sido publicada. As duas coisas estavam
+erradas.
+
+### Alterado
+
+- **Nome do produto: DriverPro.** `com.driverprofit` virou `com.driverpro` em
+  todo o projeto — pacote Kotlin, `applicationId`, banco (`driverpro.db`),
+  ícone e documentação
+- Primeiro redesign visual completo, seguindo a logo e a referência do Pedro
 
 ## [0.13.0] — Exportar e importar arquivo
 
