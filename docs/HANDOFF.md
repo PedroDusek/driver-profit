@@ -4,21 +4,19 @@ Documento de continuidade. Leia isto **antes** de qualquer coisa ao retomar o
 projeto em uma sessão nova, junto com `PRD.md`, `ARCHITECTURE.md` e
 `DEVELOPMENT.md`.
 
-**Última atualização:** v0.15.0 (em preparação, PR #23)
+**Última atualização:** v0.15.0 (publicada)
 
 ---
 
 ## 0. Comece por aqui
 
-**Tudo consolidado numa branch só: `feature/dark-green-redesign`.** Ela é a
-ponta real do projeto e leva, nesta ordem: o rebrand v0.14.0, o redesign
-visual novo, a navegação por abas, a reorganização feature-first e a correção
-do aviso de conciliação. [PR #23](https://github.com/PedroDusek/driver-profit/pull/23),
-gate verde.
+**A v0.15.0 está publicada.** Merge fast-forward na `main`, tag `v0.15.0`,
+release com APK, e ela assumiu o *Latest*. A `main` voltou a ser a ponta real
+do projeto: rebrand DriverPro, identidade visual do Figma, abas fixas,
+reorganização feature-first e comparação de períodos, tudo lá.
 
-> **A `main` está bem atrás.** Ela ainda tem v0.13.0, com o pacote antigo
-> `com.driverprofit` e a estrutura por camada técnica. Tudo que veio depois
-> vive no PR #23.
+Testes instrumentados confirmados em aparelho pelo Pedro antes do release
+(contagem não anotada). 416 testes unitários, gate verde.
 
 > **Reorganização feature-first — mergeada** (commit `7600fdd`). `core/`,
 > `data/`, `domain/` e `feature/` (organizados por tipo técnico de arquivo)
@@ -86,13 +84,13 @@ gate verde.
 > A lição é a mesma que a correção logo abaixo já registrava, e que se repetiu:
 > conferir `git tag` e `gh release list` antes de confiar no que o handoff diz.
 
-> **O PR #22 deve ser fechado, não mergeado.** Todos os commits do rebrand já
-> estão dentro do #23; mergear os dois duplicaria o histórico.
+> **O PR #22 foi fechado sem merge** — seus commits entraram pelo #23, que
+> foi mergeado na v0.15.0.
 
-> **O que falta antes de taguear a v0.15.0:** rodar
-> `connectedDebugAndroidTest` num aparelho (só o Pedro roda isso — o CI não
-> tem device, então gate verde no PR **não** diz nada sobre migração), e
-> conferir o visual novo no celular.
+> **Próximo passo: v0.16.0 — crash handling.** Erro não tratado hoje fecha o
+> app sem deixar rastro, e num app offline sem analytics ninguém fica sabendo.
+> Depois vem v0.17.0, testes de fluxo — nenhuma das oito telas tem verificação
+> automatizada, que segue sendo a maior lacuna aberta.
 
 > **Correção:** esta seção dizia que v0.13.0 ainda estava numa branch
 > aguardando merge. Não estava mais — `git log`/`git tag` confirmam que já
@@ -128,7 +126,7 @@ gate verde.
 | v0.12.0 Veículo atual | ✅ | **10** | ✅ |
 | v0.13.0 Exportar e importar arquivo | ✅ | 10 | ✅ |
 | v0.14.0 Nome e redesign visual (DriverPro) | ⚠️ tagueada **fora da main** | 10 | ✅ |
-| **v0.15.0** Identidade visual, abas fixas, feature-first, comparação de períodos | PR #23, gate verde | 10 | — |
+| **v0.15.0** Identidade visual, abas fixas, feature-first, comparação | ✅ | 10 | ✅ |
 
 O PRD §58 volta a valer: dá para fazer `git checkout v0.8.0` e reproduzir aquele
 estado.
@@ -199,7 +197,7 @@ tem um construtor que roda na JVM com SQLite empacotado, **sem Robolectric**.
 | Código | `C:\Users\pedro\Desktop\driver-profit` |
 | Repositório | https://github.com/PedroDusek/driver-profit (público) |
 | Branch estável | `main`, protegida |
-| Última tag | `v0.14.0` (⚠️ aponta fora da `main` — ver seção 0) |
+| Última tag | `v0.15.0` |
 | Versão do banco | **10** |
 
 ⚠️ **O caminho não pode conter acento.** O projeto nasceu em
@@ -327,7 +325,8 @@ estimado em si chega na v0.8.0.
 | v0.12.0 Veículo atual | ✅ |
 | v0.13.0 Exportar e importar arquivo | ✅ |
 | v0.14.0 Nome e redesign visual (DriverPro) | ⚠️ publicada, tag fora da main |
-| **v0.15.0 Identidade visual, abas fixas, feature-first e comparação de períodos** | ⬅️ PR #23, aguarda teste no aparelho |
+| v0.15.0 Identidade visual, abas fixas, feature-first, comparação | ✅ |
+| **v0.16.0 Crash handling** | ⬅️ próxima |
 | v0.16.0 Crash handling · v0.17.0 Testes de fluxo | |
 | v0.18.0 Analytics · v0.19.0 UX polish · v0.20.0 Hardening · v0.21.0 RC · v1.0.0 MVP | |
 

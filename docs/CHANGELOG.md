@@ -5,7 +5,7 @@ Versionamento conforme [Semantic Versioning](https://semver.org/lang/pt-BR/).
 
 ## [Não publicado]
 
-## [0.15.0] — Identidade visual e comparação de períodos
+## [0.15.0] — Identidade visual e comparação de períodos — 26/08/2026
 
 Continua de onde a v0.14.0 parou. Traz a adaptação ao design de referência do
 Figma, a reorganização feature-first, a navegação por abas fixas, a comparação
