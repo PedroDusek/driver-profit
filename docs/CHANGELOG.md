@@ -5,15 +5,61 @@ Versionamento conforme [Semantic Versioning](https://semver.org/lang/pt-BR/).
 
 ## [Não publicado]
 
-## [0.15.0] — Identidade visual DriverPro
+## [0.15.0] — Identidade visual e comparação de períodos
 
 Reúne o rebrand que estava preparado como v0.14.0 — pronto numa branch, mas
-nunca publicado — e a adaptação ao design de referência do Figma. Sai como uma
-versão só porque as duas coisas nunca existiram separadamente num release:
-a v0.14.0 não chegou a ser tagueada.
+nunca publicado —, a adaptação ao design de referência do Figma e dois
+indicadores novos no dashboard. Sai como uma versão só porque nada disso
+existiu separadamente num release: a v0.14.0 não chegou a ser tagueada.
 
-**Banco na versão 10, sem migração.** Nada nesta versão toca schema, entidade
-ou cálculo.
+**Banco na versão 10, sem migração.** Nada nesta versão toca schema nem
+entidade, e nenhum cálculo existente mudou de resultado.
+
+### Adicionado
+
+- **Custo por hora** no dashboard, ao lado de "Lucro por hora". É **só o custo
+  variável** do trabalho (`workOperationalCost ÷ horas online`). Custo fixo
+  fica de fora pelo mesmo motivo que já fica fora do custo por km — seguro,
+  IPVA e financiamento não variam com quanto se roda nem com quantas horas se
+  trabalha. O caso que decidiu isso: no dia em que o IPVA de R$ 1.200 é pago
+  tendo-se trabalhado 3 horas, incluir os fixos mostraria a hora custando
+  R$ 416,67.
+
+  O numerador é a **fatia de trabalho** da despesa operacional, e não a despesa
+  inteira: hora online é 100% trabalho. No custo por km o rateio se cancela
+  algebricamente e por isso lá os totais podem ser usados dos dois lados; aqui
+  não existe "hora pessoal", então o cancelamento não vale.
+
+  Consequência assumida e testada: `ganho/hora − custo/hora` **não** fecha em
+  `lucro/hora`, e a diferença são os custos fixos — a mesma assimetria que já
+  existe entre `costPerKm` e `fixedCostPerKm`. Há nota na tela explicando,
+  senão a conta pareceria errada para quem conferisse na calculadora.
+
+- **Comparação com o período anterior equivalente.** Hoje compara com ontem,
+  esta semana com a semana passada, este mês com o mês anterior, e um período
+  personalizado com o intervalo imediatamente anterior de mesmo tamanho.
+  Aparece no lucro, faturamento, despesas e nas razões por hora e por km.
+
+  Volume (km, horas, corridas) fica **sem** comparação de propósito: uma seta
+  vermelha em "corridas" no dia de folga sinalizaria problema onde não há.
+
+### Decisões registradas
+
+- **Mês anterior não é deslocamento de dias.** Em 31 de março, recuar 31 dias
+  cairia em 28 de fevereiro, e a comparação passaria a incluir três dias de
+  janeiro e perder três de fevereiro. `DashboardPeriod.previousRangeAt` usa mês
+  de calendário inteiro; só o período personalizado desloca por dias, porque aí
+  não há semântica de calendário a preservar
+- **O módulo do período anterior vai no denominador da variação.** É o que faz
+  prejuízo encolhendo (−100 → −50) ler como melhora de 50%, e não como piora:
+  sem ele, o sinal negativo da base inverteria o resultado
+- **Se subir é bom vive no domínio, não na tela.** Custo que sobe é vermelho,
+  lucro que sobe é verde. Deixar a tela decidir a cor abriria espaço para
+  pintar de verde um custo que aumentou — que afirma o contrário do que
+  aconteceu, e é pior que não mostrar variação nenhuma
+- **"Sem lançamento no período anterior" é diferente de "variação zero".**
+  Ninguém rodou, então não há com o que comparar; a tela diz isso com todas as
+  letras em vez de exibir 0%
 
 ### Alterado
 
