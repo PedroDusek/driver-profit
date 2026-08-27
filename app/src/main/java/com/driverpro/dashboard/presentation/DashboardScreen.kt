@@ -451,20 +451,6 @@ private fun CostRatiosCard(comparison: DashboardComparison, period: DashboardPer
             change = comparison.costPerKm,
             period = period,
         )
-        MetricRow(
-            label = stringResource(R.string.dashboard_cost_per_hour),
-            value = BrazilianFormatter.moneyOrUnavailable(metrics.costPerHour),
-            change = comparison.costPerHour,
-            period = period,
-        )
-        // Sem esta nota, quem somasse custo/hora ao lucro/hora e comparasse
-        // com o ganho/hora acharia a conta errada. A diferenca sao os custos
-        // fixos, que ficam fora do custo de rodar de proposito.
-        Text(
-            text = stringResource(R.string.dashboard_cost_per_hour_note),
-            style = MaterialTheme.typography.bodySmall,
-            color = MaterialTheme.colorScheme.onSurfaceVariant,
-        )
 
         // Sem dado de uso pessoal o app calcula com o que tem — e **diz isso**
         // (PRD §22). Antes da v0.9.1 a tela ficava calada, e um número

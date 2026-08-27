@@ -130,7 +130,6 @@ class DashboardComparisonTest {
         assertEquals(MetricChange.NoBaseline, r.netProfit)
         assertEquals(MetricChange.NoBaseline, r.totalRevenue)
         assertEquals(MetricChange.NoBaseline, r.costPerKm)
-        assertEquals(MetricChange.NoBaseline, r.costPerHour)
     }
 
     @Test
@@ -164,7 +163,6 @@ class DashboardComparisonTest {
         )
 
         assertEquals(MetricChange.NoBase, r.revenuePerHour)
-        assertEquals(MetricChange.NoBase, r.costPerHour)
     }
 
     @Test

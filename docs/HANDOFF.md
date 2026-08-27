@@ -50,19 +50,22 @@ gate verde.
 > em `PersonalUsageListViewModelTest`, escritos para reproduzir o defeito
 > antes de corrigi-lo.
 
-> **Dashboard ganhou custo por hora e comparação com o período anterior**
-> (commit `eec6bb0`). O custo por hora é **só o custo variável** do trabalho:
-> fixos ficam de fora pelo mesmo motivo que já ficam fora do custo por km, e
-> incluí-los mostraria a hora custando R$ 416,67 no dia em que o IPVA é pago
-> tendo-se trabalhado 3 horas. Consequência assumida: `ganho/hora − custo/hora`
-> não fecha em `lucro/hora`, e a diferença são os fixos — há nota na tela.
+> **Dashboard ganhou comparação com o período anterior** (commit `eec6bb0`).
+> Hoje compara com ontem, esta semana com a semana passada, este mês com o mês
+> anterior, e um período personalizado com o intervalo anterior de mesmo
+> tamanho. Duas armadilhas resolvidas e testadas: mês anterior é mês de
+> calendário, não deslocamento de dias (31 de março recuando 31 dias cairia em
+> fevereiro errado), e o módulo do anterior vai no denominador, senão prejuízo
+> que encolhe leria como piora. **Se subir é bom vive no domínio**, para a tela
+> não ter como pintar de verde um custo que aumentou.
 >
-> A comparação cobre os cinco períodos e o personalizado. Duas armadilhas
-> resolvidas e testadas: mês anterior é mês de calendário, não deslocamento de
-> dias (31 de março recuando 31 dias cairia em fevereiro errado), e o módulo do
-> anterior vai no denominador, senão prejuízo que encolhe leria como piora.
-> **Se subir é bom vive no domínio**, para a tela não ter como pintar de verde
-> um custo que aumentou. 419 testes.
+> ⚠️ **Um "custo por hora" foi implementado junto e depois removido**
+> (commit a seguir). Ele dividia o custo operacional do trabalho pelas horas
+> online, e ficou sem sentido na tela: como os custos fixos ficavam de fora,
+> `ganho/hora − custo/hora` não fechava em `lucro/hora`, e três números lado a
+> lado que não se somam confundem mais do que informam. A assimetria funciona
+> entre `costPerKm` e `fixedCostPerKm`, que estão em linhas separadas — não
+> funcionou para hora. Registrado para não ser reinventado sem resolver isso.
 
 > ⚠️ **A v0.14.0 foi publicada, e a tag dela aponta para fora da `main`.**
 > Este documento afirmava o contrário — que ela nunca tinha sido tagueada — e a
@@ -125,7 +128,7 @@ gate verde.
 | v0.12.0 Veículo atual | ✅ | **10** | ✅ |
 | v0.13.0 Exportar e importar arquivo | ✅ | 10 | ✅ |
 | v0.14.0 Nome e redesign visual (DriverPro) | ⚠️ tagueada **fora da main** | 10 | ✅ |
-| **v0.15.0** Identidade visual, abas fixas, feature-first, custo/hora e comparação | PR #23, gate verde | 10 | — |
+| **v0.15.0** Identidade visual, abas fixas, feature-first, comparação de períodos | PR #23, gate verde | 10 | — |
 
 O PRD §58 volta a valer: dá para fazer `git checkout v0.8.0` e reproduzir aquele
 estado.
@@ -324,7 +327,7 @@ estimado em si chega na v0.8.0.
 | v0.12.0 Veículo atual | ✅ |
 | v0.13.0 Exportar e importar arquivo | ✅ |
 | v0.14.0 Nome e redesign visual (DriverPro) | ⚠️ publicada, tag fora da main |
-| **v0.15.0 Identidade visual, abas fixas, feature-first, custo/hora e comparação** | ⬅️ PR #23, aguarda teste no aparelho |
+| **v0.15.0 Identidade visual, abas fixas, feature-first e comparação de períodos** | ⬅️ PR #23, aguarda teste no aparelho |
 | v0.16.0 Crash handling · v0.17.0 Testes de fluxo | |
 | v0.18.0 Analytics · v0.19.0 UX polish · v0.20.0 Hardening · v0.21.0 RC · v1.0.0 MVP | |
 

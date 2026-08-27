@@ -99,8 +99,6 @@
     <string name="reconcile_no_readings">Sem leituras de odômetro suficientes neste período para conferir.</string>
     <string name="dashboard_profit_per_km">Lucro por km</string>
     <string name="dashboard_profit_per_hour">Lucro por hora</string>
-    <string name="dashboard_cost_per_hour">Custo por hora</string>
-    <string name="dashboard_cost_per_hour_note">Só o custo de rodar: combustível, manutenção e afins, na parte que cabe ao trabalho. Custos fixos ficam fora, do mesmo jeito que ficam fora do custo por km.</string>
 
     <!-- Comparação com o período anterior -->
     <string name="dashboard_trend_change">%1$d%% %2$s</string>

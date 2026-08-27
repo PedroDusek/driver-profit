@@ -99,9 +99,6 @@ data class DashboardComparison(
     val costPerKm: MetricChange
         get() = compare(current.costPerKm, previous.costPerKm, MetricPolarity.LOWER_IS_BETTER)
 
-    val costPerHour: MetricChange
-        get() = compare(current.costPerHour, previous.costPerHour, MetricPolarity.LOWER_IS_BETTER)
-
     val profitPerKm: MetricChange
         get() = compare(current.profitPerKm, previous.profitPerKm, MetricPolarity.HIGHER_IS_BETTER)
 

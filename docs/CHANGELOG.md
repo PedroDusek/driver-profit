@@ -8,8 +8,8 @@ Versionamento conforme [Semantic Versioning](https://semver.org/lang/pt-BR/).
 ## [0.15.0] — Identidade visual e comparação de períodos
 
 Continua de onde a v0.14.0 parou. Traz a adaptação ao design de referência do
-Figma, a reorganização feature-first, a navegação por abas fixas, dois
-indicadores novos no dashboard e uma correção no aviso de conciliação.
+Figma, a reorganização feature-first, a navegação por abas fixas, a comparação
+com o período anterior no dashboard e uma correção no aviso de conciliação.
 
 Como a v0.14.0 foi tagueada a partir de um commit que nunca chegou à `main`
 (ver abaixo), esta é a primeira versão em que o rebrand entra na branch
@@ -20,24 +20,6 @@ já continha.
 entidade, e nenhum cálculo existente mudou de resultado.
 
 ### Adicionado
-
-- **Custo por hora** no dashboard, ao lado de "Lucro por hora". É **só o custo
-  variável** do trabalho (`workOperationalCost ÷ horas online`). Custo fixo
-  fica de fora pelo mesmo motivo que já fica fora do custo por km — seguro,
-  IPVA e financiamento não variam com quanto se roda nem com quantas horas se
-  trabalha. O caso que decidiu isso: no dia em que o IPVA de R$ 1.200 é pago
-  tendo-se trabalhado 3 horas, incluir os fixos mostraria a hora custando
-  R$ 416,67.
-
-  O numerador é a **fatia de trabalho** da despesa operacional, e não a despesa
-  inteira: hora online é 100% trabalho. No custo por km o rateio se cancela
-  algebricamente e por isso lá os totais podem ser usados dos dois lados; aqui
-  não existe "hora pessoal", então o cancelamento não vale.
-
-  Consequência assumida e testada: `ganho/hora − custo/hora` **não** fecha em
-  `lucro/hora`, e a diferença são os custos fixos — a mesma assimetria que já
-  existe entre `costPerKm` e `fixedCostPerKm`. Há nota na tela explicando,
-  senão a conta pareceria errada para quem conferisse na calculadora.
 
 - **Comparação com o período anterior equivalente.** Hoje compara com ontem,
   esta semana com a semana passada, este mês com o mês anterior, e um período
